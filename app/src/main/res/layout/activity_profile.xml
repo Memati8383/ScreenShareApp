@@ -39,355 +39,376 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
             app:title="Profil"
-            app:titleTextColor="@android:color/white"
+            app:titleTextColor="?android:textColorPrimary"
             app:navigationIcon="@drawable/ic_back"
-            app:navigationIconTint="@android:color/white" />
+            app:navigationIconTint="?android:textColorPrimary" />
 
-        <!-- Empty State (Profile Not Created) -->
-        <LinearLayout
-            android:id="@+id/layoutEmpty"
+        <!-- Create Form (Profile Not Created) -->
+        <ScrollView
+            android:id="@+id/createForm"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:paddingHorizontal="32dp"
+            android:fillViewport="true"
             android:visibility="visible">
 
-            <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:src="@drawable/ic_person"
-                android:layout_marginBottom="24dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Profil Oluştur"
-                android:textColor="@android:color/white"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingHorizontal="32dp"
+                android:paddingVertical="32dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Kişisel bilgilerinizi girerek başlayın"
-                android:textColor="#99FFFFFF"
-                android:textSize="14sp"
-                android:layout_marginBottom="32dp" />
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/ic_person"
+                    android:layout_marginBottom="24dp" />
 
-            <!-- Name -->
-            <EditText
-                android:id="@+id/etName"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:background="@drawable/bg_input"
-                android:hint="Adınız Soyadınız"
-                android:textColorHint="#4DFFFFFF"
-                android:textColor="@android:color/white"
-                android:textSize="15sp"
-                android:paddingHorizontal="16dp"
-                android:inputType="textPersonName"
-                android:singleLine="true"
-                android:layout_marginBottom="12dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Profil Oluştur"
+                    android:textColor="?android:textColorPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
 
-            <!-- Email -->
-            <EditText
-                android:id="@+id/etEmail"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:background="@drawable/bg_input"
-                android:hint="E-posta adresiniz"
-                android:textColorHint="#4DFFFFFF"
-                android:textColor="@android:color/white"
-                android:textSize="15sp"
-                android:paddingHorizontal="16dp"
-                android:inputType="textEmailAddress"
-                android:singleLine="true"
-                android:layout_marginBottom="24dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kişisel bilgilerinizi girerek başlayın"
+                    android:textColor="?android:textColorSecondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="32dp" />
 
-            <!-- Save Button -->
-            <Button
-                android:id="@+id/btnSave"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:background="@drawable/bg_button_primary"
-                android:text="BAŞLA"
-                android:textColor="@android:color/white"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.1"
-                android:stateListAnimator="@null" />
+                <EditText
+                    android:id="@+id/nameInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_input"
+                    android:hint="Adınız Soyadınız"
+                    android:textColorHint="#4DFFFFFF"
+                    android:textColor="?android:textColorPrimary"
+                    android:textSize="15sp"
+                    android:paddingHorizontal="16dp"
+                    android:inputType="textPersonName"
+                    android:singleLine="true"
+                    android:layout_marginBottom="12dp" />
 
-        </LinearLayout>
+                <EditText
+                    android:id="@+id/emailInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_input"
+                    android:hint="E-posta adresiniz"
+                    android:textColorHint="#4DFFFFFF"
+                    android:textColor="?android:textColorPrimary"
+                    android:textSize="15sp"
+                    android:paddingHorizontal="16dp"
+                    android:inputType="textEmailAddress"
+                    android:singleLine="true"
+                    android:layout_marginBottom="24dp" />
+
+                <Button
+                    android:id="@+id/saveBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_button_primary"
+                    android:text="KAYDET"
+                    android:textColor="@android:color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"
+                    android:stateListAnimator="@null" />
+
+            </LinearLayout>
+        </ScrollView>
 
         <!-- Profile View (Profile Created) -->
-        <LinearLayout
-            android:id="@+id/layoutProfile"
+        <ScrollView
+            android:id="@+id/profileView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:fillViewport="true"
             android:visibility="gone">
 
-            <ScrollView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fillViewport="true"
-                android:overScrollMode="never">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="24dp"
+                android:paddingBottom="32dp">
 
+                <!-- Profile Header -->
                 <LinearLayout
+                    android:id="@+id/profileHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
                     android:orientation="vertical"
-                    android:gravity="center_horizontal"
-                    android:paddingHorizontal="24dp"
-                    android:paddingBottom="32dp">
+                    android:padding="24dp"
+                    android:gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp">
 
-                    <!-- Profile Card -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_glass_card"
-                        android:orientation="vertical"
-                        android:padding="24dp"
-                        android:gravity="center"
-                        android:layout_marginTop="16dp"
+                    <FrameLayout
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
                         android:layout_marginBottom="16dp">
 
-                        <FrameLayout
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:layout_marginBottom="16dp">
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_avatar_glass" />
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_avatar_glass" />
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_person" />
+                    </FrameLayout>
 
-                            <ImageView
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_person" />
-                        </FrameLayout>
+                    <TextView
+                        android:id="@+id/profileName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Kullanıcı"
+                        android:textColor="?android:textColorPrimary"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/profileEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="email@email.com"
+                        android:textColor="?android:textColorSecondary"
+                        android:textSize="13sp"
+                        android:layout_marginTop="4dp" />
+
+                    <View
+                        android:layout_width="60dp"
+                        android:layout_height="2dp"
+                        android:background="@drawable/bg_divider_glass"
+                        android:layout_marginTop="16dp" />
+                </LinearLayout>
+
+                <!-- Stats Row -->
+                <LinearLayout
+                    android:id="@+id/statsCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_glass_card"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center"
+                        android:layout_marginEnd="8dp">
 
                         <TextView
-                            android:id="@+id/tvUserName"
+                            android:id="@+id/statRooms"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Kullanıcı"
-                            android:textColor="@android:color/white"
-                            android:textSize="22sp"
+                            android:text="0"
+                            android:textColor="@color/accent"
+                            android:textSize="28sp"
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/tvEmail"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="email@email.com"
-                            android:textColor="#99FFFFFF"
-                            android:textSize="13sp"
+                            android:text="Oturum"
+                            android:textColor="?android:textColorSecondary"
+                            android:textSize="11sp"
                             android:layout_marginTop="4dp" />
-
-                        <View
-                            android:layout_width="60dp"
-                            android:layout_height="2dp"
-                            android:background="@drawable/bg_divider_glass"
-                            android:layout_marginTop="16dp" />
                     </LinearLayout>
 
-                    <!-- Stats Row -->
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_glass_card"
-                            android:orientation="vertical"
-                            android:padding="16dp"
-                            android:gravity="center"
-                            android:layout_marginEnd="8dp">
-
-                            <TextView
-                                android:id="@+id/tvSessionCount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textColor="#00B4FF"
-                                android:textSize="28sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Oturum"
-                                android:textColor="#99FFFFFF"
-                                android:textSize="11sp"
-                                android:layout_marginTop="4dp" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_glass_card"
-                            android:orientation="vertical"
-                            android:padding="16dp"
-                            android:gravity="center"
-                            android:layout_marginStart="8dp">
-
-                            <TextView
-                                android:id="@+id/tvTotalTime"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0dk"
-                                android:textColor="#00B4FF"
-                                android:textSize="28sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Toplam Süre"
-                                android:textColor="#99FFFFFF"
-                                android:textSize="11sp"
-                                android:layout_marginTop="4dp" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Menu Items -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:background="@drawable/bg_glass_card"
                         android:orientation="vertical"
-                        android:padding="8dp">
+                        android:padding="16dp"
+                        android:gravity="center"
+                        android:layout_marginStart="8dp">
 
-                        <LinearLayout
-                            android:id="@+id/btnEditProfile"
-                            android:layout_width="match_parent"
-                            android:layout_height="52dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:paddingHorizontal="16dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="@drawable/bg_selector">
+                        <TextView
+                            android:id="@+id/statHours"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="@color/accent"
+                            android:textSize="28sp"
+                            android:textStyle="bold" />
 
-                            <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/ic_person"
-                                android:layout_marginEnd="14dp" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Profili Düzenle"
-                                android:textColor="@android:color/white"
-                                android:textSize="15sp" />
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:src="@drawable/ic_arrow_right"
-                                android:alpha="0.5" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#1AFFFFFF"
-                            android:layout_marginHorizontal="16dp" />
-
-                        <LinearLayout
-                            android:id="@+id/btnNotifications"
-                            android:layout_width="match_parent"
-                            android:layout_height="52dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:paddingHorizontal="16dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="@drawable/bg_selector">
-
-                            <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/ic_settings"
-                                android:layout_marginEnd="14dp" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Bildirim Ayarları"
-                                android:textColor="@android:color/white"
-                                android:textSize="15sp" />
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:src="@drawable/ic_arrow_right"
-                                android:alpha="0.5" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#1AFFFFFF"
-                            android:layout_marginHorizontal="16dp" />
-
-                        <LinearLayout
-                            android:id="@+id/btnPrivacy"
-                            android:layout_width="match_parent"
-                            android:layout_height="52dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:paddingHorizontal="16dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="@drawable/bg_selector">
-
-                            <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/ic_lock"
-                                android:layout_marginEnd="14dp" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Gizlilik"
-                                android:textColor="@android:color/white"
-                                android:textSize="15sp" />
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:src="@drawable/ic_arrow_right"
-                                android:alpha="0.5" />
-                        </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Toplam Süre"
+                            android:textColor="?android:textColorSecondary"
+                            android:textSize="11sp"
+                            android:layout_marginTop="4dp" />
                     </LinearLayout>
+                </LinearLayout>
+
+                <!-- Menu Items -->
+                <LinearLayout
+                    android:id="@+id/menuCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <LinearLayout
+                        android:id="@+id/menuSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="@drawable/bg_selector">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_settings"
+                            android:layout_marginEnd="14dp" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Ayarlar"
+                            android:textColor="?android:textColorPrimary"
+                            android:textSize="15sp" />
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_arrow_right"
+                            android:alpha="0.5" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#1AFFFFFF"
+                        android:layout_marginHorizontal="16dp" />
+
+                    <LinearLayout
+                        android:id="@+id/menuHelp"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="@drawable/bg_selector">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_help"
+                            android:layout_marginEnd="14dp" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Yardım"
+                            android:textColor="?android:textColorPrimary"
+                            android:textSize="15sp" />
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_arrow_right"
+                            android:alpha="0.5" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#1AFFFFFF"
+                        android:layout_marginHorizontal="16dp" />
+
+                    <LinearLayout
+                        android:id="@+id/menuAbout"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="@drawable/bg_selector">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_info"
+                            android:layout_marginEnd="14dp" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Hakkında"
+                            android:textColor="?android:textColorPrimary"
+                            android:textSize="15sp" />
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_arrow_right"
+                            android:alpha="0.5" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Logout -->
+                <LinearLayout
+                    android:id="@+id/btnLogout"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginTop="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Screen Mirror v1.0.0"
-                        android:textColor="#4DFFFFFF"
-                        android:textSize="11sp"
-                        android:layout_marginTop="16dp" />
-
+                        android:text="Profili Sil"
+                        android:textColor="@color/dark_status_error"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
-            </ScrollView>
-        </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Screen Mirror v1.0.0"
+                    android:textColor="#4DFFFFFF"
+                    android:textSize="11sp"
+                    android:layout_marginTop="16dp" />
+
+            </LinearLayout>
+        </ScrollView>
 
     </LinearLayout>
 

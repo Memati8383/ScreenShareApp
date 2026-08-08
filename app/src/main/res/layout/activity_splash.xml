@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_dark">
+    android:background="?android:windowBackground">
 
     <ImageView
         android:id="@+id/splash_bg"
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="@string/splash_title"
-            android:textColor="@color/text_primary"
+            android:textColor="?android:textColorPrimary"
             android:textSize="36sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium"
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/splash_subtitle"
-            android:textColor="@color/text_secondary"
+            android:textColor="?android:textColorSecondary"
             android:textSize="16sp"
             android:alpha="0" />
     </LinearLayout>

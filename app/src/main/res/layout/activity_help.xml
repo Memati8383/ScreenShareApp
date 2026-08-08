@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_dark"
+    android:background="?android:windowBackground"
     android:orientation="vertical"
     android:fitsSystemWindows="true">
 
@@ -11,10 +11,10 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/bg_card"
-        app:titleTextColor="@color/text_primary"
+        android:background="@android:color/transparent"
+        app:titleTextColor="?android:textColorPrimary"
         app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="@color/text_primary" />
+        app:navigationIconTint="?android:textColorPrimary" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Nasil Calisir?"
-                    android:textColor="@color/text_primary"
+                    android:textColor="?android:textColorPrimary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -69,7 +69,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="ScreenShare, WebRTC teknolojisi kullanarak iki cihaz arasinda ekran paylasimi yapmanizi saglar.\n\n1. Ayni oda adini her iki cihazda da girin\n2. Bir cihazda 'Yayinla', digerinde 'Izle' secin\n3. Baglanti otomatik olarak kurulacak"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="?android:textColorSecondary"
                     android:textSize="14sp"
                     android:lineSpacingExtra="4dp" />
             </LinearLayout>
@@ -90,7 +90,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Ekran Yayini Nasil Baslatilir?"
-                    android:textColor="@color/text_primary"
+                    android:textColor="?android:textColorPrimary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -116,7 +116,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="1. Ana sayfada oda adini girin\n2. 'Yayinla (Host)' secenegine tiklayin\n3. 'Yayinla' butonuna basin\n4. Ekr paylasim iznini onaylayin\n5. Diger cihazin baglanmasini bekleyin"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="?android:textColorSecondary"
                     android:textSize="14sp"
                     android:lineSpacingExtra="4dp" />
             </LinearLayout>
@@ -137,7 +137,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Ekran Yayini Nasil Izlenir?"
-                    android:textColor="@color/text_primary"
+                    android:textColor="?android:textColorPrimary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -163,7 +163,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="1. Ana sayfada ayni oda adini girin\n2. 'Izle (Client)' secenegine tiklayin\n3. 'Izle' butonuna basin\n4. Yayinci cihazin baglanmasini bekleyin\n5. Ekran yayini otomatik olarak baslayacak"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="?android:textColorSecondary"
                     android:textSize="14sp"
                     android:lineSpacingExtra="4dp" />
             </LinearLayout>
@@ -184,7 +184,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Sorun Giderme"
-                    android:textColor="@color/text_primary"
+                    android:textColor="?android:textColorPrimary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -210,7 +210,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="• Baglanti sorunu: Internet baglantinizi kontrol edin\n• Gecikme: WiFi agina baglanmayi deneyin\n• Ekran paylasimi baslamadi: Izinleri kontrol edin\n• Uygulama crasladi: Uygulamayi yeniden baslatin"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="?android:textColorSecondary"
                     android:textSize="14sp"
                     android:lineSpacingExtra="4dp" />
             </LinearLayout>
@@ -231,7 +231,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Sikca Sorulan Sorular"
-                    android:textColor="@color/text_primary"
+                    android:textColor="?android:textColorPrimary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -257,7 +257,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="S: Ayni anda kac cihaz baglanabilir?\nC: Su an icin 2 cihaz (1 yayinci + 1 izleyici)\n\nS: Internet baglantisi gerekli mi?\nC: Evet, her iki cihazin da internete bagli olmasi gerekir\n\nS: Ucretsiz mi?\nC: Evet, uygulama tamamen ucretsizdir"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="?android:textColorSecondary"
                     android:textSize="14sp"
                     android:lineSpacingExtra="4dp" />
             </LinearLayout>

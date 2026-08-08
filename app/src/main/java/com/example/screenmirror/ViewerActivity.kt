@@ -1,225 +1,203 @@
 package com.example.screenmirror
 
-import android.content.ContentValues
+import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
-import android.provider.MediaStore
-import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import org.webrtc.SurfaceViewRenderer
+import androidx.core.content.ContextCompat
+import com.google.android.material.appbar.MaterialToolbar
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 class ViewerActivity : AppCompatActivity() {
 
-    private lateinit var renderer: SurfaceViewRenderer
-    private lateinit var controlPanel: LinearLayout
-    private lateinit var waitingOverlay: LinearLayout
-    private lateinit var tvStatus: TextView
+    private lateinit var tvViewerStatus: TextView
     private lateinit var tvStats: TextView
     private lateinit var tvViewerCount: TextView
-    private lateinit var tvViewerLabel: TextView
     private lateinit var tvConnectionQuality: TextView
-    private lateinit var statusDot: View
+    private lateinit var btnScreenshot: View
+    private lateinit var btnDisconnect: Button
+    private lateinit var controlPanel: View
+
+    private var receiver: BroadcastReceiver? = null
+    private var startTime = 0L
     private val handler = Handler(Looper.getMainLooper())
-    private var panelVisible = false
+    private var statsCheckerRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppSettings.applyTheme(this)
         super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.activity_viewer)
 
-        renderer = findViewById(R.id.viewerSurface)
-        controlPanel = findViewById(R.id.controlPanel)
-        waitingOverlay = findViewById(R.id.waitingOverlay)
-        tvStatus = findViewById(R.id.tvViewerStatus)
+        createNotificationChannel()
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        tvViewerStatus = findViewById(R.id.tvViewerStatus)
         tvStats = findViewById(R.id.tvStats)
         tvViewerCount = findViewById(R.id.tvViewerCount)
-        tvViewerLabel = findViewById(R.id.tvViewerLabel)
         tvConnectionQuality = findViewById(R.id.tvConnectionQuality)
-        statusDot = findViewById(R.id.statusDot)
+        btnScreenshot = findViewById(R.id.btnScreenshot)
+        btnDisconnect = findViewById(R.id.btnDisconnect)
+        controlPanel = findViewById(R.id.controlPanel)
 
-        val room = intent.getStringExtra("room") ?: ""
+        startTime = System.currentTimeMillis()
+        registerReceiver()
+        startStatsChecker()
 
-        ScreenShareService.renderer = renderer
-        ScreenShareService.onState = { s ->
-            handler.post { updateState(s) }
+        tvConnectionQuality.visibility = if (AppSettings.isQualityStatsEnabled(this)) View.VISIBLE else View.GONE
+
+        tvStats.text = getString(R.string.viewer_stats)
+
+        btnDisconnect.setOnClickListener { showDisconnectConfirmation() }
+        btnScreenshot.setOnClickListener { takeScreenshot() }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "viewer_channel",
+                "Ekran İzleme",
+                NotificationManager.IMPORTANCE_LOW
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
         }
-        ScreenShareService.onViewerCountChanged = { count ->
-            handler.post {
-                tvViewerCount.text = count.toString()
-                tvViewerLabel.text = if (count == 1) "İzleyici" else "İzleyici"
-            }
-        }
-        ScreenShareService.onConnectionQuality = { quality ->
-            handler.post {
-                if (AppSettings.isQualityStatsEnabled(this)) {
-                    val parts = quality.split("|")
-                    val level = parts[0]
-                    val stats = if (parts.size > 1) parts[1] else ""
-                    val color = when (level) {
-                        "IYI" -> resources.getColor(R.color.status_good, null)
-                        "ORTA" -> resources.getColor(R.color.status_warn, null)
-                        else -> resources.getColor(R.color.status_bad, null)
+    }
+
+    private fun registerReceiver() {
+        receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                when (intent.action) {
+                    "com.example.screenmirror.SENDER_DISCONNECTED" -> {
+                        runOnUiThread {
+                            tvViewerStatus.text = getString(R.string.status_disconnected)
+                            Toast.makeText(context, "Yayın sona erdi", Toast.LENGTH_SHORT).show()
+                            handler.postDelayed({ finish() }, 2000)
+                        }
                     }
-                    tvConnectionQuality.text = stats
-                    tvConnectionQuality.setTextColor(color)
-                    tvConnectionQuality.visibility = View.VISIBLE
-                } else {
-                    tvConnectionQuality.visibility = View.GONE
+                    "com.example.screenmirror.VIEWER_COUNT_CHANGED" -> {
+                        val count = intent.getIntExtra("viewer_count", 0)
+                        runOnUiThread { tvViewerCount.text = count.toString() }
+                    }
+                    "com.example.screenmirror.CONNECTION_QUALITY" -> {
+                        val rtt = intent.getIntExtra("rtt", 0)
+                        val fps = intent.getIntExtra("fps", 0)
+                        val packetLoss = intent.getDoubleExtra("packet_loss", 0.0)
+                        runOnUiThread {
+                            if (!AppSettings.isQualityStatsEnabled(this@ViewerActivity)) {
+                                tvConnectionQuality.visibility = View.GONE
+                                return@runOnUiThread
+                            }
+                            tvConnectionQuality.visibility = View.VISIBLE
+                            tvConnectionQuality.text = "RTT: ${rtt}ms | FPS: $fps | Kayıp: %.1f%%".format(packetLoss)
+
+                            val color = when {
+                                rtt < 100 && packetLoss < 1 -> ContextCompat.getColor(context, R.color.dark_status_good)
+                                rtt < 200 && packetLoss < 3 -> ContextCompat.getColor(context, R.color.dark_status_warning)
+                                else -> ContextCompat.getColor(context, R.color.dark_status_error)
+                            }
+                            tvConnectionQuality.setTextColor(color)
+                        }
+                    }
                 }
             }
         }
 
-        renderer.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                togglePanel()
+        val filter = IntentFilter().apply {
+            addAction("com.example.screenmirror.SENDER_DISCONNECTED")
+            addAction("com.example.screenmirror.VIEWER_COUNT_CHANGED")
+            addAction("com.example.screenmirror.CONNECTION_QUALITY")
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(receiver, filter)
+        }
+    }
+
+    private fun showDisconnectConfirmation() {
+        val dialogTheme = if (AppSettings.isDarkTheme(this)) {
+            R.style.Theme_ScreenShare_Dialog
+        } else {
+            R.style.Theme_ScreenShare_Light_Dialog
+        }
+        AlertDialog.Builder(this, dialogTheme)
+            .setTitle("Bağlantıyı Kes")
+            .setMessage("Yayından ayrılmak istediğinize emin misiniz?")
+            .setPositiveButton("Ayrıl") { _, _ -> cleanupAndFinish() }
+            .setNegativeButton("İptal", null)
+            .show()
+    }
+
+    private fun cleanupAndFinish() {
+        sendBroadcast(Intent("com.example.screenmirror.DISCONNECT_VIEWER").apply {
+            setPackage(packageName)
+        })
+        try { receiver?.let { unregisterReceiver(it) } } catch (_: Exception) {}
+        statsCheckerRunnable?.let { handler.removeCallbacks(it) }
+        finish()
+    }
+
+    private fun startStatsChecker() {
+        statsCheckerRunnable = object : Runnable {
+            override fun run() {
+                if (!AppSettings.isQualityStatsEnabled(this@ViewerActivity)) {
+                    tvConnectionQuality.visibility = View.GONE
+                    handler.postDelayed(this, 2000)
+                    return
+                }
+                sendBroadcast(Intent("com.example.screenmirror.REQUEST_STATS").apply {
+                    setPackage(packageName)
+                })
+                handler.postDelayed(this, 2000)
             }
-            true
         }
-
-        findViewById<View>(R.id.btnDisconnect).setOnClickListener {
-            stopService(Intent(this, ScreenShareService::class.java))
-            finish()
-        }
-
-        findViewById<View>(R.id.btnScreenshot).setOnClickListener {
-            takeScreenshot()
-        }
-
-        renderer.postDelayed({
-            val svc = Intent(this, ScreenShareService::class.java).apply {
-                putExtra("role", "viewer")
-                putExtra("room", room)
-            }
-            if (android.os.Build.VERSION.SDK_INT >= 26) startForegroundService(svc) else startService(svc)
-        }, 500)
+        handler.postDelayed(statsCheckerRunnable!!, 2000)
     }
 
     private fun takeScreenshot() {
-        try {
-            val bitmap = Bitmap.createBitmap(renderer.width, renderer.height, Bitmap.Config.ARGB_8888)
-            android.view.PixelCopy.request(renderer, null, bitmap, { result ->
-                if (result == android.view.PixelCopy.SUCCESS) {
-                    saveScreenshot(bitmap)
-                } else {
-                    handler.post { Toast.makeText(this, "Ekran goruntusu alinamadi", Toast.LENGTH_SHORT).show() }
-                }
-            }, handler)
-        } catch (e: Exception) {
-            Toast.makeText(this, "Ekran goruntusu alinamadi", Toast.LENGTH_SHORT).show()
+        val screenView = window.decorView.rootView
+        screenView.isDrawingCacheEnabled = true
+        val bitmap = Bitmap.createBitmap(screenView.drawingCache)
+        screenView.isDrawingCacheEnabled = false
+
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val filename = "screenmirror_viewer_$timestamp.png"
+
+        val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(
+            android.os.Environment.DIRECTORY_PICTURES
+        )
+        val screenmirrorDir = File(picturesDir, "ScreenMirror")
+        if (!screenmirrorDir.exists()) screenmirrorDir.mkdirs()
+
+        val file = File(screenmirrorDir, filename)
+        FileOutputStream(file).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
         }
-    }
-
-    private fun saveScreenshot(bitmap: Bitmap) {
-        try {
-            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-            val filename = "ScreenMirror_Izleyici_$timestamp.png"
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val values = ContentValues().apply {
-                    put(MediaStore.Images.Media.DISPLAY_NAME, filename)
-                    put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-                    put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/ScreenMirror")
-                }
-                val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-                uri?.let {
-                    contentResolver.openOutputStream(it)?.use { os ->
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
-                    }
-                }
-            } else {
-                val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                val dir = File(path, "ScreenMirror")
-                dir.mkdirs()
-                val file = File(dir, filename)
-                FileOutputStream(file).use { os ->
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
-                }
-            }
-
-            bitmap.recycle()
-            handler.post { Toast.makeText(this, "Ekran goruntusu kaydedildi", Toast.LENGTH_SHORT).show() }
-        } catch (e: Exception) {
-            handler.post { Toast.makeText(this, "Ekran goruntusu kaydedilemedi", Toast.LENGTH_SHORT).show() }
-        }
-    }
-
-    private fun togglePanel() {
-        panelVisible = !panelVisible
-        controlPanel.visibility = if (panelVisible) View.VISIBLE else View.GONE
-        if (panelVisible) {
-            handler.postDelayed({ panelVisible = false; controlPanel.visibility = View.GONE }, 4000)
-        }
-    }
-
-    private fun updateState(state: String) {
-        when {
-            state.contains("ICE: CONNECTED") -> {
-                waitingOverlay.visibility = View.GONE
-                tvStats.text = "Baglanti aktif"
-                statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    resources.getColor(R.color.status_good, null))
-            }
-            state.contains("ICE: DISCONNECTED") -> {
-                tvStats.text = "Baglanti kesildi"
-                statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    resources.getColor(R.color.status_bad, null))
-            }
-            state.contains("ICE: FAILED") -> {
-                tvStats.text = "Baglanti hatasi"
-                statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    resources.getColor(R.color.status_bad, null))
-            }
-            state.contains("ICE: CHECKING") -> {
-                tvStats.text = "Baglanti kontrol ediliyor..."
-                statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    resources.getColor(R.color.status_warn, null))
-            }
-            state.contains("Es cihaz") -> {
-                tvStats.text = "Yayinci baglandi, bekleniyor..."
-            }
-            state.contains("Canli goruntu") -> {
-                waitingOverlay.visibility = View.GONE
-                tvStats.text = "Canli goruntu"
-            }
-            state.contains("donduruldu") -> {
-                tvStats.text = "Yayin donduruldu"
-            }
-            state.contains("devam ediyor") -> {
-                tvStats.text = "Yayin devam ediyor"
-            }
-            state.contains("Izleyici ayrildi") -> {
-                tvStats.text = "Izleyici ayrildi"
-            }
-            else -> {
-                tvStatus.text = state
-            }
-        }
+        Toast.makeText(this, "Ekran görüntüsü kaydedildi: $filename", Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        handler.removeCallbacksAndMessages(null)
-        try {
-            stopService(Intent(this, ScreenShareService::class.java))
-        } catch (_: Exception) {}
-        ScreenShareService.renderer = null
-        ScreenShareService.onState = null
-        ScreenShareService.onViewerCountChanged = null
-        ScreenShareService.onConnectionQuality = null
+        try { receiver?.let { unregisterReceiver(it) } } catch (_: Exception) {}
+        statsCheckerRunnable?.let { handler.removeCallbacks(it) }
     }
 }

@@ -46,7 +46,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
             app:navigationIcon="@drawable/ic_back"
-            app:navigationIconTint="@android:color/white" />
+            app:navigationIconTint="?android:textColorPrimary" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -99,7 +99,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Screen Mirror"
-                        android:textColor="@android:color/white"
+                        android:textColor="?android:textColorPrimary"
                         android:textSize="26sp"
                         android:textStyle="bold"
                         android:fontFamily="sans-serif-medium"
@@ -109,7 +109,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Sürüm 1.0.0 (Build 1)"
-                        android:textColor="#B3FFFFFF"
+                        android:textColor="?android:textColorSecondary"
                         android:textSize="13sp"
                         android:layout_marginTop="4dp" />
 
@@ -123,7 +123,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="WebRTC tabanlı gerçek zamanlı ekran paylaşımı. Kolay kurulum, düşük gecikme, güvenli bağlantı."
-                        android:textColor="#CCFFFFFF"
+                        android:textColor="?android:textColorSecondary"
                         android:textSize="13sp"
                         android:gravity="center"
                         android:lineSpacingExtra="4dp"
@@ -143,7 +143,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="YENİLİKLER"
-                        android:textColor="#80FFFFFF"
+                        android:textColor="?android:textColorSecondary"
                         android:textSize="11sp"
                         android:letterSpacing="0.15"
                         android:layout_marginBottom="12dp" />
@@ -152,7 +152,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="✓ Bulut üzerinden ekran paylaşımı\n✓ Düşük gecikme süresi\n✓ Güvenli SSL/WSS bağlantısı\n✓ Kolay oda oluşturma\n✓ Son oturum geçmişi"
-                        android:textColor="#CCFFFFFF"
+                        android:textColor="?android:textColorSecondary"
                         android:textSize="13sp"
                         android:lineSpacingExtra="6dp" />
                 </LinearLayout>
@@ -171,7 +171,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="ÖZELLİKLER"
-                        android:textColor="#80FFFFFF"
+                        android:textColor="?android:textColorSecondary"
                         android:textSize="11sp"
                         android:letterSpacing="0.15"
                         android:layout_marginBottom="16dp" />
@@ -208,14 +208,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Anlık Ekran Paylaşımı"
-                                android:textColor="@android:color/white"
+                                android:textColor="?android:textColorPrimary"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Gerçek zamanlı HD ekran yayını"
-                                android:textColor="#99FFFFFF"
+                                android:textColor="?android:textColorSecondary"
                                 android:textSize="12sp"
                                 android:layout_marginTop="2dp" />
                         </LinearLayout>
@@ -253,14 +253,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Düşük Gecikme"
-                                android:textColor="@android:color/white"
+                                android:textColor="?android:textColorPrimary"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="WebRTC ile milisaniyeler içinde"
-                                android:textColor="#99FFFFFF"
+                                android:textColor="?android:textColorSecondary"
                                 android:textSize="12sp"
                                 android:layout_marginTop="2dp" />
                         </LinearLayout>
@@ -298,14 +298,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Bulut Çözümü"
-                                android:textColor="@android:color/white"
+                                android:textColor="?android:textColorPrimary"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Her yerden bağlanın, sınır yok"
-                                android:textColor="#99FFFFFF"
+                                android:textColor="?android:textColorSecondary"
                                 android:textSize="12sp"
                                 android:layout_marginTop="2dp" />
                         </LinearLayout>
@@ -343,14 +343,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Kolay Bağlantı"
-                                android:textColor="@android:color/white"
+                                android:textColor="?android:textColorPrimary"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Tek oda adı ile hızlı kurulum"
-                                android:textColor="#99FFFFFF"
+                                android:textColor="?android:textColorSecondary"
                                 android:textSize="12sp"
                                 android:layout_marginTop="2dp" />
                         </LinearLayout>
@@ -388,14 +388,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Güvenli İletişim"
-                                android:textColor="@android:color/white"
+                                android:textColor="?android:textColorPrimary"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="SSL/WSS ile şifreli bağlantı"
-                                android:textColor="#99FFFFFF"
+                                android:textColor="?android:textColorSecondary"
                                 android:textSize="12sp"
                                 android:layout_marginTop="2dp" />
                         </LinearLayout>
@@ -432,14 +432,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Tam Ekran Modu"
-                                android:textColor="@android:color/white"
+                                android:textColor="?android:textColorPrimary"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Kesintisiz izleme deneyimi"
-                                android:textColor="#99FFFFFF"
+                                android:textColor="?android:textColorSecondary"
                                 android:textSize="12sp"
                                 android:layout_marginTop="2dp" />
                         </LinearLayout>
@@ -482,7 +482,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Geliştirici"
-                            android:textColor="#80FFFFFF"
+                            android:textColor="?android:textColorSecondary"
                             android:textSize="11sp"
                             android:letterSpacing="0.1" />
 
@@ -490,7 +490,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Ferit Akdemir"
-                            android:textColor="@android:color/white"
+                            android:textColor="?android:textColorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:layout_marginTop="2dp" />
@@ -499,7 +499,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="akdemirferit608@gmail.com"
-                            android:textColor="#80FFFFFF"
+                            android:textColor="?android:textColorSecondary"
                             android:textSize="12sp"
                             android:layout_marginTop="2dp" />
                     </LinearLayout>
@@ -513,7 +513,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Basit olan karmaşıktır, karmaşık olan basittir."
-                    android:textColor="#4D00B4FF"
+                    android:textColor="@color/accent"
                     android:textSize="12sp"
                     android:textStyle="italic"
                     android:gravity="center"

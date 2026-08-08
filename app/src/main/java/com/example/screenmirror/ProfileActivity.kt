@@ -1,105 +1,147 @@
 package com.example.screenmirror
 
+import android.animation.ObjectAnimator
 import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
+import android.view.animation.OvershootInterpolator
 import android.widget.EditText
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.screenmirror.data.RoomHistoryManager
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.button.MaterialButton
 
 class ProfileActivity : AppCompatActivity() {
 
-    private lateinit var layoutEmpty: LinearLayout
-    private lateinit var layoutProfile: LinearLayout
-    private lateinit var etName: EditText
-    private lateinit var etEmail: EditText
-    private lateinit var tvUserName: TextView
-    private lateinit var tvEmail: TextView
+    private lateinit var prefs: SharedPreferences
+    private lateinit var nameInput: EditText
+    private lateinit var emailInput: EditText
+    private lateinit var saveBtn: MaterialButton
+    private lateinit var profileView: ScrollView
+    private lateinit var createForm: ScrollView
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppSettings.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
+
+        prefs = getSharedPreferences("user_profile", Context.MODE_PRIVATE)
 
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
+        supportActionBar?.title = getString(R.string.nav_profile)
+
         toolbar.setNavigationOnClickListener { finish() }
 
-        layoutEmpty = findViewById(R.id.layoutEmpty)
-        layoutProfile = findViewById(R.id.layoutProfile)
-        etName = findViewById(R.id.etName)
-        etEmail = findViewById(R.id.etEmail)
-        tvUserName = findViewById(R.id.tvUserName)
-        tvEmail = findViewById(R.id.tvEmail)
+        profileView = findViewById(R.id.profileView)
+        createForm = findViewById(R.id.createForm)
+        nameInput = findViewById(R.id.nameInput)
+        emailInput = findViewById(R.id.emailInput)
+        saveBtn = findViewById(R.id.saveBtn)
 
-        loadProfile()
+        if (hasProfile()) {
+            showProfile()
+        } else {
+            showCreateForm()
+        }
 
-        findViewById<Button>(R.id.btnSave).setOnClickListener { saveProfile() }
-        findViewById<View>(R.id.btnEditProfile).setOnClickListener {
-            Toast.makeText(this, "Profili düzenleme yakında", Toast.LENGTH_SHORT).show()
+        saveBtn.setOnClickListener {
+            val name = nameInput.text.toString().trim()
+            val email = emailInput.text.toString().trim()
+            if (name.isEmpty()) {
+                nameInput.error = "İsim gerekli"
+                return@setOnClickListener
+            }
+            saveProfile(name, email)
+            Toast.makeText(this, if (profileView.visibility == View.VISIBLE) "Profil güncellendi" else "Profil kaydedildi", Toast.LENGTH_SHORT).show()
+            showProfile()
         }
-        findViewById<View>(R.id.btnNotifications).setOnClickListener {
-            Toast.makeText(this, "Bildirim ayarları yakında", Toast.LENGTH_SHORT).show()
+
+        findViewById<LinearLayout>(R.id.btnLogout).setOnClickListener {
+            clearProfile()
+            Toast.makeText(this, "Profil silindi", Toast.LENGTH_SHORT).show()
+            showCreateForm()
         }
-        findViewById<View>(R.id.btnPrivacy).setOnClickListener {
-            Toast.makeText(this, "Gizlilik ayarları yakında", Toast.LENGTH_SHORT).show()
+
+        findViewById<LinearLayout>(R.id.menuSettings).setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
+
+        findViewById<LinearLayout>(R.id.menuHelp).setOnClickListener {
+            startActivity(Intent(this, HelpActivity::class.java))
+        }
+
+        findViewById<LinearLayout>(R.id.menuAbout).setOnClickListener {
+            startActivity(Intent(this, AboutActivity::class.java))
+        }
+
+        animateElements()
     }
 
-    private fun loadProfile() {
-        val prefs = getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+    private fun hasProfile(): Boolean {
+        return prefs.contains("name")
+    }
+
+    private fun showProfile() {
+        profileView.visibility = View.VISIBLE
+        createForm.visibility = View.GONE
+
         val name = prefs.getString("name", "") ?: ""
         val email = prefs.getString("email", "") ?: ""
+        val roomsHosted = prefs.getInt("rooms_hosted", 0)
+        val hoursShared = prefs.getInt("hours_shared", 0)
 
-        if (name.isNotEmpty()) {
-            layoutEmpty.visibility = View.GONE
-            layoutProfile.visibility = View.VISIBLE
-            tvUserName.text = name
-            tvEmail.text = email
-            loadStats()
-        } else {
-            layoutEmpty.visibility = View.VISIBLE
-            layoutProfile.visibility = View.GONE
-        }
+        findViewById<TextView>(R.id.profileName).text = name
+        findViewById<TextView>(R.id.profileEmail).text = email
+        findViewById<TextView>(R.id.statRooms).text = roomsHosted.toString()
+        findViewById<TextView>(R.id.statHours).text = hoursShared.toString()
+
+        nameInput.setText(name)
+        emailInput.setText(email)
     }
 
-    private fun saveProfile() {
-        val name = etName.text.toString().trim()
-        val email = etEmail.text.toString().trim()
+    private fun showCreateForm() {
+        profileView.visibility = View.GONE
+        createForm.visibility = View.VISIBLE
+        nameInput.text.clear()
+        emailInput.text.clear()
+    }
 
-        if (name.isEmpty()) {
-            etName.error = "Adınızı girin"
-            return
-        }
-        if (email.isEmpty()) {
-            etEmail.error = "E-posta girin"
-            return
-        }
-
-        getSharedPreferences("user_profile", Context.MODE_PRIVATE)
-            .edit()
+    private fun saveProfile(name: String, email: String) {
+        prefs.edit()
             .putString("name", name)
             .putString("email", email)
             .apply()
-
-        Toast.makeText(this, "Profil kaydedildi", Toast.LENGTH_SHORT).show()
-        loadProfile()
     }
 
-    private fun loadStats() {
-        val manager = RoomHistoryManager(this)
-        val history = manager.getAll()
-        val count = history.size
-        val totalMs = history.sumOf { it.duration }
-        val totalMin = totalMs / 1000 / 60
+    private fun clearProfile() {
+        prefs.edit().clear().apply()
+    }
 
-        findViewById<TextView>(R.id.tvSessionCount).text = count.toString()
-        findViewById<TextView>(R.id.tvTotalTime).text = if (totalMin > 0) "${totalMin}dk" else "0dk"
+    private fun animateElements() {
+        val header = findViewById<LinearLayout>(R.id.profileHeader)
+        val stats = findViewById<LinearLayout>(R.id.statsCard)
+        val menu = findViewById<LinearLayout>(R.id.menuCard)
+
+        listOf(header, stats, menu).forEachIndexed { index, view ->
+            view.alpha = 0f
+            view.translationY = 30f
+            view.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(500)
+                .setStartDelay((index * 150).toLong())
+                .setInterpolator(OvershootInterpolator())
+                .start()
+        }
     }
 }

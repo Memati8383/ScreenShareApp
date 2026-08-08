@@ -15,6 +15,8 @@
     <color name="dark_status_good">#FF00E676</color>
     <color name="dark_status_warn">#FFFFD600</color>
     <color name="dark_status_bad">#FFFF1744</color>
+    <color name="dark_status_error">#FFFF1744</color>
+    <color name="dark_status_warning">#FFFFD600</color>
     <color name="dark_border">#1AFFFFFF</color>
     <color name="dark_nav_bg">#FF12162A</color>
     <color name="dark_nav_active">#FF00B4FF</color>
@@ -56,4 +58,6 @@
     <color name="status_warn">@color/dark_status_warn</color>
     <color name="status_bad">@color/dark_status_bad</color>
     <color name="surface_stroke">@color/dark_border</color>
+    <color name="status_error">@color/dark_status_error</color>
+    <color name="status_warning">@color/dark_status_warning</color>
 </resources>

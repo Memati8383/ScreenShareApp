@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/bg_dark">
+    android:background="?android:windowBackground">
 
     <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
@@ -13,9 +13,9 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/transparent"
         app:title="@string/settings_title"
-        app:titleTextColor="@android:color/white"
+        app:titleTextColor="?android:textColorPrimary"
         app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="@android:color/white" />
+        app:navigationIconTint="?android:textColorPrimary" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -31,15 +31,12 @@
 
             <!-- Theme Setting -->
             <LinearLayout
-                android:id="@+id/btnTheme"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:background="@drawable/bg_glass_card"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="16dp"
-                android:clickable="true"
-                android:focusable="true"
                 android:layout_marginBottom="12dp">
 
                 <ImageView
@@ -58,7 +55,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/settings_theme"
-                        android:textColor="@android:color/white"
+                        android:textColor="?android:textColorPrimary"
                         android:textSize="16sp" />
 
                     <TextView
@@ -66,29 +63,27 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/settings_theme_dark"
-                        android:textColor="#99FFFFFF"
+                        android:textColor="?android:textColorSecondary"
                         android:textSize="13sp"
                         android:layout_marginTop="2dp" />
                 </LinearLayout>
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_arrow_right"
-                    android:alpha="0.5" />
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/themeSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:thumbTint="@color/accent"
+                    android:trackTint="@color/bg_input" />
             </LinearLayout>
 
             <!-- Language Setting -->
             <LinearLayout
-                android:id="@+id/btnLanguage"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:background="@drawable/bg_glass_card"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="16dp"
-                android:clickable="true"
-                android:focusable="true"
                 android:layout_marginBottom="12dp">
 
                 <ImageView
@@ -107,24 +102,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/settings_language"
-                        android:textColor="@android:color/white"
+                        android:textColor="?android:textColorPrimary"
                         android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/tvLanguageValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Türkçe"
-                        android:textColor="#99FFFFFF"
-                        android:textSize="13sp"
+                    <Spinner
+                        android:id="@+id/languageSpinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
                         android:layout_marginTop="2dp" />
                 </LinearLayout>
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_arrow_right"
-                    android:alpha="0.5" />
             </LinearLayout>
 
             <!-- Notifications Toggle -->
@@ -153,14 +139,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/settings_notifications"
-                        android:textColor="@android:color/white"
+                        android:textColor="?android:textColorPrimary"
                         android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/settings_notifications_desc"
-                        android:textColor="#99FFFFFF"
+                        android:textColor="?android:textColorSecondary"
                         android:textSize="13sp"
                         android:layout_marginTop="2dp" />
                 </LinearLayout>
@@ -198,14 +184,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/settings_quality_stats"
-                        android:textColor="@android:color/white"
+                        android:textColor="?android:textColorPrimary"
                         android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/settings_quality_stats_desc"
-                        android:textColor="#99FFFFFF"
+                        android:textColor="?android:textColorSecondary"
                         android:textSize="13sp"
                         android:layout_marginTop="2dp" />
                 </LinearLayout>

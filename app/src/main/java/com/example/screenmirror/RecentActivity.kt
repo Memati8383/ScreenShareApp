@@ -27,6 +27,7 @@ class RecentActivity : AppCompatActivity() {
     private lateinit var historyManager: RoomHistoryManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppSettings.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recent)
 
@@ -39,7 +40,7 @@ class RecentActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
-        supportActionBar?.title = "Son Odalar"
+        supportActionBar?.title = getString(R.string.nav_recent)
 
         toolbar.setNavigationOnClickListener {
             finish()
@@ -90,11 +91,16 @@ class RecentActivity : AppCompatActivity() {
     }
 
     private fun showDeleteDialog(room: RoomHistory) {
-        AlertDialog.Builder(this, R.style.Theme_ScreenShare_Dialog)
-            .setTitle("Odadi Sil")
-            .setMessage("${room.roomName} odasini silmek istediginize emin misiniz?")
+        val dialogTheme = if (AppSettings.isDarkTheme(this)) {
+            R.style.Theme_ScreenShare_Dialog
+        } else {
+            R.style.Theme_ScreenShare_Light_Dialog
+        }
+        AlertDialog.Builder(this, dialogTheme)
+            .setTitle("Oda Sil")
+            .setMessage("${room.roomName} odasını silmek istediğinize emin misiniz?")
             .setPositiveButton("Sil") { _, _ -> deleteRoom(room) }
-            .setNegativeButton("Iptal", null)
+            .setNegativeButton("İptal", null)
             .show()
     }
 
@@ -142,12 +148,12 @@ class RecentActivity : AppCompatActivity() {
                 tvRoomName.text = room.roomName
                 tvTime.text = formatDate(room.endTime)
                 tvDuration.text = formatDuration(room.duration)
-                tvParticipants.text = "Katilimci: ${room.participantCount}"
+                tvParticipants.text = "Katılımcı: ${room.participantCount}"
 
                 val dotColor = if (room.role == "sender") {
-                    ContextCompat.getColor(itemView.context, R.color.accent)
+                    ContextCompat.getColor(itemView.context, R.color.dark_accent)
                 } else {
-                    ContextCompat.getColor(itemView.context, R.color.status_good)
+                    ContextCompat.getColor(itemView.context, R.color.dark_status_good)
                 }
                 statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(dotColor)
 

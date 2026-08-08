@@ -15,6 +15,7 @@ class HelpActivity : AppCompatActivity() {
     private var expandedArrow: ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppSettings.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_help)
 
@@ -22,7 +23,7 @@ class HelpActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
-        supportActionBar?.title = "Yardim"
+        supportActionBar?.title = getString(R.string.nav_help)
 
         toolbar.setNavigationOnClickListener {
             finish()

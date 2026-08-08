@@ -70,6 +70,9 @@
 
     <!-- Pencereler -->
     <string name="dialog_quality_title">Yayın Kalitesi</string>
+    <string name="status_live">CANLI</string>
+    <string name="status_connected">Bağlantı kuruldu</string>
+    <string name="status_disconnected">Bağlantı kesildi</string>
     <string name="dialog_fps_title">Kare Hızı</string>
     <string name="dialog_hd">HD (1280x720)</string>
     <string name="dialog_sd">SD (854x480)</string>
