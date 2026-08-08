@@ -12,6 +12,7 @@
     <string name="main_room_label">ROOM NAME</string>
     <string name="main_room_hint">Enter room name</string>
     <string name="main_room_hint_create">Create room name</string>
+    <string name="room_copied">Room name copied</string>
     <string name="main_start">START</string>
     <string name="main_connect">CONNECT</string>
     <string name="main_share">Broadcast</string>

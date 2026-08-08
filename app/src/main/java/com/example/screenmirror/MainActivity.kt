@@ -68,6 +68,16 @@ class MainActivity : AppCompatActivity() {
         btnShare.setOnClickListener { startSender() }
         btnWatch.setOnClickListener { goToViewer() }
 
+        tilRoom.setEndIconOnClickListener {
+            val room = etRoom.text.toString().trim()
+            if (room.isNotEmpty()) {
+                val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                val clip = android.content.ClipData.newPlainText("room_name", room)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(this, getString(R.string.room_copied), Toast.LENGTH_SHORT).show()
+            }
+        }
+
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> true

@@ -172,6 +172,8 @@
                 app:hintEnabled="true"
                 app:startIconDrawable="@drawable/ic_home"
                 app:startIconTint="@color/text_secondary"
+                app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_copy"
                 android:layout_marginBottom="20dp">
 
                 <com.google.android.material.textfield.TextInputEditText

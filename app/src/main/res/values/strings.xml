@@ -12,6 +12,7 @@
     <string name="main_room_label">ODA ADI</string>
     <string name="main_room_hint">Oda adı girin</string>
     <string name="main_room_hint_create">Oda adı oluşturun</string>
+    <string name="room_copied">Oda adı kopyalandı</string>
     <string name="main_start">BAŞLA</string>
     <string name="main_connect">BAĞLAN</string>
     <string name="main_share">Yayınla</string>
