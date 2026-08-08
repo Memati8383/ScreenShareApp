@@ -12,7 +12,9 @@ class CloudSignalingClient(
     private val role: String,
     private val onRemoteDescription: (SessionDescription) -> Unit,
     private val onRemoteIce: (IceCandidate) -> Unit,
-    private val onPeerJoined: () -> Unit
+    private val onPeerJoined: () -> Unit,
+    private val onPeerLeft: () -> Unit = {},
+    private val onViewerCountChanged: (Int) -> Unit = {}
 ) {
     private var client: OkHttpClient? = null
     private var ws: WebSocket? = null
@@ -89,9 +91,14 @@ class CloudSignalingClient(
                     val roster = msg.getJSONArray("roster")
                     val newCount = roster.length()
                     Log.i("CloudSig", "ROSTER: $newCount peer var (onceki: $peerCount)")
+                    val viewers = if (newCount > 1) newCount - 1 else 0
+                    onViewerCountChanged(viewers)
                     if (newCount > peerCount && newCount > 1) {
                         Log.i("CloudSig", "Baska peer katildi! onPeerJoined cagiriliyor")
                         onPeerJoined()
+                    } else if (newCount < peerCount && peerCount > 1) {
+                        Log.i("CloudSig", "Peer ayrildi! onPeerLeft cagiriliyor")
+                        onPeerLeft()
                     }
                     peerCount = newCount
                 }

@@ -30,6 +30,12 @@ class ScreenShareService : Service() {
         @Volatile var renderer: SurfaceViewRenderer? = null
         private var factoryInitialized = false
         @Volatile var onState: ((String) -> Unit)? = null
+        @Volatile var onViewerCountChanged: ((Int) -> Unit)? = null
+
+        @Volatile var captureWidth: Int = 1280
+        @Volatile var captureHeight: Int = 720
+        @Volatile var captureFps: Int = 30
+        @Volatile var isFrozen: Boolean = false
     }
 
     private var role = "viewer"
@@ -159,7 +165,7 @@ class ScreenShareService : Service() {
             val notif = Notification.Builder(this, "screen")
                 .setSmallIcon(android.R.drawable.ic_menu_send)
                 .setContentTitle("Screen Mirror")
-                .setContentText("Birisi odaya katıldı!")
+                .setContentText("Birisi odaya katildi!")
                 .setAutoCancel(true)
                 .build()
             val nm = getSystemService(NotificationManager::class.java)
@@ -271,6 +277,13 @@ class ScreenShareService : Service() {
                             offerPending = true
                         }
                     }
+                },
+                onPeerLeft = {
+                    participantCount = 1
+                    postState("Izleyici ayrildi")
+                },
+                onViewerCountChanged = { count ->
+                    mainHandler.post { onViewerCountChanged?.invoke(count) }
                 }
             )
             Log.i(TAG, "cloud signaling objesi olusturuldu")
@@ -306,10 +319,9 @@ class ScreenShareService : Service() {
             val eb = eglBase ?: return
             val f = factory ?: return
 
-            val dm = resources.displayMetrics
-            val w = dm.widthPixels
-            val h = dm.heightPixels
-            Log.i(TAG, "screen: ${w}x${h}")
+            val w = captureWidth
+            val h = captureHeight
+            Log.i(TAG, "screen: ${w}x${h} @ ${captureFps}fps")
 
             surfaceTextureHelper = SurfaceTextureHelper.create("CaptureThread", eb.eglBaseContext)
             videoSource = f.createVideoSource(true)
@@ -317,7 +329,7 @@ class ScreenShareService : Service() {
                 override fun onStop() { stopSelf() }
             })
             capturer?.initialize(surfaceTextureHelper, this, videoSource?.capturerObserver)
-            capturer?.startCapture(w, h, 30)
+            capturer?.startCapture(w, h, captureFps)
             localTrack = f.createVideoTrack("screen0", videoSource)
             peerConnection?.addTrack(localTrack, listOf("stream0"))
             Log.i(TAG, "capture baslatildi, localTrack eklenmis")
@@ -330,6 +342,21 @@ class ScreenShareService : Service() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "startCapture HATA", e)
+        }
+    }
+
+    fun toggleFreeze() {
+        isFrozen = !isFrozen
+        if (isFrozen) {
+            try { capturer?.stopCapture() } catch (_: Exception) {}
+            postState("Yayin donduruldu")
+        } else {
+            if (pendingResultCode != 0 || pendingData != null) {
+                // re-capture with stored projection data
+            } else {
+                // need to restart capture
+                postState("Yayin devam ediyor")
+            }
         }
     }
 

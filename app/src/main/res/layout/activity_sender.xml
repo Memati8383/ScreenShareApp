@@ -52,7 +52,7 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Stats row -->
+        <!-- Stats + Viewer count row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -75,12 +75,51 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 
+            <!-- Viewer count -->
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_viewer" />
+
+            <TextView
+                android:id="@+id/tvViewerCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="0"
+                android:textColor="@color/text_primary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvViewerLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text=" izleyici"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp" />
+
             <View
                 android:id="@+id/senderStatusDot"
                 android:layout_width="8dp"
                 android:layout_height="8dp"
                 android:background="@drawable/bg_circle_gradient" />
         </LinearLayout>
+
+        <!-- Timer row (visible when recording) -->
+        <TextView
+            android:id="@+id/tvTimer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="00:00"
+            android:textColor="@color/status_bad"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:visibility="gone" />
 
         <!-- Control buttons row 1: Screenshot & Record -->
         <LinearLayout
@@ -111,7 +150,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Ekran Görüntüsü"
+                    android:text="Ekran Goruntusu"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -149,7 +188,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Control buttons row 2: Pause & Stop -->
+        <!-- Control buttons row 2: Freeze & Quality -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -158,7 +197,7 @@
             android:gravity="center">
 
             <LinearLayout
-                android:id="@+id/btnPause"
+                android:id="@+id/btnFreeze"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -170,15 +209,17 @@
                 android:focusable="true">
 
                 <ImageView
+                    android:id="@+id/ivFreeze"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_pause" />
+                    android:src="@drawable/ic_frozen" />
 
                 <TextView
+                    android:id="@+id/tvFreeze"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Duraklat"
+                    android:text="Dondur"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -188,7 +229,7 @@
                 android:layout_height="0dp" />
 
             <LinearLayout
-                android:id="@+id/btnStop"
+                android:id="@+id/btnQuality"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -202,16 +243,28 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_stop_square" />
+                    android:src="@drawable/ic_settings" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Durdur"
-                    android:textColor="@color/status_bad"
+                    android:text="Kalite"
+                    android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
         </LinearLayout>
+
+        <!-- Stop button -->
+        <Button
+            android:id="@+id/btnStop"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_button_outline"
+            android:text="Yayini Durdur"
+            android:textColor="@color/status_bad"
+            android:textSize="14sp"
+            android:stateListAnimator="@null" />
     </LinearLayout>
 </FrameLayout>
