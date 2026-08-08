@@ -76,6 +76,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.ScreenShare" />
 
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ScreenShare" />
+
         <service
             android:name=".ScreenShareService"
             android:exported="false"

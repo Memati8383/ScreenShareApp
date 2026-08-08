@@ -100,6 +100,17 @@
                 android:background="@drawable/bg_circle_gradient" />
         </LinearLayout>
 
+        <!-- Connection Quality Stats -->
+        <TextView
+            android:id="@+id/tvConnectionQuality"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            android:fontFamily="monospace"
+            android:visibility="gone" />
+
         <!-- Buttons row: Screenshot & Disconnect -->
         <LinearLayout
             android:layout_width="match_parent"

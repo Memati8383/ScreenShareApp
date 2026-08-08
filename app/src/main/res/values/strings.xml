@@ -13,4 +13,65 @@
     <string name="viewer_connected">Bağlantı kuruldu</string>
     <string name="drawer_open">Menüyü aç</string>
     <string name="drawer_close">Menüyü kapat</string>
+
+    <!-- Ayarlar -->
+    <string name="settings_title">Ayarlar</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_dark">Karanlık</string>
+    <string name="settings_theme_light">Aydınlık</string>
+    <string name="settings_language">Dil</string>
+    <string name="settings_notifications">Bildirimler</string>
+    <string name="settings_notifications_desc">Bildirimleri aç/kapat</string>
+    <string name="settings_quality_stats">Kalite İstatistikleri</string>
+    <string name="settings_quality_stats_desc">Bağlantı kalitesi istatistiklerini göster</string>
+
+    <!-- Profil -->
+    <string name="profile_title">Profil</string>
+    <string name="profile_create">Profil Oluştur</string>
+    <string name="profile_create_desc">Kişisel bilgilerinizi girerek başlayın</string>
+    <string name="profile_name_hint">Adınız Soyadınız</string>
+    <string name="profile_email_hint">E-posta adresiniz</string>
+    <string name="profile_save">KAYDET</string>
+    <string name="profile_edit">Profili Düzenle</string>
+    <string name="profile_notifications">Bildirim Ayarları</string>
+    <string name="profile_privacy">Gizlilik</string>
+    <string name="profile_sessions">Oturum</string>
+    <string name="profile_total_time">Toplam Süre</string>
+    <string name="profile_version">Screen Mirror v1.0.0</string>
+
+    <!-- Navigasyon -->
+    <string name="nav_home">Ana Sayfa</string>
+    <string name="nav_recent">Son Odalar</string>
+    <string name="nav_profile">Profil</string>
+    <string name="nav_help">Yardım</string>
+    <string name="nav_feedback">Geri Bildirim</string>
+    <string name="nav_about">Hakkında</string>
+    <string name="nav_share">Uygulamayı Paylaş</string>
+
+    <!-- Ana Sayfa -->
+    <string name="main_room_hint">Oda adı</string>
+    <string name="main_start">BAŞLA</string>
+    <string name="main_connect">BAĞLAN</string>
+    <string name="main_share_desc">Ekranınızı paylaşacaksınız</string>
+    <string name="main_watch_desc">Başkasının ekranını izleyeceksiniz</string>
+
+    <!-- Yayıncı -->
+    <string name="sender_screenshot">Ekran Görüntüsü</string>
+    <string name="sender_record">Kaydet</string>
+    <string name="sender_freeze">Dondur</string>
+    <string name="sender_quality">Kalite</string>
+    <string name="sender_stop_broadcast">Yayını Durdur</string>
+    <string name="sender_viewers">izleyici</string>
+
+    <!-- İzleyici -->
+    <string name="viewer_disconnect">Bağlantıyı Kes</string>
+    <string name="viewer_screenshot">Ekran Görüntüsü</string>
+    <string name="viewer_stats">Bağlanıyor...</string>
+
+    <!-- Pencereler -->
+    <string name="dialog_quality_title">Yayın Kalitesi</string>
+    <string name="dialog_fps_title">Kare Hızı</string>
+    <string name="dialog_hd">HD (1280x720)</string>
+    <string name="dialog_sd">SD (854x480)</string>
+    <string name="dialog_low">Düşük (640x360)</string>
 </resources>

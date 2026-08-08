@@ -31,6 +31,7 @@ class ScreenShareService : Service() {
         private var factoryInitialized = false
         @Volatile var onState: ((String) -> Unit)? = null
         @Volatile var onViewerCountChanged: ((Int) -> Unit)? = null
+        @Volatile var onConnectionQuality: ((String) -> Unit)? = null
 
         @Volatile var captureWidth: Int = 1280
         @Volatile var captureHeight: Int = 720
@@ -291,6 +292,8 @@ class ScreenShareService : Service() {
             webRtcReady = true
             postState("WebRTC hazir")
 
+            startStatsChecker()
+
             if (role == "sender" && pendingResultCode != 0 && pendingData != null) {
                 val code = pendingResultCode; val data = pendingData
                 pendingResultCode = 0; pendingData = null
@@ -419,6 +422,58 @@ class ScreenShareService : Service() {
         mainHandler.post { onState?.invoke(s) }
     }
 
+    private fun startStatsChecker() {
+        val statsRunnable = object : Runnable {
+            override fun run() {
+                if (!webRtcReady || peerConnection == null) return
+                peerConnection?.getStats { report ->
+                    var bitrate = 0L
+                    var framesPerSecond = 0
+                    var packetLoss = 0.0
+                    var roundTripTime = 0.0
+
+                    report.statsMap.forEach { (key, stats) ->
+                        when (stats.type) {
+                            "inbound-rtp" -> {
+                                val bytesReceived = stats.members["bytesReceived"] as? Long ?: 0
+                                val framesDecoded = stats.members["framesDecoded"] as? Long ?: 0
+                                framesPerSecond = stats.members["framesPerSecond"] as? Int ?: 0
+                                val packetsLost = stats.members["packetsLost"] as? Long ?: 0
+                                val packetsReceived = stats.members["packetsReceived"] as? Long ?: 1
+                                if (packetsReceived > 0) {
+                                    packetLoss = (packetsLost.toDouble() / packetsReceived) * 100
+                                }
+                            }
+                            "candidate-pair" -> {
+                                val state = stats.members["state"] as? String
+                                if (state == "succeeded") {
+                                    roundTripTime = stats.members["currentRoundTripTime"] as? Double ?: 0.0
+                                }
+                            }
+                        }
+                    }
+
+                    val quality = when {
+                        packetLoss > 5 || roundTripTime > 0.5 -> "KOTU"
+                        packetLoss > 2 || roundTripTime > 0.3 -> "ORTA"
+                        else -> "IYI"
+                    }
+
+                    val statsText = String.format(
+                        "RTT: %.0fms | Kayip: %.1f%% | FPS: %d",
+                        roundTripTime * 1000, packetLoss, framesPerSecond
+                    )
+
+                    mainHandler.post {
+                        onConnectionQuality?.invoke("$quality|$statsText")
+                    }
+                }
+                mainHandler.postDelayed(this, 2000)
+            }
+        }
+        mainHandler.postDelayed(statsRunnable, 3000)
+    }
+
     override fun onDestroy() {
         Log.i(TAG, "onDestroy")
         super.onDestroy()
@@ -492,6 +547,8 @@ class ScreenShareService : Service() {
             val nm = getSystemService(NotificationManager::class.java)
             nm.cancel(1)
         } catch (_: Exception) {}
+
+        mainHandler.removeCallbacksAndMessages(null)
 
         Log.i(TAG, "onDestroy - temizlik tamamlandi")
     }

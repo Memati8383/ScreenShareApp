@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Dark Theme Colors -->
     <color name="bg_dark">#FF0A0E27</color>
     <color name="bg_card">#FF131833</color>
     <color name="bg_input">#FF1A1F3D</color>
@@ -15,4 +16,14 @@
     <color name="status_warn">#FFFFD600</color>
     <color name="status_bad">#FFFF1744</color>
     <color name="surface_stroke">#1AFFFFFF</color>
+
+    <!-- Light Theme Colors -->
+    <color name="bg_light">#FFF5F7FA</color>
+    <color name="bg_card_light">#FFFFFFFF</color>
+    <color name="bg_input_light">#FFF0F2F5</color>
+    <color name="bg_overlay_light">#CCF5F7FA</color>
+    <color name="text_primary_light">#FF1A1A2E</color>
+    <color name="text_secondary_light">#FF6B7280</color>
+    <color name="text_hint_light">#FF9CA3AF</color>
+    <color name="surface_stroke_light">#1A000000</color>
 </resources>

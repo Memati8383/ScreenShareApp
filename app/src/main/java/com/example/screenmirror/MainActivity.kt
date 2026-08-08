@@ -88,6 +88,10 @@ class MainActivity : AppCompatActivity() {
                     startActivity(Intent(this, FeedbackActivity::class.java))
                     true
                 }
+                R.id.drawer_settings -> {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                    true
+                }
                 R.id.drawer_about -> {
                     startActivity(Intent(this, AboutActivity::class.java))
                     true

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Dark Theme (Default) -->
     <style name="Theme.ScreenShare" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@color/bg_dark</item>
         <item name="android:statusBarColor">@color/bg_dark</item>
@@ -7,6 +8,20 @@
         <item name="colorPrimary">@color/gradient_start</item>
         <item name="colorPrimaryDark">@color/bg_dark</item>
         <item name="colorAccent">@color/accent</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+    </style>
+
+    <!-- Light Theme -->
+    <style name="Theme.ScreenShare.Light" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@color/bg_light</item>
+        <item name="android:statusBarColor">@color/bg_light</item>
+        <item name="android:navigationBarColor">@color/bg_light</item>
+        <item name="colorPrimary">@color/gradient_start</item>
+        <item name="colorPrimaryDark">@color/bg_light</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:textColorPrimary">@color/text_primary_light</item>
+        <item name="android:textColorSecondary">@color/text_secondary_light</item>
     </style>
 
     <style name="Theme.ScreenShare.Dialog" parent="Theme.AppCompat.Dialog.Alert">

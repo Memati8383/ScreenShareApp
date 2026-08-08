@@ -32,6 +32,7 @@ class ViewerActivity : AppCompatActivity() {
     private lateinit var tvStats: TextView
     private lateinit var tvViewerCount: TextView
     private lateinit var tvViewerLabel: TextView
+    private lateinit var tvConnectionQuality: TextView
     private lateinit var statusDot: View
     private val handler = Handler(Looper.getMainLooper())
     private var panelVisible = false
@@ -48,6 +49,7 @@ class ViewerActivity : AppCompatActivity() {
         tvStats = findViewById(R.id.tvStats)
         tvViewerCount = findViewById(R.id.tvViewerCount)
         tvViewerLabel = findViewById(R.id.tvViewerLabel)
+        tvConnectionQuality = findViewById(R.id.tvConnectionQuality)
         statusDot = findViewById(R.id.statusDot)
 
         val room = intent.getStringExtra("room") ?: ""
@@ -60,6 +62,25 @@ class ViewerActivity : AppCompatActivity() {
             handler.post {
                 tvViewerCount.text = count.toString()
                 tvViewerLabel.text = if (count == 1) "İzleyici" else "İzleyici"
+            }
+        }
+        ScreenShareService.onConnectionQuality = { quality ->
+            handler.post {
+                if (AppSettings.isQualityStatsEnabled(this)) {
+                    val parts = quality.split("|")
+                    val level = parts[0]
+                    val stats = if (parts.size > 1) parts[1] else ""
+                    val color = when (level) {
+                        "IYI" -> resources.getColor(R.color.status_good, null)
+                        "ORTA" -> resources.getColor(R.color.status_warn, null)
+                        else -> resources.getColor(R.color.status_bad, null)
+                    }
+                    tvConnectionQuality.text = stats
+                    tvConnectionQuality.setTextColor(color)
+                    tvConnectionQuality.visibility = View.VISIBLE
+                } else {
+                    tvConnectionQuality.visibility = View.GONE
+                }
             }
         }
 
@@ -199,5 +220,6 @@ class ViewerActivity : AppCompatActivity() {
         ScreenShareService.renderer = null
         ScreenShareService.onState = null
         ScreenShareService.onViewerCountChanged = null
+        ScreenShareService.onConnectionQuality = null
     }
 }

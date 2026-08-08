@@ -23,6 +23,10 @@
     <item android:title="Uygulama">
         <menu>
             <item
+                android:id="@+id/drawer_settings"
+                android:icon="@drawable/ic_settings"
+                android:title="Ayarlar" />
+            <item
                 android:id="@+id/drawer_about"
                 android:icon="@drawable/ic_info_circle"
                 android:title="Uygulama Hakkinda" />

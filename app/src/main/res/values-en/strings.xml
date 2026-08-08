@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Screen Mirror</string>
+    <string name="splash_title">Screen Mirror</string>
+    <string name="splash_subtitle">Screen Sharing</string>
+    <string name="main_share">Broadcast</string>
+    <string name="main_watch">Watch</string>
+    <string name="sender_sharing">Screen sharing...</string>
+    <string name="sender_stop">Stop</string>
+    <string name="sender_pause">Pause</string>
+    <string name="sender_resume">Resume</string>
+    <string name="viewer_waiting">Waiting for connection...</string>
+    <string name="viewer_connected">Connection established</string>
+    <string name="drawer_open">Open menu</string>
+    <string name="drawer_close">Close menu</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_notifications_desc">Enable/disable notifications</string>
+    <string name="settings_quality_stats">Quality Statistics</string>
+    <string name="settings_quality_stats_desc">Show connection quality stats</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+    <string name="profile_create">Create Profile</string>
+    <string name="profile_create_desc">Enter your personal information to get started</string>
+    <string name="profile_name_hint">Your Name</string>
+    <string name="profile_email_hint">Your Email</string>
+    <string name="profile_save">SAVE</string>
+    <string name="profile_edit">Edit Profile</string>
+    <string name="profile_notifications">Notification Settings</string>
+    <string name="profile_privacy">Privacy</string>
+    <string name="profile_sessions">Sessions</string>
+    <string name="profile_total_time">Total Time</string>
+    <string name="profile_version">Screen Mirror v1.0.0</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_recent">Recent</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_help">Help</string>
+    <string name="nav_feedback">Feedback</string>
+    <string name="nav_about">About</string>
+    <string name="nav_share">Share App</string>
+
+    <!-- Main -->
+    <string name="main_room_hint">Room name</string>
+    <string name="main_start">START</string>
+    <string name="main_connect">CONNECT</string>
+    <string name="main_share_desc">You will broadcast your screen</string>
+    <string name="main_watch_desc">You will watch someone else\'s screen</string>
+
+    <!-- Sender -->
+    <string name="sender_screenshot">Screenshot</string>
+    <string name="sender_record">Record</string>
+    <string name="sender_freeze">Freeze</string>
+    <string name="sender_quality">Quality</string>
+    <string name="sender_stop_broadcast">Stop Broadcast</string>
+    <string name="sender_viewers">viewers</string>
+
+    <!-- Viewer -->
+    <string name="viewer_disconnect">Disconnect</string>
+    <string name="viewer_screenshot">Screenshot</string>
+    <string name="viewer_stats">Connecting...</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_quality_title">Broadcast Quality</string>
+    <string name="dialog_fps_title">Frame Rate</string>
+    <string name="dialog_hd">HD (1280x720)</string>
+    <string name="dialog_sd">SD (854x480)</string>
+    <string name="dialog_low">Low (640x360)</string>
+</resources>
