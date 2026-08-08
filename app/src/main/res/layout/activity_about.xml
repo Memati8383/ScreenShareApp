@@ -108,7 +108,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Sürüm 1.0.0"
+                        android:text="Sürüm 1.0.0 (Build 1)"
                         android:textColor="#B3FFFFFF"
                         android:textSize="13sp"
                         android:layout_marginTop="4dp" />
@@ -122,12 +122,39 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="WebRTC ile gerçek zamanlı ekran paylaşımı"
+                        android:text="WebRTC tabanlı gerçek zamanlı ekran paylaşımı. Kolay kurulum, düşük gecikme, güvenli bağlantı."
                         android:textColor="#CCFFFFFF"
-                        android:textSize="14sp"
+                        android:textSize="13sp"
                         android:gravity="center"
                         android:lineSpacingExtra="4dp"
                         android:layout_marginTop="16dp" />
+                </LinearLayout>
+
+                <!-- What's New Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="YENİLİKLER"
+                        android:textColor="#80FFFFFF"
+                        android:textSize="11sp"
+                        android:letterSpacing="0.15"
+                        android:layout_marginBottom="12dp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="✓ Bulut üzerinden ekran paylaşımı\n✓ Düşük gecikme süresi\n✓ Güvenli SSL/WSS bağlantısı\n✓ Kolay oda oluşturma\n✓ Son oturum geçmişi"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="13sp"
+                        android:lineSpacingExtra="6dp" />
                 </LinearLayout>
 
                 <!-- Features Card (Glass) -->

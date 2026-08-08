@@ -64,7 +64,7 @@ class ScreenShareService : Service() {
     override fun onCreate() {
         super.onCreate()
         try {
-            val ch = NotificationChannel("screen", "ScreenShare", NotificationManager.IMPORTANCE_LOW)
+            val ch = NotificationChannel("screen", "ScreenShare", NotificationManager.IMPORTANCE_DEFAULT)
             getSystemService(NotificationManager::class.java).createNotificationChannel(ch)
             Log.i(TAG, "onCreate - kanal olusturuldu")
         } catch (e: Exception) {
@@ -83,6 +83,10 @@ class ScreenShareService : Service() {
             }
 
             showNotification(if (role == "sender") "Yayin aktif" else "Izleme aktif")
+
+            if (role == "sender") {
+                showBroadcastStartNotification()
+            }
 
             val r = renderer
             if (r == null) {
@@ -147,6 +151,36 @@ class ScreenShareService : Service() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "foreground hatasi", e)
+        }
+    }
+
+    private fun showJoinNotification() {
+        try {
+            val notif = Notification.Builder(this, "screen")
+                .setSmallIcon(android.R.drawable.ic_menu_send)
+                .setContentTitle("Screen Mirror")
+                .setContentText("Birisi odaya katıldı!")
+                .setAutoCancel(true)
+                .build()
+            val nm = getSystemService(NotificationManager::class.java)
+            nm.notify(2, notif)
+        } catch (e: Exception) {
+            Log.e(TAG, "bildirim hatasi", e)
+        }
+    }
+
+    private fun showBroadcastStartNotification() {
+        try {
+            val notif = Notification.Builder(this, "screen")
+                .setSmallIcon(android.R.drawable.ic_menu_camera)
+                .setContentTitle("Screen Mirror")
+                .setContentText("Yayın başlatıldı - Bağlantı bekleniyor")
+                .setAutoCancel(true)
+                .build()
+            val nm = getSystemService(NotificationManager::class.java)
+            nm.notify(3, notif)
+        } catch (e: Exception) {
+            Log.e(TAG, "bildirim hatasi", e)
         }
     }
 
@@ -228,6 +262,7 @@ class ScreenShareService : Service() {
                 onPeerJoined = {
                     postState("Es cihaz baglandi")
                     participantCount = 2
+                    showJoinNotification()
                     if (role == "sender") {
                         if (localTrack != null) {
                             executor.execute { createOffer() }
