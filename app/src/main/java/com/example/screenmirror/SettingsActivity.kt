@@ -36,8 +36,9 @@ class SettingsActivity : AppCompatActivity() {
         val languageCodes = arrayOf("tr", "en")
 
         val adapter = ArrayAdapter(this, R.layout.spinner_item, languages)
-        adapter.setDropDownViewResource(R.layout.spinner_item)
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
         languageSpinner.adapter = adapter
+        languageSpinner.setBackgroundResource(android.R.color.transparent)
 
         val currentLang = AppSettings.getLanguage(this)
         val currentIndex = languageCodes.indexOf(currentLang).coerceAtLeast(0)

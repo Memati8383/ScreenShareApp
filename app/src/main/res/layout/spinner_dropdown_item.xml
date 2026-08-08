@@ -6,4 +6,4 @@
     android:paddingHorizontal="16dp"
     android:textColor="@android:color/white"
     android:textSize="15sp"
-    android:background="@android:color/transparent" />
+    android:background="@drawable/bg_glass_card" />
