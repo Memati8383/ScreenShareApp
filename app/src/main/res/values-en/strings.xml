@@ -8,14 +8,16 @@
 
     <!-- Main -->
     <string name="main_title">Screen Mirror</string>
+    <string name="main_subtitle">Share your screen instantly or join a room</string>
     <string name="main_room_label">ROOM NAME</string>
-    <string name="main_room_hint">Room name</string>
+    <string name="main_room_hint">Enter room name</string>
+    <string name="main_room_hint_create">Create room name</string>
     <string name="main_start">START</string>
     <string name="main_connect">CONNECT</string>
     <string name="main_share">Broadcast</string>
     <string name="main_watch">Watch</string>
-    <string name="main_share_desc">You will share your screen</string>
-    <string name="main_watch_desc">You will watch someone\'s screen</string>
+    <string name="main_share_desc">Broadcast your own screen live</string>
+    <string name="main_watch_desc">Watch another room\'s screen</string>
     <string name="main_error_empty_room">Enter a room name</string>
 
     <!-- Bottom Nav -->

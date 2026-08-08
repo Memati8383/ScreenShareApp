@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -18,6 +17,9 @@ import androidx.core.app.ActivityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
+import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,7 +27,8 @@ class MainActivity : AppCompatActivity() {
     private val REQ_PERMISSIONS = 1002
     private lateinit var mpm: MediaProjectionManager
 
-    private lateinit var etRoom: EditText
+    private lateinit var tilRoom: TextInputLayout
+    private lateinit var etRoom: TextInputEditText
     private lateinit var tvStatus: TextView
     private lateinit var btnShare: Button
     private lateinit var btnWatch: Button
@@ -34,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navigationView: NavigationView
     private lateinit var btnHostMode: LinearLayout
     private lateinit var btnClientMode: LinearLayout
+    private lateinit var tvSubtitle: TextView
     private var isHostMode = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         mpm = getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
 
+        tilRoom = findViewById(R.id.tilRoom)
         etRoom = findViewById(R.id.etRoom)
         tvStatus = findViewById(R.id.tvStatus)
         btnShare = findViewById(R.id.btnShare)
@@ -50,8 +55,9 @@ class MainActivity : AppCompatActivity() {
         navigationView = findViewById(R.id.navigationView)
         btnHostMode = findViewById(R.id.btnHostMode)
         btnClientMode = findViewById(R.id.btnClientMode)
+        tvSubtitle = findViewById(R.id.tvSubtitle)
 
-        updateCardStyles()
+        switchMode(true)
 
         findViewById<ImageView>(R.id.btnMenuDrawer).setOnClickListener {
             drawerLayout.open()
@@ -108,28 +114,48 @@ class MainActivity : AppCompatActivity() {
         requestPermissions()
     }
 
-    private fun updateCardStyles() {
-        btnHostMode.setBackgroundResource(R.drawable.bg_card)
-        btnClientMode.setBackgroundResource(R.drawable.bg_card)
-    }
-
     private fun switchMode(hostMode: Boolean) {
         isHostMode = hostMode
-        val tvSubtitle = findViewById<TextView>(R.id.tvSubtitle)
 
         if (hostMode) {
-            btnHostMode.setBackgroundResource(R.drawable.bg_card_selected)
-            btnClientMode.setBackgroundResource(R.drawable.bg_card)
+            btnHostMode.setBackgroundResource(R.drawable.bg_card_active)
+            btnClientMode.setBackgroundResource(R.drawable.bg_card_inactive)
             btnShare.visibility = View.VISIBLE
             btnWatch.visibility = View.GONE
-            tvSubtitle.text = getString(R.string.main_share_desc)
+            tilRoom.hint = getString(R.string.main_room_hint_create)
+            etRoom.setText(generateRoomCode())
+            etRoom.isEnabled = false
         } else {
-            btnClientMode.setBackgroundResource(R.drawable.bg_card_selected)
-            btnHostMode.setBackgroundResource(R.drawable.bg_card)
+            btnClientMode.setBackgroundResource(R.drawable.bg_card_active)
+            btnHostMode.setBackgroundResource(R.drawable.bg_card_inactive)
             btnShare.visibility = View.GONE
             btnWatch.visibility = View.VISIBLE
-            tvSubtitle.text = getString(R.string.main_watch_desc)
+            tilRoom.hint = getString(R.string.main_room_hint)
+            etRoom.setText("")
+            etRoom.isEnabled = true
         }
+
+        updateCardIcons(hostMode)
+    }
+
+    private fun updateCardIcons(hostMode: Boolean) {
+        val hostIcon = btnHostMode.getChildAt(0) as? ImageView
+        val clientIcon = btnClientMode.getChildAt(0) as? ImageView
+
+        hostIcon?.setImageResource(R.drawable.ic_cast)
+        clientIcon?.setImageResource(R.drawable.ic_eye)
+
+        if (hostMode) {
+            hostIcon?.setColorFilter(getColor(R.color.accent))
+            clientIcon?.setColorFilter(getColor(R.color.text_secondary))
+        } else {
+            hostIcon?.setColorFilter(getColor(R.color.text_secondary))
+            clientIcon?.setColorFilter(getColor(R.color.accent))
+        }
+    }
+
+    private fun generateRoomCode(): String {
+        return Random.nextInt(100000, 999999).toString()
     }
 
     private fun requestPermissions() {

@@ -8,14 +8,16 @@
 
     <!-- Ana Sayfa -->
     <string name="main_title">Screen Mirror</string>
+    <string name="main_subtitle">Ekranınızı anında paylaşın veya bir odaya katılın</string>
     <string name="main_room_label">ODA ADI</string>
-    <string name="main_room_hint">Oda adı</string>
+    <string name="main_room_hint">Oda adı girin</string>
+    <string name="main_room_hint_create">Oda adı oluşturun</string>
     <string name="main_start">BAŞLA</string>
     <string name="main_connect">BAĞLAN</string>
     <string name="main_share">Yayınla</string>
     <string name="main_watch">İzle</string>
-    <string name="main_share_desc">Ekranınızı paylaşacaksınız</string>
-    <string name="main_watch_desc">Başkasının ekranını izleyeceksiniz</string>
+    <string name="main_share_desc">Kendi ekranınızı canlı yayınlayın</string>
+    <string name="main_watch_desc">Başka bir odanın ekranını izleyin</string>
     <string name="main_error_empty_room">Oda adını girin</string>
 
     <!-- Alt Menü -->
