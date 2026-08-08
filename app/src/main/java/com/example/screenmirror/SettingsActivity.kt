@@ -1,10 +1,13 @@
 package com.example.screenmirror
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ListPopupWindow
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
@@ -39,6 +42,8 @@ class SettingsActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
         languageSpinner.adapter = adapter
         languageSpinner.setBackgroundResource(android.R.color.transparent)
+        languageSpinner.setPopupBackgroundResource(R.drawable.bg_spinner_popup)
+        languageSpinner.elevation = 8f
 
         val currentLang = AppSettings.getLanguage(this)
         val currentIndex = languageCodes.indexOf(currentLang).coerceAtLeast(0)
