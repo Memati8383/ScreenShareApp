@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -14,7 +13,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -36,11 +34,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navigationView: NavigationView
     private lateinit var btnHostMode: LinearLayout
     private lateinit var btnClientMode: LinearLayout
+    private lateinit var btnThemeToggle: ImageView
     private var isHostMode = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         AppSettings.applyTheme(this)
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mpm = getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
 
@@ -53,12 +52,18 @@ class MainActivity : AppCompatActivity() {
         navigationView = findViewById(R.id.navigationView)
         btnHostMode = findViewById(R.id.btnHostMode)
         btnClientMode = findViewById(R.id.btnClientMode)
+        btnThemeToggle = findViewById(R.id.btnThemeToggle)
 
-        val btnMenu = findViewById<ImageView>(R.id.btnMenuDrawer)
-        btnMenu.setOnClickListener { drawerLayout.open() }
+        updateThemeIcon()
+        updateCardStyles()
 
-        findViewById<ImageView>(R.id.btnThemeToggle).setOnClickListener {
-            toggleTheme()
+        findViewById<ImageView>(R.id.btnMenuDrawer).setOnClickListener {
+            drawerLayout.open()
+        }
+
+        btnThemeToggle.setOnClickListener {
+            AppSettings.toggleTheme(this)
+            AppSettings.restartActivity(this)
         }
 
         btnHostMode.setOnClickListener { switchMode(true) }
@@ -112,6 +117,26 @@ class MainActivity : AppCompatActivity() {
         requestPermissions()
     }
 
+    private fun updateThemeIcon() {
+        if (AppSettings.isDarkTheme(this)) {
+            btnThemeToggle.setImageResource(R.drawable.ic_sun)
+        } else {
+            btnThemeToggle.setImageResource(R.drawable.ic_moon)
+        }
+    }
+
+    private fun updateCardStyles() {
+        if (AppSettings.isDarkTheme(this)) {
+            btnHostMode.setBackgroundResource(R.drawable.bg_card)
+            btnClientMode.setBackgroundResource(R.drawable.bg_card)
+            bottomNav.setBackgroundColor(resources.getColor(R.color.dark_nav_bg, null))
+        } else {
+            btnHostMode.setBackgroundResource(R.drawable.bg_card_light)
+            btnClientMode.setBackgroundResource(R.drawable.bg_card_light)
+            bottomNav.setBackgroundColor(resources.getColor(R.color.light_nav_bg, null))
+        }
+    }
+
     private fun switchMode(hostMode: Boolean) {
         isHostMode = hostMode
         val tvSubtitle = findViewById<TextView>(R.id.tvSubtitle)
@@ -121,13 +146,13 @@ class MainActivity : AppCompatActivity() {
             btnClientMode.setBackgroundResource(R.drawable.bg_card)
             btnShare.visibility = View.VISIBLE
             btnWatch.visibility = View.GONE
-            tvSubtitle.text = "Ekranınızı paylaşacaksınız"
+            tvSubtitle.text = getString(R.string.main_share_desc)
         } else {
             btnClientMode.setBackgroundResource(R.drawable.bg_card_selected)
             btnHostMode.setBackgroundResource(R.drawable.bg_card)
             btnShare.visibility = View.GONE
             btnWatch.visibility = View.VISIBLE
-            tvSubtitle.text = "Başkasının ekranını izleyeceksiniz"
+            tvSubtitle.text = getString(R.string.main_watch_desc)
         }
     }
 
@@ -188,20 +213,6 @@ class MainActivity : AppCompatActivity() {
             putExtra(Intent.EXTRA_TEXT, "Screen Mirror ile ekranınızı paylaşın!\n\nİndir: https://play.google.com/store/apps/details?id=com.example.screenmirror")
         }
         startActivity(Intent.createChooser(intent, "Uygulamayı Paylaş"))
-    }
-
-    private fun toggleTheme() {
-        val currentTheme = AppSettings.getTheme(this)
-        val newTheme = if (currentTheme == AppSettings.THEME_DARK) {
-            AppSettings.THEME_LIGHT
-        } else {
-            AppSettings.THEME_DARK
-        }
-        AppSettings.setTheme(this, newTheme)
-        val intent = Intent(this, MainActivity::class.java)
-        finish()
-        startActivity(intent)
-        overridePendingTransition(0, 0)
     }
 
     override fun onDestroy() {

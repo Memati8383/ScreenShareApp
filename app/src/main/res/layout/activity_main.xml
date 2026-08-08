@@ -4,7 +4,6 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FF0A0E27"
     android:fitsSystemWindows="true">
 
     <!-- Main Content -->
@@ -12,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        android:background="?android:windowBackground">
 
         <!-- Top Bar -->
         <LinearLayout
@@ -28,9 +28,9 @@
                 android:layout_height="40dp"
                 android:src="@drawable/ic_menu"
                 android:padding="8dp"
-                android:background="@drawable/bg_circle_button"
                 android:clickable="true"
-                android:focusable="true" />
+                android:focusable="true"
+                android:background="?selectableItemBackgroundBorderless" />
 
             <View
                 android:layout_width="0dp"
@@ -41,11 +41,10 @@
                 android:id="@+id/btnThemeToggle"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/ic_theme_toggle"
                 android:padding="8dp"
-                android:background="@drawable/bg_circle_button"
                 android:clickable="true"
-                android:focusable="true" />
+                android:focusable="true"
+                android:background="?selectableItemBackgroundBorderless" />
         </LinearLayout>
 
         <!-- Content -->
@@ -62,7 +61,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Screen Mirror"
-                android:textColor="@android:color/white"
+                android:textColor="?android:textColorPrimary"
                 android:textSize="32sp"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium"
@@ -72,8 +71,8 @@
                 android:id="@+id/tvSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ekranınızı paylaşın"
-                android:textColor="#99FFFFFF"
+                android:text="@string/main_share_desc"
+                android:textColor="?android:textColorSecondary"
                 android:textSize="15sp"
                 android:layout_marginBottom="48dp" />
 
@@ -92,7 +91,6 @@
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:background="@drawable/bg_card"
                     android:padding="24dp"
                     android:layout_marginEnd="8dp"
                     android:clickable="true"
@@ -107,8 +105,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="YAYINLA"
-                        android:textColor="@android:color/white"
+                        android:text="@string/main_share"
+                        android:textColor="?android:textColorPrimary"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:letterSpacing="0.1" />
@@ -116,8 +114,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ekranınızı paylaşın"
-                        android:textColor="#99FFFFFF"
+                        android:text="@string/main_share_desc"
+                        android:textColor="?android:textColorSecondary"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
@@ -130,7 +128,6 @@
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:background="@drawable/bg_card"
                     android:padding="24dp"
                     android:layout_marginStart="8dp"
                     android:clickable="true"
@@ -145,8 +142,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="İZLE"
-                        android:textColor="@android:color/white"
+                        android:text="@string/main_watch"
+                        android:textColor="?android:textColorPrimary"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:letterSpacing="0.1" />
@@ -154,8 +151,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Yayını izleyin"
-                        android:textColor="#99FFFFFF"
+                        android:text="@string/main_watch_desc"
+                        android:textColor="?android:textColorSecondary"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
@@ -166,7 +163,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="ODA ADI"
-                android:textColor="#66FFFFFF"
+                android:textColor="?android:textColorHint"
                 android:textSize="11sp"
                 android:letterSpacing="0.15"
                 android:layout_marginBottom="8dp" />
@@ -175,10 +172,9 @@
                 android:id="@+id/etRoom"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:background="@drawable/bg_input"
-                android:hint="Oda adını girin"
-                android:textColorHint="#4DFFFFFF"
-                android:textColor="@android:color/white"
+                android:hint="@string/main_room_hint"
+                android:textColorHint="?android:textColorHint"
+                android:textColor="?android:textColorPrimary"
                 android:textSize="15sp"
                 android:paddingHorizontal="16dp"
                 android:inputType="text"
@@ -191,8 +187,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="20dp"
-                android:background="@drawable/bg_button_primary"
-                android:text="BAŞLA"
+                android:text="@string/main_start"
                 android:textColor="@android:color/white"
                 android:textSize="15sp"
                 android:textStyle="bold"
@@ -204,9 +199,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="20dp"
-                android:background="@drawable/bg_button_outline"
-                android:text="BAĞLAN"
-                android:textColor="#00B4FF"
+                android:text="@string/main_connect"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.1"
@@ -220,7 +213,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:gravity="center"
-                android:textColor="#66FFFFFF"
+                android:textColor="?android:textColorSecondary"
                 android:textSize="13sp"
                 android:visibility="gone" />
 
@@ -231,9 +224,6 @@
             android:id="@+id/bottomNav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FF12162A"
-            app:itemIconTint="@color/bottom_nav_color"
-            app:itemTextColor="@color/bottom_nav_color"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/bottom_nav_menu" />
 
@@ -245,10 +235,7 @@
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="#FF12162A"
         app:headerLayout="@layout/drawer_header"
-        app:menu="@menu/drawer_menu"
-        app:itemTextColor="@android:color/white"
-        app:itemIconTint="@android:color/white" />
+        app:menu="@menu/drawer_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

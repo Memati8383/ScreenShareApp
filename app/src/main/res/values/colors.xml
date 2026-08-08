@@ -1,29 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Dark Theme Colors -->
-    <color name="bg_dark">#FF0A0E27</color>
-    <color name="bg_card">#FF131833</color>
-    <color name="bg_input">#FF1A1F3D</color>
-    <color name="bg_overlay">#CC0A0E27</color>
-    <color name="gradient_start">#FF0066FF</color>
-    <color name="gradient_end">#FF00D4FF</color>
-    <color name="accent">#FF00B4FF</color>
-    <color name="accent_dim">#8000B4FF</color>
-    <color name="text_primary">#FFFFFFFF</color>
-    <color name="text_secondary">#99FFFFFF</color>
-    <color name="text_hint">#66FFFFFF</color>
-    <color name="status_good">#FF00E676</color>
-    <color name="status_warn">#FFFFD600</color>
-    <color name="status_bad">#FFFF1744</color>
-    <color name="surface_stroke">#1AFFFFFF</color>
+    <!-- ==================== DARK THEME ==================== -->
+    <color name="dark_bg">#FF0A0E27</color>
+    <color name="dark_bg_card">#FF131833</color>
+    <color name="dark_bg_input">#FF1A1F3D</color>
+    <color name="dark_bg_surface">#FF161B3A</color>
+    <color name="dark_text_primary">#FFFFFFFF</color>
+    <color name="dark_text_secondary">#99FFFFFF</color>
+    <color name="dark_text_hint">#66FFFFFF</color>
+    <color name="dark_accent">#FF00B4FF</color>
+    <color name="dark_accent_dim">#8000B4FF</color>
+    <color name="dark_gradient_start">#FF0066FF</color>
+    <color name="dark_gradient_end">#FF00D4FF</color>
+    <color name="dark_status_good">#FF00E676</color>
+    <color name="dark_status_warn">#FFFFD600</color>
+    <color name="dark_status_bad">#FFFF1744</color>
+    <color name="dark_border">#1AFFFFFF</color>
+    <color name="dark_nav_bg">#FF12162A</color>
+    <color name="dark_nav_active">#FF00B4FF</color>
+    <color name="dark_nav_inactive">#66FFFFFF</color>
 
-    <!-- Light Theme Colors -->
-    <color name="bg_light">#FFF5F7FA</color>
-    <color name="bg_card_light">#FFFFFFFF</color>
-    <color name="bg_input_light">#FFF0F2F5</color>
-    <color name="bg_overlay_light">#CCF5F7FA</color>
-    <color name="text_primary_light">#FF1A1A2E</color>
-    <color name="text_secondary_light">#FF6B7280</color>
-    <color name="text_hint_light">#FF9CA3AF</color>
-    <color name="surface_stroke_light">#1A000000</color>
+    <!-- ==================== LIGHT THEME ==================== -->
+    <color name="light_bg">#FFF0F2F5</color>
+    <color name="light_bg_card">#FFFFFFFF</color>
+    <color name="light_bg_input">#FFE8EAED</color>
+    <color name="light_bg_surface">#FFF8F9FA</color>
+    <color name="light_text_primary">#FF1A1A2E</color>
+    <color name="light_text_secondary">#FF6B7280</color>
+    <color name="light_text_hint">#FF9CA3AF</color>
+    <color name="light_accent">#FF0066FF</color>
+    <color name="light_accent_dim">#800066FF</color>
+    <color name="light_gradient_start">#FF0066FF</color>
+    <color name="light_gradient_end">#FF00D4FF</color>
+    <color name="light_status_good">#FF16A34A</color>
+    <color name="light_status_warn">#FFD97706</color>
+    <color name="light_status_bad">#FFDC2626</color>
+    <color name="light_border">#1A000000</color>
+    <color name="light_nav_bg">#FFFFFFFF</color>
+    <color name="light_nav_active">#FF0066FF</color>
+    <color name="light_nav_inactive">#FF9CA3AF</color>
+
+    <!-- ==================== LEGACY ALIASES (Dark defaults) ==================== -->
+    <color name="bg_dark">@color/dark_bg</color>
+    <color name="bg_card">@color/dark_bg_card</color>
+    <color name="bg_input">@color/dark_bg_input</color>
+    <color name="bg_overlay">#CC0A0E27</color>
+    <color name="gradient_start">@color/dark_gradient_start</color>
+    <color name="gradient_end">@color/dark_gradient_end</color>
+    <color name="accent">@color/dark_accent</color>
+    <color name="accent_dim">@color/dark_accent_dim</color>
+    <color name="text_primary">@color/dark_text_primary</color>
+    <color name="text_secondary">@color/dark_text_secondary</color>
+    <color name="text_hint">@color/dark_text_hint</color>
+    <color name="status_good">@color/dark_status_good</color>
+    <color name="status_warn">@color/dark_status_warn</color>
+    <color name="status_bad">@color/dark_status_bad</color>
+    <color name="surface_stroke">@color/dark_border</color>
 </resources>

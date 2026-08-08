@@ -1,5 +1,6 @@
 package com.example.screenmirror
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 
@@ -19,12 +20,21 @@ object AppSettings {
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
     }
 
+    fun isDarkTheme(context: Context): Boolean {
+        return prefs(context).getString(KEY_THEME, THEME_DARK) == THEME_DARK
+    }
+
     fun getTheme(context: Context): String {
         return prefs(context).getString(KEY_THEME, THEME_DARK) ?: THEME_DARK
     }
 
     fun setTheme(context: Context, theme: String) {
         prefs(context).edit().putString(KEY_THEME, theme).apply()
+    }
+
+    fun toggleTheme(context: Context) {
+        val newTheme = if (isDarkTheme(context)) THEME_LIGHT else THEME_DARK
+        setTheme(context, newTheme)
     }
 
     fun getLanguage(context: Context): String {
@@ -51,20 +61,18 @@ object AppSettings {
         prefs(context).edit().putBoolean(KEY_QUALITY_STATS, enabled).apply()
     }
 
-    fun applyTheme(context: Context) {
-        val theme = getTheme(context)
-        when (theme) {
-            THEME_LIGHT -> context.setTheme(R.style.Theme_ScreenShare_Light)
-            else -> context.setTheme(R.style.Theme_ScreenShare)
+    fun applyTheme(activity: Activity) {
+        if (isDarkTheme(activity)) {
+            activity.setTheme(R.style.Theme_ScreenShare)
+        } else {
+            activity.setTheme(R.style.Theme_ScreenShare_Light)
         }
     }
 
-    fun applyLanguage(context: Context): Context {
-        val lang = getLanguage(context)
-        val locale = java.util.Locale(lang)
-        java.util.Locale.setDefault(locale)
-        val config = android.content.res.Configuration(context.resources.configuration)
-        config.setLocale(locale)
-        return context.createConfigurationContext(config)
+    fun restartActivity(activity: Activity) {
+        val intent = activity.intent
+        activity.finish()
+        activity.startActivity(intent)
+        activity.overridePendingTransition(0, 0)
     }
 }
