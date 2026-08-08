@@ -73,11 +73,11 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_home -> true
                 R.id.nav_recent -> {
                     startActivity(Intent(this, RecentActivity::class.java))
-                    true
+                    false
                 }
                 R.id.nav_profile -> {
                     startActivity(Intent(this, ProfileActivity::class.java))
-                    true
+                    false
                 }
                 else -> false
             }
@@ -112,6 +112,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         requestPermissions()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        bottomNav.menu.setGroupCheckable(0, true, true)
+        bottomNav.menu.findItem(R.id.nav_home)?.isChecked = true
     }
 
     private fun switchMode(hostMode: Boolean) {
