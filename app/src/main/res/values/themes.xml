@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.ScreenShare" parent="Theme.AppCompat.NoActionBar">
+    <style name="Theme.ScreenShare" parent="Theme.MaterialComponents.NoActionBar">
         <item name="android:windowBackground">@color/dark_bg</item>
         <item name="android:statusBarColor">@color/dark_bg</item>
         <item name="android:navigationBarColor">@color/dark_bg</item>
         <item name="colorPrimary">@color/dark_accent</item>
-        <item name="colorPrimaryDark">@color/dark_bg</item>
-        <item name="colorAccent">@color/dark_accent</item>
+        <item name="colorPrimaryVariant">@color/dark_accent</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">@color/dark_accent</item>
+        <item name="colorSecondaryVariant">@color/dark_accent</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSurface">@color/dark_bg_card</item>
+        <item name="colorOnSurface">@color/dark_text_primary</item>
         <item name="android:textColorPrimary">@color/dark_text_primary</item>
         <item name="android:textColorSecondary">@color/dark_text_secondary</item>
         <item name="android:textColorHint">@color/dark_text_hint</item>
@@ -15,10 +20,12 @@
         <item name="android:windowLightNavigationBar">false</item>
     </style>
 
-    <style name="Theme.ScreenShare.Dialog" parent="Theme.AppCompat.Dialog.Alert">
+    <style name="Theme.ScreenShare.Dialog" parent="Theme.MaterialComponents.Dialog.Alert">
         <item name="android:background">@color/dark_bg_card</item>
         <item name="android:textColorPrimary">@color/dark_text_primary</item>
         <item name="android:textColorSecondary">@color/dark_text_secondary</item>
         <item name="colorAccent">@color/dark_accent</item>
+        <item name="colorPrimary">@color/dark_accent</item>
+        <item name="colorSurface">@color/dark_bg_card</item>
     </style>
 </resources>
