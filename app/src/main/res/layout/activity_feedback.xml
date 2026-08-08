@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FF0A0E27"
+    android:fitsSystemWindows="true">
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        app:title="Geri Bildirim"
+        app:titleTextColor="@android:color/white"
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationIconTint="@android:color/white" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="32dp">
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Görüşleriniz bizim için değerli"
+                android:textColor="#99FFFFFF"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:layout_marginBottom="20dp" />
+
+            <!-- Subject Buttons -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="KONU"
+                android:textColor="#66FFFFFF"
+                android:textSize="11sp"
+                android:letterSpacing="0.15"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="20dp">
+
+                <TextView
+                    android:id="@+id/btnOneri"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Öneri"
+                    android:textColor="@android:color/white"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_button_primary"
+                    android:layout_marginEnd="6dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/btnHata"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Hata"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="13sp"
+                    android:background="@drawable/bg_input"
+                    android:layout_marginEnd="6dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/btnGorus"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Görüş"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="13sp"
+                    android:background="@drawable/bg_input"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <!-- Name -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AD"
+                android:textColor="#66FFFFFF"
+                android:textSize="11sp"
+                android:letterSpacing="0.15"
+                android:layout_marginBottom="6dp" />
+
+            <EditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_input"
+                android:hint="Adınız"
+                android:textColorHint="#4DFFFFFF"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:paddingHorizontal="14dp"
+                android:inputType="textPersonName"
+                android:singleLine="true"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Email -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="E-POSTA"
+                android:textColor="#66FFFFFF"
+                android:textSize="11sp"
+                android:letterSpacing="0.15"
+                android:layout_marginBottom="6dp" />
+
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_input"
+                android:hint="E-posta adresiniz"
+                android:textColorHint="#4DFFFFFF"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:paddingHorizontal="14dp"
+                android:inputType="textEmailAddress"
+                android:singleLine="true"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Message -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MESAJINIZ"
+                android:textColor="#66FFFFFF"
+                android:textSize="11sp"
+                android:letterSpacing="0.15"
+                android:layout_marginBottom="6dp" />
+
+            <EditText
+                android:id="@+id/etMessage"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:background="@drawable/bg_input"
+                android:hint="Mesajınızı yazın..."
+                android:textColorHint="#4DFFFFFF"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="12dp"
+                android:gravity="top"
+                android:inputType="textMultiLine"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Send Button -->
+            <Button
+                android:id="@+id/btnSend"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_button_primary"
+                android:text="GÖNDER"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"
+                android:stateListAnimator="@null" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

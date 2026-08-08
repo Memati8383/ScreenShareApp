@@ -1,0 +1,17 @@
+[versions]
+agp = "9.2.1"
+appcompat = "1.7.0"
+webrtc = "1.3.10"
+okhttp = "4.12.0"
+material = "1.12.0"
+gson = "2.11.0"
+
+[libraries]
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+google-webrtc = { group = "io.getstream", name = "stream-webrtc-android", version.ref = "webrtc" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }

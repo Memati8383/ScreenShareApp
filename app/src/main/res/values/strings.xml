@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Screen Mirror</string>
+    <string name="splash_title">Screen Mirror</string>
+    <string name="splash_subtitle">Ekran Paylaşımı</string>
+    <string name="main_share">Yayınla</string>
+    <string name="main_watch">İzle</string>
+    <string name="sender_sharing">Ekran paylaşılıyor...</string>
+    <string name="sender_stop">Durdur</string>
+    <string name="sender_pause">Duraklat</string>
+    <string name="sender_resume">Devam</string>
+    <string name="viewer_waiting">Bağlantı bekleniyor...</string>
+    <string name="viewer_connected">Bağlantı kuruldu</string>
+    <string name="drawer_open">Menüyü aç</string>
+    <string name="drawer_close">Menüyü kapat</string>
+</resources>

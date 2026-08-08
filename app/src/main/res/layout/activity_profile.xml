@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <!-- Gradient Background -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_about_gradient" />
+
+    <!-- Decorative Circles -->
+    <View
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_marginStart="-40dp"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/bg_circle_glass1" />
+
+    <View
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginEnd="-20dp"
+        android:layout_marginTop="250dp"
+        android:background="@drawable/bg_circle_glass2" />
+
+    <!-- Main Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Toolbar -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent"
+            app:title="Profil"
+            app:titleTextColor="@android:color/white"
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="@android:color/white" />
+
+        <!-- Empty State (Profile Not Created) -->
+        <LinearLayout
+            android:id="@+id/layoutEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingHorizontal="32dp"
+            android:visibility="visible">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_person"
+                android:layout_marginBottom="24dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Profil Oluştur"
+                android:textColor="@android:color/white"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kişisel bilgilerinizi girerek başlayın"
+                android:textColor="#99FFFFFF"
+                android:textSize="14sp"
+                android:layout_marginBottom="32dp" />
+
+            <!-- Name -->
+            <EditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_input"
+                android:hint="Adınız Soyadınız"
+                android:textColorHint="#4DFFFFFF"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:paddingHorizontal="16dp"
+                android:inputType="textPersonName"
+                android:singleLine="true"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Email -->
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_input"
+                android:hint="E-posta adresiniz"
+                android:textColorHint="#4DFFFFFF"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:paddingHorizontal="16dp"
+                android:inputType="textEmailAddress"
+                android:singleLine="true"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Save Button -->
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_button_primary"
+                android:text="BAŞLA"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"
+                android:stateListAnimator="@null" />
+
+        </LinearLayout>
+
+        <!-- Profile View (Profile Created) -->
+        <LinearLayout
+            android:id="@+id/layoutProfile"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:overScrollMode="never">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:paddingHorizontal="24dp"
+                    android:paddingBottom="32dp">
+
+                    <!-- Profile Card -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_glass_card"
+                        android:orientation="vertical"
+                        android:padding="24dp"
+                        android:gravity="center"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp">
+
+                        <FrameLayout
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_marginBottom="16dp">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/bg_avatar_glass" />
+
+                            <ImageView
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_person" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/tvUserName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Kullanıcı"
+                            android:textColor="@android:color/white"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="email@email.com"
+                            android:textColor="#99FFFFFF"
+                            android:textSize="13sp"
+                            android:layout_marginTop="4dp" />
+
+                        <View
+                            android:layout_width="60dp"
+                            android:layout_height="2dp"
+                            android:background="@drawable/bg_divider_glass"
+                            android:layout_marginTop="16dp" />
+                    </LinearLayout>
+
+                    <!-- Stats Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_glass_card"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:gravity="center"
+                            android:layout_marginEnd="8dp">
+
+                            <TextView
+                                android:id="@+id/tvSessionCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="#00B4FF"
+                                android:textSize="28sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Oturum"
+                                android:textColor="#99FFFFFF"
+                                android:textSize="11sp"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_glass_card"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:gravity="center"
+                            android:layout_marginStart="8dp">
+
+                            <TextView
+                                android:id="@+id/tvTotalTime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0dk"
+                                android:textColor="#00B4FF"
+                                android:textSize="28sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Toplam Süre"
+                                android:textColor="#99FFFFFF"
+                                android:textSize="11sp"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Menu Items -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_glass_card"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <LinearLayout
+                            android:id="@+id/btnEditProfile"
+                            android:layout_width="match_parent"
+                            android:layout_height="52dp"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="16dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="@drawable/bg_selector">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:src="@drawable/ic_person"
+                                android:layout_marginEnd="14dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Profili Düzenle"
+                                android:textColor="@android:color/white"
+                                android:textSize="15sp" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_arrow_right"
+                                android:alpha="0.5" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#1AFFFFFF"
+                            android:layout_marginHorizontal="16dp" />
+
+                        <LinearLayout
+                            android:id="@+id/btnNotifications"
+                            android:layout_width="match_parent"
+                            android:layout_height="52dp"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="16dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="@drawable/bg_selector">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:src="@drawable/ic_settings"
+                                android:layout_marginEnd="14dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Bildirim Ayarları"
+                                android:textColor="@android:color/white"
+                                android:textSize="15sp" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_arrow_right"
+                                android:alpha="0.5" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#1AFFFFFF"
+                            android:layout_marginHorizontal="16dp" />
+
+                        <LinearLayout
+                            android:id="@+id/btnPrivacy"
+                            android:layout_width="match_parent"
+                            android:layout_height="52dp"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="16dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="@drawable/bg_selector">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:src="@drawable/ic_lock"
+                                android:layout_marginEnd="14dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Gizlilik"
+                                android:textColor="@android:color/white"
+                                android:textSize="15sp" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_arrow_right"
+                                android:alpha="0.5" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Screen Mirror v1.0.0"
+                        android:textColor="#4DFFFFFF"
+                        android:textSize="11sp"
+                        android:layout_marginTop="16dp" />
+
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

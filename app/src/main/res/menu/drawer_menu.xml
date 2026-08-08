@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/drawer_home"
+            android:icon="@drawable/ic_home"
+            android:title="Ana Sayfa" />
+    </group>
+
+    <item android:title="Destek">
+        <menu>
+            <item
+                android:id="@+id/drawer_help"
+                android:icon="@drawable/ic_help"
+                android:title="Yardim" />
+            <item
+                android:id="@+id/drawer_feedback"
+                android:icon="@drawable/ic_feedback"
+                android:title="Geri Bildirim" />
+        </menu>
+    </item>
+
+    <item android:title="Uygulama">
+        <menu>
+            <item
+                android:id="@+id/drawer_about"
+                android:icon="@drawable/ic_info_circle"
+                android:title="Uygulama Hakkinda" />
+            <item
+                android:id="@+id/drawer_share"
+                android:icon="@drawable/ic_share_app"
+                android:title="Uygulamayi Paylas" />
+        </menu>
+    </item>
+</menu>
