@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppSettings.applyTheme(this)
         setContentView(R.layout.activity_main)
         mpm = getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
 
@@ -53,8 +54,12 @@ class MainActivity : AppCompatActivity() {
         btnHostMode = findViewById(R.id.btnHostMode)
         btnClientMode = findViewById(R.id.btnClientMode)
 
-        val btnMenu = findViewById<ImageView>(R.id.btnMenu)
+        val btnMenu = findViewById<ImageView>(R.id.btnMenuDrawer)
         btnMenu.setOnClickListener { drawerLayout.open() }
+
+        findViewById<ImageView>(R.id.btnThemeToggle).setOnClickListener {
+            toggleTheme()
+        }
 
         btnHostMode.setOnClickListener { switchMode(true) }
         btnClientMode.setOnClickListener { switchMode(false) }
@@ -183,6 +188,20 @@ class MainActivity : AppCompatActivity() {
             putExtra(Intent.EXTRA_TEXT, "Screen Mirror ile ekranınızı paylaşın!\n\nİndir: https://play.google.com/store/apps/details?id=com.example.screenmirror")
         }
         startActivity(Intent.createChooser(intent, "Uygulamayı Paylaş"))
+    }
+
+    private fun toggleTheme() {
+        val currentTheme = AppSettings.getTheme(this)
+        val newTheme = if (currentTheme == AppSettings.THEME_DARK) {
+            AppSettings.THEME_LIGHT
+        } else {
+            AppSettings.THEME_DARK
+        }
+        AppSettings.setTheme(this, newTheme)
+        val intent = Intent(this, MainActivity::class.java)
+        finish()
+        startActivity(intent)
+        overridePendingTransition(0, 0)
     }
 
     override fun onDestroy() {
