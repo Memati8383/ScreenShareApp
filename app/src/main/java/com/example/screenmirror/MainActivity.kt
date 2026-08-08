@@ -155,7 +155,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun generateRoomCode(): String {
-        return Random.nextInt(100000, 999999).toString()
+        val chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+        val part1 = (1..3).map { chars.random() }.joinToString("")
+        val part2 = (1..3).map { chars.random() }.joinToString("")
+        return "$part1-$part2"
     }
 
     private fun requestPermissions() {
