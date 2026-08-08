@@ -6,4 +6,4 @@
     android:paddingHorizontal="20dp"
     android:textColor="@android:color/white"
     android:textSize="15sp"
-    android:background="@drawable/bg_spinner_dropdown" />
+    android:background="?attr/selectableItemBackground" />
