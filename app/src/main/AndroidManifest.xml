@@ -13,7 +13,8 @@
         android:maxSdkVersion="28" />
 
     <application
-        android:label="ScreenShare"
+        android:name=".ScreenMirrorApp"
+        android:label="@string/app_name"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.ScreenShare">
 

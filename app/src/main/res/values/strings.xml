@@ -1,24 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Screen Mirror</string>
+
+    <!-- Splash -->
     <string name="splash_title">Screen Mirror</string>
     <string name="splash_subtitle">Ekran Paylaşımı</string>
+
+    <!-- Ana Sayfa -->
+    <string name="main_title">Screen Mirror</string>
+    <string name="main_room_label">ODA ADI</string>
+    <string name="main_room_hint">Oda adı</string>
+    <string name="main_start">BAŞLA</string>
+    <string name="main_connect">BAĞLAN</string>
     <string name="main_share">Yayınla</string>
     <string name="main_watch">İzle</string>
-    <string name="sender_sharing">Ekran paylaşılıyor...</string>
-    <string name="sender_stop">Durdur</string>
-    <string name="sender_pause">Duraklat</string>
-    <string name="sender_resume">Devam</string>
-    <string name="viewer_waiting">Bağlantı bekleniyor...</string>
-    <string name="viewer_connected">Bağlantı kuruldu</string>
-    <string name="drawer_open">Menüyü aç</string>
-    <string name="drawer_close">Menüyü kapat</string>
+    <string name="main_share_desc">Ekranınızı paylaşacaksınız</string>
+    <string name="main_watch_desc">Başkasının ekranını izleyeceksiniz</string>
+    <string name="main_error_empty_room">Oda adını girin</string>
+
+    <!-- Alt Menü -->
+    <string name="nav_home">Ana Sayfa</string>
+    <string name="nav_recent">Son Odalar</string>
+    <string name="nav_profile">Profil</string>
+    <string name="nav_help">Yardım</string>
+
+    <!-- Durum -->
+    <string name="status_live">CANLI</string>
+    <string name="status_connecting">Bağlanıyor…</string>
+    <string name="status_connected">Bağlandı</string>
+    <string name="status_disconnected">Bağlantı kesildi</string>
+
+    <!-- Drawer Menü -->
+    <string name="drawer_title">Destek</string>
+    <string name="drawer_help">Yardım</string>
+    <string name="drawer_feedback">Geri Bildirim</string>
+    <string name="drawer_app_title">Uygulama</string>
+    <string name="drawer_settings">Ayarlar</string>
+    <string name="drawer_about">Uygulama Hakkında</string>
+    <string name="drawer_share">Uygulamayı Paylaş</string>
+
+    <!-- Drawer Başlık -->
+    <string name="drawer_header_title">ScreenShare</string>
+    <string name="drawer_header_subtitle">Ekran Paylaşımı v1.0</string>
 
     <!-- Ayarlar -->
     <string name="settings_title">Ayarlar</string>
-    <string name="settings_theme">Tema</string>
-    <string name="settings_theme_dark">Karanlık</string>
-    <string name="settings_theme_light">Aydınlık</string>
     <string name="settings_language">Dil</string>
     <string name="settings_notifications">Bildirimler</string>
     <string name="settings_notifications_desc">Bildirimleri aç/kapat</string>
@@ -32,49 +58,123 @@
     <string name="profile_name_hint">Adınız Soyadınız</string>
     <string name="profile_email_hint">E-posta adresiniz</string>
     <string name="profile_save">KAYDET</string>
-    <string name="profile_edit">Profili Düzenle</string>
-    <string name="profile_notifications">Bildirim Ayarları</string>
-    <string name="profile_privacy">Gizlilik</string>
+    <string name="profile_user">Kullanıcı</string>
     <string name="profile_sessions">Oturum</string>
     <string name="profile_total_time">Toplam Süre</string>
+    <string name="profile_menu_settings">Ayarlar</string>
+    <string name="profile_menu_help">Yardım</string>
+    <string name="profile_menu_about">Hakkında</string>
+    <string name="profile_delete">Profili Sil</string>
     <string name="profile_version">Screen Mirror v1.0.0</string>
+    <string name="profile_error_name">İsim gerekli</string>
+    <string name="profile_saved">Profil kaydedildi</string>
+    <string name="profile_updated">Profil güncellendi</string>
+    <string name="profile_deleted">Profil silindi</string>
 
-    <!-- Navigasyon -->
-    <string name="nav_home">Ana Sayfa</string>
-    <string name="nav_recent">Son Odalar</string>
-    <string name="nav_profile">Profil</string>
-    <string name="nav_help">Yardım</string>
-    <string name="nav_feedback">Geri Bildirim</string>
-    <string name="nav_about">Hakkında</string>
-    <string name="nav_share">Uygulamayı Paylaş</string>
-
-    <!-- Ana Sayfa -->
-    <string name="main_room_hint">Oda adı</string>
-    <string name="main_start">BAŞLA</string>
-    <string name="main_connect">BAĞLAN</string>
-    <string name="main_share_desc">Ekranınızı paylaşacaksınız</string>
-    <string name="main_watch_desc">Başkasının ekranını izleyeceksiniz</string>
+    <!-- Son Odalar -->
+    <string name="recent_empty">Henüz oda geçmişi yok</string>
+    <string name="recent_deleted">%s silindi</string>
+    <string name="recent_undo">Geri Al</string>
+    <string name="recent_delete_title">Oda Sil</string>
+    <string name="recent_delete_msg">%s odasını silmek istediğinize emin misiniz?</string>
+    <string name="recent_delete_confirm">Sil</string>
+    <string name="recent_participants">Katılımcı: %d</string>
 
     <!-- Yayıncı -->
+    <string name="sender_room_prefix">Oda: %s</string>
+    <string name="sender_status_live">CANLI</string>
     <string name="sender_screenshot">Ekran Görüntüsü</string>
     <string name="sender_record">Kaydet</string>
+    <string name="sender_stop_record">Durdur</string>
     <string name="sender_freeze">Dondur</string>
+    <string name="sender_unfreeze">Devam</string>
     <string name="sender_quality">Kalite</string>
     <string name="sender_stop_broadcast">Yayını Durdur</string>
-    <string name="sender_viewers">izleyici</string>
+    <string name="sender_viewer_label"> izleyici</string>
+    <string name="sender_channel_name">Ekran Paylaşımı</string>
+    <string name="sender_frozen">Yayın duraklatıldı</string>
+    <string name="sender_resumed">Yayın devam ediyor</string>
+    <string name="sender_peer_left">İzleyici ayrıldı</string>
+    <string name="sender_stop_title">Yayını Durdur</string>
+    <string name="sender_stop_msg">Yayını sonlandırmak istediğinize emin misiniz?</string>
+    <string name="sender_stop_confirm">Durdur</string>
+    <string name="sender_screenshot_saved">Ekran görüntüsü kaydedildi: %s</string>
+    <string name="sender_record_started">Kayıt başladı</string>
+    <string name="sender_record_stopped">Kayıt durduruldu</string>
 
     <!-- İzleyici -->
-    <string name="viewer_disconnect">Bağlantıyı Kes</string>
-    <string name="viewer_screenshot">Ekran Görüntüsü</string>
-    <string name="viewer_stats">Bağlanıyor...</string>
+    <string name="viewer_channel_name">Ekran İzleme</string>
+    <string name="viewer_waiting">Yayın bekleniyor…</string>
+    <string name="viewer_stats">RTT: -- | FPS: -- | Kayıp: --%</string>
+    <string name="viewer_broadcast_ended">Yayın sona erdi</string>
+    <string name="viewer_disconnect_title">Bağlantıyı Kes</string>
+    <string name="viewer_disconnect_msg">Yayından ayrılmak istediğinize emin misiniz?</string>
+    <string name="viewer_disconnect_confirm">Ayrıl</string>
+    <string name="viewer_screenshot_saved">Ekran görüntüsü kaydedildi: %s</string>
 
-    <!-- Pencereler -->
-    <string name="dialog_quality_title">Yayın Kalitesi</string>
-    <string name="status_live">CANLI</string>
-    <string name="status_connected">Bağlantı kuruldu</string>
-    <string name="status_disconnected">Bağlantı kesildi</string>
-    <string name="dialog_fps_title">Kare Hızı</string>
-    <string name="dialog_hd">HD (1280x720)</string>
-    <string name="dialog_sd">SD (854x480)</string>
-    <string name="dialog_low">Düşük (640x360)</string>
+    <!-- Ortak -->
+    <string name="btn_cancel">İptal</string>
+    <string name="quality_stats_format" formatted="false">RTT: %dms | FPS: %d | Kayıp: %.1f%%</string>
+
+    <!-- Yardım -->
+    <string name="help_title">Yardım</string>
+    <string name="help_how_title">Nasıl Çalışır?</string>
+    <string name="help_how_desc">ScreenShare, WebRTC teknolojisi kullanarak iki cihaz arasında ekran paylaşımı yapmanızı sağlar.\n\n1. Aynı oda adını her iki cihazda da girin\n2. Bir cihazda \'Yayınla\', diğerinde \'İzle\' seçin\n3. Bağlantı otomatik olarak kurulacak</string>
+    <string name="help_start_title">Ekran Yayını Nasıl Başlatılır?</string>
+    <string name="help_start_desc">1. Ana sayfada oda adını girin\n2. \'Yayınla (Host)\' seçeneğine tıklayın\n3. \'Yayınla\' butonuna basın\n4. Ekran paylaşım iznini onaylayın\n5. Diğer cihazın bağlanmasını bekleyin</string>
+    <string name="help_watch_title">Ekran Yayını Nasıl İzlenir?</string>
+    <string name="help_watch_desc">1. Ana sayfada aynı oda adını girin\n2. \'İzle (Client)\' seçeneğine tıklayın\n3. \'İzle\' butonuna basın\n4. Yayıncı cihazın bağlanmasını bekleyin\n5. Ekran yayını otomatik olarak başlayacak</string>
+    <string name="help_troubleshoot_title">Sorun Giderme</string>
+    <string name="help_troubleshoot_desc">• Bağlantı sorunu: İnternet bağlantınızı kontrol edin\n• Gecikme: WiFi ağına bağlanmayı deneyin\n• Ekran paylaşımı başlamadı: İzinleri kontrol edin\n• Uygulama çöktü: Uygulamayı yeniden başlatın</string>
+    <string name="help_faq_title">Sıkça Sorulan Sorular</string>
+    <string name="help_faq_desc">S: Aynı anda kaç cihaz bağlanabilir?\nC: Şu an için 2 cihaz (1 yayıncı + 1 izleyici)\n\nS: İnternet bağlantısı gerekli mi?\nC: Evet, her iki cihazın da internete bağlı olması gerekir\n\nS: Ücretsiz mi?\nC: Evet, uygulama tamamen ücretsizdir</string>
+
+    <!-- Hakkında -->
+    <string name="about_version">Sürüm 1.0.0 (Build 1)</string>
+    <string name="about_desc">WebRTC tabanlı gerçek zamanlı ekran paylaşımı. Kolay kurulum, düşük gecikme, güvenli bağlantı.</string>
+    <string name="about_whats_new">YENİLİKLER</string>
+    <string name="about_whats_new_list">✓ Bulut üzerinden ekran paylaşımı\n✓ Düşük gecikme süresi\n✓ Güvenli SSL/WSS bağlantısı\n✓ Kolay oda oluşturma\n✓ Son oturum geçmişi</string>
+    <string name="about_features">ÖZELLİKLER</string>
+    <string name="about_feature_screenshot_title">Anlık Ekran Paylaşımı</string>
+    <string name="about_feature_screenshot_desc">Gerçek zamanlı HD ekran yayını</string>
+    <string name="about_feature_lowlatency_title">Düşük Gecikme</string>
+    <string name="about_feature_lowlatency_desc">WebRTC ile milisaniyeler içinde</string>
+    <string name="about_feature_cloud_title">Bulut Çözümü</string>
+    <string name="about_feature_cloud_desc">Her yerden bağlanın, sınır yok</string>
+    <string name="about_developer">Geliştirici</string>
+    <string name="about_developer_name">Ferit Akdemir</string>
+    <string name="about_developer_email">akdemirferit608@gmail.com</string>
+    <string name="about_quote">Basit olan karmaşıktır, karmaşık olan basittir.</string>
+    <string name="about_social_instagram">Instagram</string>
+    <string name="about_social_github">GitHub</string>
+    <string name="about_social_source">Kaynak Kod</string>
+
+    <!-- Geri Bildirim -->
+    <string name="feedback_title">Geri Bildirim</string>
+    <string name="feedback_header">Görüşleriniz bizim için değerli</string>
+    <string name="feedback_subject_label">KONU</string>
+    <string name="feedback_subject_suggestion">Öneri</string>
+    <string name="feedback_subject_bug">Hata</string>
+    <string name="feedback_subject_opinion">Görüş</string>
+    <string name="feedback_name_label">AD</string>
+    <string name="feedback_name_hint">Adınız</string>
+    <string name="feedback_email_label">E-POSTA</string>
+    <string name="feedback_email_hint">E-posta adresiniz</string>
+    <string name="feedback_message_label">MESAJINIZ</string>
+    <string name="feedback_message_hint">Mesajınızı yazın…</string>
+    <string name="feedback_send">GÖNDER</string>
+    <string name="feedback_error_subject">Lütfen bir konu seçin</string>
+    <string name="feedback_error_message">Mesaj boş olamaz</string>
+    <string name="feedback_email_subject">Screen Mirror - %s</string>
+    <string name="feedback_email_field_subject">Konu: %s</string>
+    <string name="feedback_email_field_name">İsim: %s</string>
+    <string name="feedback_email_field_email">E-posta: %s</string>
+    <string name="feedback_email_not_set">Belirtilmemiş</string>
+    <string name="feedback_email_chooser">E-posta gönder</string>
+    <string name="feedback_email_not_found">E-posta uygulaması bulunamadı</string>
+
+    <!-- Paylaşım -->
+    <string name="share_subject">Screen Mirror</string>
+    <string name="share_text">Screen Mirror ile ekranınızı paylaşın!\n\nİndir: https://play.google.com/store/apps/details?id=com.example.screenmirror</string>
+    <string name="share_chooser">Uygulamayı Paylaş</string>
 </resources>

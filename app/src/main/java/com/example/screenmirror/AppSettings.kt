@@ -3,38 +3,22 @@ package com.example.screenmirror
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.ConfigurationCompat
+import androidx.core.os.LocaleListCompat
+import java.util.Locale
 
 object AppSettings {
     private const val PREF_NAME = "app_settings"
-    private const val KEY_THEME = "theme_mode"
     private const val KEY_LANGUAGE = "language"
     private const val KEY_NOTIFICATIONS = "notifications_enabled"
     private const val KEY_QUALITY_STATS = "quality_stats_enabled"
 
-    const val THEME_DARK = "dark"
-    const val THEME_LIGHT = "light"
     const val LANG_TR = "tr"
     const val LANG_EN = "en"
 
     private fun prefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-    }
-
-    fun isDarkTheme(context: Context): Boolean {
-        return prefs(context).getString(KEY_THEME, THEME_DARK) == THEME_DARK
-    }
-
-    fun getTheme(context: Context): String {
-        return prefs(context).getString(KEY_THEME, THEME_DARK) ?: THEME_DARK
-    }
-
-    fun setTheme(context: Context, theme: String) {
-        prefs(context).edit().putString(KEY_THEME, theme).apply()
-    }
-
-    fun toggleTheme(context: Context) {
-        val newTheme = if (isDarkTheme(context)) THEME_LIGHT else THEME_DARK
-        setTheme(context, newTheme)
     }
 
     fun getLanguage(context: Context): String {
@@ -43,6 +27,15 @@ object AppSettings {
 
     fun setLanguage(context: Context, lang: String) {
         prefs(context).edit().putString(KEY_LANGUAGE, lang).apply()
+        applyLanguage(context)
+    }
+
+    fun applyLanguage(context: Context) {
+        val lang = getLanguage(context)
+        val locale = Locale.forLanguageTag(lang)
+        Locale.setDefault(locale)
+        val localeList = LocaleListCompat.forLanguageTags(lang)
+        AppCompatDelegate.setApplicationLocales(localeList)
     }
 
     fun isNotificationsEnabled(context: Context): Boolean {
@@ -59,14 +52,6 @@ object AppSettings {
 
     fun setQualityStatsEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit().putBoolean(KEY_QUALITY_STATS, enabled).apply()
-    }
-
-    fun applyTheme(activity: Activity) {
-        if (isDarkTheme(activity)) {
-            activity.setTheme(R.style.Theme_ScreenShare)
-        } else {
-            activity.setTheme(R.style.Theme_ScreenShare_Light)
-        }
     }
 
     fun restartActivity(activity: Activity) {

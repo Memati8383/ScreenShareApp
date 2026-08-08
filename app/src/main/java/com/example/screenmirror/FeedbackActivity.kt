@@ -20,7 +20,6 @@ class FeedbackActivity : AppCompatActivity() {
     private lateinit var messageInput: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppSettings.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feedback)
 
@@ -28,7 +27,7 @@ class FeedbackActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
-        supportActionBar?.title = getString(R.string.nav_feedback)
+        supportActionBar?.title = getString(R.string.feedback_title)
 
         toolbar.setNavigationOnClickListener { finish() }
 
@@ -47,9 +46,9 @@ class FeedbackActivity : AppCompatActivity() {
             button.setOnClickListener {
                 selectSubject(index)
                 selectedSubject = when (index) {
-                    0 -> "Öneri"
-                    1 -> "Hata Bildirimi"
-                    2 -> "Görüş"
+                    0 -> getString(R.string.feedback_subject_suggestion)
+                    1 -> getString(R.string.feedback_subject_bug)
+                    2 -> getString(R.string.feedback_subject_opinion)
                     else -> ""
                 }
             }
@@ -61,19 +60,19 @@ class FeedbackActivity : AppCompatActivity() {
             val message = messageInput.text.toString().trim()
 
             if (selectedSubject.isEmpty()) {
-                Toast.makeText(this, "Lütfen bir konu seçin", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.feedback_error_subject), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (message.isEmpty()) {
-                messageInput.error = "Mesaj boş olamaz"
+                messageInput.error = getString(R.string.feedback_error_message)
                 return@setOnClickListener
             }
 
-            val subject = "Screen Mirror - $selectedSubject"
+            val subject = getString(R.string.feedback_email_subject, selectedSubject)
             val body = buildString {
-                appendLine("Konu: $selectedSubject")
-                appendLine("İsim: ${name.ifEmpty { "Belirtilmemiş" }}")
-                appendLine("E-posta: ${email.ifEmpty { "Belirtilmemiş" }}")
+                appendLine(getString(R.string.feedback_email_field_subject, selectedSubject))
+                appendLine(getString(R.string.feedback_email_field_name, name.ifEmpty { getString(R.string.feedback_email_not_set) }))
+                appendLine(getString(R.string.feedback_email_field_email, email.ifEmpty { getString(R.string.feedback_email_not_set) }))
                 appendLine("---")
                 appendLine(message)
             }
@@ -86,14 +85,14 @@ class FeedbackActivity : AppCompatActivity() {
             }
 
             try {
-                startActivity(Intent.createChooser(intent, "E-posta gönder"))
+                startActivity(Intent.createChooser(intent, getString(R.string.feedback_email_chooser)))
                 nameInput.text.clear()
                 emailInput.text.clear()
                 messageInput.text.clear()
                 subjectButtons.forEach { it.isSelected = false }
                 selectedSubject = ""
             } catch (_: Exception) {
-                Toast.makeText(this, "E-posta uygulaması bulunamadı", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.feedback_email_not_found), Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -1,63 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- ==================== DARK THEME (Default) ==================== -->
     <style name="Theme.ScreenShare" parent="Theme.AppCompat.NoActionBar">
-        <!-- Background -->
         <item name="android:windowBackground">@color/dark_bg</item>
         <item name="android:statusBarColor">@color/dark_bg</item>
         <item name="android:navigationBarColor">@color/dark_bg</item>
-
-        <!-- Colors -->
         <item name="colorPrimary">@color/dark_accent</item>
         <item name="colorPrimaryDark">@color/dark_bg</item>
         <item name="colorAccent">@color/dark_accent</item>
-
-        <!-- Text -->
         <item name="android:textColorPrimary">@color/dark_text_primary</item>
         <item name="android:textColorSecondary">@color/dark_text_secondary</item>
         <item name="android:textColorHint">@color/dark_text_hint</item>
-
-        <!-- Components -->
         <item name="android:editTextColor">@color/dark_text_primary</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
     </style>
 
-    <!-- ==================== LIGHT THEME ==================== -->
-    <style name="Theme.ScreenShare.Light" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Background -->
-        <item name="android:windowBackground">@color/light_bg</item>
-        <item name="android:statusBarColor">@color/light_bg</item>
-        <item name="android:navigationBarColor">@color/light_bg</item>
-
-        <!-- Colors -->
-        <item name="colorPrimary">@color/light_accent</item>
-        <item name="colorPrimaryDark">@color/light_bg</item>
-        <item name="colorAccent">@color/light_accent</item>
-
-        <!-- Text -->
-        <item name="android:textColorPrimary">@color/light_text_primary</item>
-        <item name="android:textColorSecondary">@color/light_text_secondary</item>
-        <item name="android:textColorHint">@color/light_text_hint</item>
-
-        <!-- Components -->
-        <item name="android:editTextColor">@color/light_text_primary</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
-    </style>
-
-    <!-- ==================== DIALOG THEMES ==================== -->
     <style name="Theme.ScreenShare.Dialog" parent="Theme.AppCompat.Dialog.Alert">
         <item name="android:background">@color/dark_bg_card</item>
         <item name="android:textColorPrimary">@color/dark_text_primary</item>
         <item name="android:textColorSecondary">@color/dark_text_secondary</item>
         <item name="colorAccent">@color/dark_accent</item>
-    </style>
-
-    <style name="Theme.ScreenShare.Light.Dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:background">@color/light_bg_card</item>
-        <item name="android:textColorPrimary">@color/light_text_primary</item>
-        <item name="android:textColorSecondary">@color/light_text_secondary</item>
-        <item name="colorAccent">@color/light_accent</item>
     </style>
 </resources>

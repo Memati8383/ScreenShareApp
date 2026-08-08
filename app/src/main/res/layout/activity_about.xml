@@ -5,13 +5,11 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <!-- Gradient Background -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bg_about_gradient" />
 
-    <!-- Decorative Circles -->
     <View
         android:layout_width="200dp"
         android:layout_height="200dp"
@@ -33,20 +31,18 @@
         android:layout_marginBottom="200dp"
         android:background="@drawable/bg_circle_glass3" />
 
-    <!-- Main Content -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Toolbar -->
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
             app:navigationIcon="@drawable/ic_back"
-            app:navigationIconTint="?android:textColorPrimary" />
+            app:navigationIconTint="@android:color/white" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -62,7 +58,6 @@
                 android:paddingHorizontal="24dp"
                 android:paddingBottom="32dp">
 
-                <!-- App Icon with Glow -->
                 <FrameLayout
                     android:layout_width="120dp"
                     android:layout_height="120dp"
@@ -84,7 +79,6 @@
                         android:padding="28dp" />
                 </FrameLayout>
 
-                <!-- App Name Card (Glass) -->
                 <LinearLayout
                     android:id="@+id/nameCard"
                     android:layout_width="match_parent"
@@ -98,8 +92,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Screen Mirror"
-                        android:textColor="?android:textColorPrimary"
+                        android:text="@string/app_name"
+                        android:textColor="@android:color/white"
                         android:textSize="26sp"
                         android:textStyle="bold"
                         android:fontFamily="sans-serif-medium"
@@ -108,8 +102,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Sürüm 1.0.0 (Build 1)"
-                        android:textColor="?android:textColorSecondary"
+                        android:text="@string/about_version"
+                        android:textColor="#B3FFFFFF"
                         android:textSize="13sp"
                         android:layout_marginTop="4dp" />
 
@@ -122,15 +116,14 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="WebRTC tabanlı gerçek zamanlı ekran paylaşımı. Kolay kurulum, düşük gecikme, güvenli bağlantı."
-                        android:textColor="?android:textColorSecondary"
+                        android:text="@string/about_desc"
+                        android:textColor="#CCFFFFFF"
                         android:textSize="13sp"
                         android:gravity="center"
                         android:lineSpacingExtra="4dp"
                         android:layout_marginTop="16dp" />
                 </LinearLayout>
 
-                <!-- What's New Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -142,8 +135,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="YENİLİKLER"
-                        android:textColor="?android:textColorSecondary"
+                        android:text="@string/about_whats_new"
+                        android:textColor="#80FFFFFF"
                         android:textSize="11sp"
                         android:letterSpacing="0.15"
                         android:layout_marginBottom="12dp" />
@@ -151,13 +144,12 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="✓ Bulut üzerinden ekran paylaşımı\n✓ Düşük gecikme süresi\n✓ Güvenli SSL/WSS bağlantısı\n✓ Kolay oda oluşturma\n✓ Son oturum geçmişi"
-                        android:textColor="?android:textColorSecondary"
+                        android:text="@string/about_whats_new_list"
+                        android:textColor="#CCFFFFFF"
                         android:textSize="13sp"
                         android:lineSpacingExtra="6dp" />
                 </LinearLayout>
 
-                <!-- Features Card (Glass) -->
                 <LinearLayout
                     android:id="@+id/featureCard"
                     android:layout_width="match_parent"
@@ -170,283 +162,69 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="ÖZELLİKLER"
-                        android:textColor="?android:textColorSecondary"
+                        android:text="@string/about_features"
+                        android:textColor="#80FFFFFF"
                         android:textSize="11sp"
                         android:letterSpacing="0.15"
                         android:layout_marginBottom="16dp" />
 
-                    <!-- Feature 1 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:layout_marginBottom="14dp">
-
                         <FrameLayout
                             android:layout_width="36dp"
                             android:layout_height="36dp"
                             android:layout_marginEnd="14dp">
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_feature_icon" />
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_cast" />
+                            <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_feature_icon" />
+                            <ImageView android:layout_width="18dp" android:layout_height="18dp" android:layout_gravity="center" android:src="@drawable/ic_cast" />
                         </FrameLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Anlık Ekran Paylaşımı"
-                                android:textColor="?android:textColorPrimary"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Gerçek zamanlı HD ekran yayını"
-                                android:textColor="?android:textColorSecondary"
-                                android:textSize="12sp"
-                                android:layout_marginTop="2dp" />
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/about_feature_screenshot_title" android:textColor="@android:color/white" android:textSize="15sp" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/about_feature_screenshot_desc" android:textColor="#99FFFFFF" android:textSize="12sp" android:layout_marginTop="2dp" />
                         </LinearLayout>
                     </LinearLayout>
 
-                    <!-- Feature 2 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:layout_marginBottom="14dp">
-
                         <FrameLayout
                             android:layout_width="36dp"
                             android:layout_height="36dp"
                             android:layout_marginEnd="14dp">
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_feature_icon" />
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_speed" />
+                            <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_feature_icon" />
+                            <ImageView android:layout_width="18dp" android:layout_height="18dp" android:layout_gravity="center" android:src="@drawable/ic_speed" />
                         </FrameLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Düşük Gecikme"
-                                android:textColor="?android:textColorPrimary"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="WebRTC ile milisaniyeler içinde"
-                                android:textColor="?android:textColorSecondary"
-                                android:textSize="12sp"
-                                android:layout_marginTop="2dp" />
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/about_feature_lowlatency_title" android:textColor="@android:color/white" android:textSize="15sp" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/about_feature_lowlatency_desc" android:textColor="#99FFFFFF" android:textSize="12sp" android:layout_marginTop="2dp" />
                         </LinearLayout>
                     </LinearLayout>
 
-                    <!-- Feature 3 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="14dp">
-
-                        <FrameLayout
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:layout_marginEnd="14dp">
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_feature_icon" />
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_cloud" />
-                        </FrameLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Bulut Çözümü"
-                                android:textColor="?android:textColorPrimary"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Her yerden bağlanın, sınır yok"
-                                android:textColor="?android:textColorSecondary"
-                                android:textSize="12sp"
-                                android:layout_marginTop="2dp" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Feature 4 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="14dp">
-
-                        <FrameLayout
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:layout_marginEnd="14dp">
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_feature_icon" />
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_link" />
-                        </FrameLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Kolay Bağlantı"
-                                android:textColor="?android:textColorPrimary"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Tek oda adı ile hızlı kurulum"
-                                android:textColor="?android:textColorSecondary"
-                                android:textSize="12sp"
-                                android:layout_marginTop="2dp" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Feature 5 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="14dp">
-
-                        <FrameLayout
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:layout_marginEnd="14dp">
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_feature_icon" />
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_lock" />
-                        </FrameLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Güvenli İletişim"
-                                android:textColor="?android:textColorPrimary"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="SSL/WSS ile şifreli bağlantı"
-                                android:textColor="?android:textColorSecondary"
-                                android:textSize="12sp"
-                                android:layout_marginTop="2dp" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Feature 6 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
-
                         <FrameLayout
                             android:layout_width="36dp"
                             android:layout_height="36dp"
                             android:layout_marginEnd="14dp">
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_feature_icon" />
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_fullscreen" />
+                            <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_feature_icon" />
+                            <ImageView android:layout_width="18dp" android:layout_height="18dp" android:layout_gravity="center" android:src="@drawable/ic_cloud" />
                         </FrameLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Tam Ekran Modu"
-                                android:textColor="?android:textColorPrimary"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Kesintisiz izleme deneyimi"
-                                android:textColor="?android:textColorSecondary"
-                                android:textSize="12sp"
-                                android:layout_marginTop="2dp" />
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/about_feature_cloud_title" android:textColor="@android:color/white" android:textSize="15sp" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/about_feature_cloud_desc" android:textColor="#99FFFFFF" android:textSize="12sp" android:layout_marginTop="2dp" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Developer Card (Glass) -->
                 <LinearLayout
                     android:id="@+id/devCard"
                     android:layout_width="match_parent"
@@ -461,15 +239,8 @@
                         android:layout_width="56dp"
                         android:layout_height="56dp"
                         android:layout_marginEnd="16dp">
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/bg_avatar_glass" />
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_person" />
+                        <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_avatar_glass" />
+                        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:layout_gravity="center" android:src="@drawable/ic_person" />
                     </FrameLayout>
 
                     <LinearLayout
@@ -477,43 +248,19 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Geliştirici"
-                            android:textColor="?android:textColorSecondary"
-                            android:textSize="11sp"
-                            android:letterSpacing="0.1" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Ferit Akdemir"
-                            android:textColor="?android:textColorPrimary"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="2dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="akdemirferit608@gmail.com"
-                            android:textColor="?android:textColorSecondary"
-                            android:textSize="12sp"
-                            android:layout_marginTop="2dp" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/about_developer" android:textColor="#80FFFFFF" android:textSize="11sp" android:letterSpacing="0.1" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/about_developer_name" android:textColor="@android:color/white" android:textSize="16sp" android:textStyle="bold" android:layout_marginTop="2dp" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/about_developer_email" android:textColor="#80FFFFFF" android:textSize="12sp" android:layout_marginTop="2dp" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Social Buttons -->
                 <include layout="@layout/layout_social_buttons" />
 
-                <!-- Quote -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Basit olan karmaşıktır, karmaşık olan basittir."
-                    android:textColor="@color/accent"
+                    android:text="@string/about_quote"
+                    android:textColor="#4D00B4FF"
                     android:textSize="12sp"
                     android:textStyle="italic"
                     android:gravity="center"

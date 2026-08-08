@@ -5,13 +5,11 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <!-- Gradient Background -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bg_about_gradient" />
 
-    <!-- Decorative Circles -->
     <View
         android:layout_width="180dp"
         android:layout_height="180dp"
@@ -26,24 +24,21 @@
         android:layout_marginTop="250dp"
         android:background="@drawable/bg_circle_glass2" />
 
-    <!-- Main Content -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Toolbar -->
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
-            app:title="Profil"
-            app:titleTextColor="?android:textColorPrimary"
+            app:title="@string/profile_title"
+            app:titleTextColor="@android:color/white"
             app:navigationIcon="@drawable/ic_back"
-            app:navigationIconTint="?android:textColorPrimary" />
+            app:navigationIconTint="@android:color/white" />
 
-        <!-- Create Form (Profile Not Created) -->
         <ScrollView
             android:id="@+id/createForm"
             android:layout_width="match_parent"
@@ -68,8 +63,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Profil Oluştur"
-                    android:textColor="?android:textColorPrimary"
+                    android:text="@string/profile_create"
+                    android:textColor="@android:color/white"
                     android:textSize="22sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp" />
@@ -77,8 +72,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Kişisel bilgilerinizi girerek başlayın"
-                    android:textColor="?android:textColorSecondary"
+                    android:text="@string/profile_create_desc"
+                    android:textColor="#99FFFFFF"
                     android:textSize="14sp"
                     android:layout_marginBottom="32dp" />
 
@@ -87,9 +82,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:background="@drawable/bg_input"
-                    android:hint="Adınız Soyadınız"
+                    android:hint="@string/profile_name_hint"
                     android:textColorHint="#4DFFFFFF"
-                    android:textColor="?android:textColorPrimary"
+                    android:textColor="@android:color/white"
                     android:textSize="15sp"
                     android:paddingHorizontal="16dp"
                     android:inputType="textPersonName"
@@ -101,9 +96,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:background="@drawable/bg_input"
-                    android:hint="E-posta adresiniz"
+                    android:hint="@string/profile_email_hint"
                     android:textColorHint="#4DFFFFFF"
-                    android:textColor="?android:textColorPrimary"
+                    android:textColor="@android:color/white"
                     android:textSize="15sp"
                     android:paddingHorizontal="16dp"
                     android:inputType="textEmailAddress"
@@ -115,7 +110,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:background="@drawable/bg_button_primary"
-                    android:text="KAYDET"
+                    android:text="@string/profile_save"
                     android:textColor="@android:color/white"
                     android:textSize="15sp"
                     android:textStyle="bold"
@@ -125,7 +120,6 @@
             </LinearLayout>
         </ScrollView>
 
-        <!-- Profile View (Profile Created) -->
         <ScrollView
             android:id="@+id/profileView"
             android:layout_width="match_parent"
@@ -141,7 +135,6 @@
                 android:paddingHorizontal="24dp"
                 android:paddingBottom="32dp">
 
-                <!-- Profile Header -->
                 <LinearLayout
                     android:id="@+id/profileHeader"
                     android:layout_width="match_parent"
@@ -157,25 +150,16 @@
                         android:layout_width="100dp"
                         android:layout_height="100dp"
                         android:layout_marginBottom="16dp">
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/bg_avatar_glass" />
-
-                        <ImageView
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_person" />
+                        <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_avatar_glass" />
+                        <ImageView android:layout_width="60dp" android:layout_height="60dp" android:layout_gravity="center" android:src="@drawable/ic_person" />
                     </FrameLayout>
 
                     <TextView
                         android:id="@+id/profileName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Kullanıcı"
-                        android:textColor="?android:textColorPrimary"
+                        android:text="@string/profile_user"
+                        android:textColor="@android:color/white"
                         android:textSize="22sp"
                         android:textStyle="bold" />
 
@@ -184,7 +168,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="email@email.com"
-                        android:textColor="?android:textColorSecondary"
+                        android:textColor="#99FFFFFF"
                         android:textSize="13sp"
                         android:layout_marginTop="4dp" />
 
@@ -195,7 +179,6 @@
                         android:layout_marginTop="16dp" />
                 </LinearLayout>
 
-                <!-- Stats Row -->
                 <LinearLayout
                     android:id="@+id/statsCard"
                     android:layout_width="match_parent"
@@ -212,23 +195,8 @@
                         android:padding="16dp"
                         android:gravity="center"
                         android:layout_marginEnd="8dp">
-
-                        <TextView
-                            android:id="@+id/statRooms"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textColor="@color/accent"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Oturum"
-                            android:textColor="?android:textColorSecondary"
-                            android:textSize="11sp"
-                            android:layout_marginTop="4dp" />
+                        <TextView android:id="@+id/statRooms" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#00B4FF" android:textSize="28sp" android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"                          android:text="@string/profile_sessions" android:textColor="#99FFFFFF" android:textSize="11sp" android:layout_marginTop="4dp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -240,27 +208,11 @@
                         android:padding="16dp"
                         android:gravity="center"
                         android:layout_marginStart="8dp">
-
-                        <TextView
-                            android:id="@+id/statHours"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textColor="@color/accent"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Toplam Süre"
-                            android:textColor="?android:textColorSecondary"
-                            android:textSize="11sp"
-                            android:layout_marginTop="4dp" />
+                        <TextView android:id="@+id/statHours" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#00B4FF" android:textSize="28sp" android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"                          android:text="@string/profile_total_time" android:textColor="#99FFFFFF" android:textSize="11sp" android:layout_marginTop="4dp" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Menu Items -->
                 <LinearLayout
                     android:id="@+id/menuCard"
                     android:layout_width="match_parent"
@@ -269,116 +221,29 @@
                     android:orientation="vertical"
                     android:padding="8dp">
 
-                    <LinearLayout
-                        android:id="@+id/menuSettings"
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="@drawable/bg_selector">
-
-                        <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:src="@drawable/ic_settings"
-                            android:layout_marginEnd="14dp" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Ayarlar"
-                            android:textColor="?android:textColorPrimary"
-                            android:textSize="15sp" />
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_arrow_right"
-                            android:alpha="0.5" />
+                    <LinearLayout android:id="@+id/menuSettings" android:layout_width="match_parent" android:layout_height="52dp" android:orientation="horizontal" android:gravity="center_vertical" android:paddingHorizontal="16dp" android:clickable="true" android:focusable="true" android:background="@drawable/bg_selector">
+                        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_settings" android:layout_marginEnd="14dp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/profile_menu_settings" android:textColor="@android:color/white" android:textSize="15sp" />
+                        <ImageView android:layout_width="18dp" android:layout_height="18dp" android:src="@drawable/ic_arrow_right" android:alpha="0.5" />
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#1AFFFFFF"
-                        android:layout_marginHorizontal="16dp" />
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#1AFFFFFF" android:layout_marginHorizontal="16dp" />
 
-                    <LinearLayout
-                        android:id="@+id/menuHelp"
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="@drawable/bg_selector">
-
-                        <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:src="@drawable/ic_help"
-                            android:layout_marginEnd="14dp" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Yardım"
-                            android:textColor="?android:textColorPrimary"
-                            android:textSize="15sp" />
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_arrow_right"
-                            android:alpha="0.5" />
+                    <LinearLayout android:id="@+id/menuHelp" android:layout_width="match_parent" android:layout_height="52dp" android:orientation="horizontal" android:gravity="center_vertical" android:paddingHorizontal="16dp" android:clickable="true" android:focusable="true" android:background="@drawable/bg_selector">
+                        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_help" android:layout_marginEnd="14dp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/profile_menu_help" android:textColor="@android:color/white" android:textSize="15sp" />
+                        <ImageView android:layout_width="18dp" android:layout_height="18dp" android:src="@drawable/ic_arrow_right" android:alpha="0.5" />
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#1AFFFFFF"
-                        android:layout_marginHorizontal="16dp" />
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#1AFFFFFF" android:layout_marginHorizontal="16dp" />
 
-                    <LinearLayout
-                        android:id="@+id/menuAbout"
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="@drawable/bg_selector">
-
-                        <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:src="@drawable/ic_info"
-                            android:layout_marginEnd="14dp" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Hakkında"
-                            android:textColor="?android:textColorPrimary"
-                            android:textSize="15sp" />
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_arrow_right"
-                            android:alpha="0.5" />
+                    <LinearLayout android:id="@+id/menuAbout" android:layout_width="match_parent" android:layout_height="52dp" android:orientation="horizontal" android:gravity="center_vertical" android:paddingHorizontal="16dp" android:clickable="true" android:focusable="true" android:background="@drawable/bg_selector">
+                        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_info" android:layout_marginEnd="14dp" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/profile_menu_about" android:textColor="@android:color/white" android:textSize="15sp" />
+                        <ImageView android:layout_width="18dp" android:layout_height="18dp" android:src="@drawable/ic_arrow_right" android:alpha="0.5" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Logout -->
                 <LinearLayout
                     android:id="@+id/btnLogout"
                     android:layout_width="match_parent"
@@ -389,20 +254,13 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:layout_marginTop="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Profili Sil"
-                        android:textColor="@color/dark_status_error"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/profile_delete" android:textColor="@color/status_bad" android:textSize="15sp" android:textStyle="bold" />
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Screen Mirror v1.0.0"
+                    android:text="@string/profile_version"
                     android:textColor="#4DFFFFFF"
                     android:textSize="11sp"
                     android:layout_marginTop="16dp" />

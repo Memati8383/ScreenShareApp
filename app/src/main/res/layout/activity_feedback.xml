@@ -4,19 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?android:windowBackground"
+    android:background="#FF0A0E27"
     android:fitsSystemWindows="true">
 
-    <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/transparent"
-        app:title="Geri Bildirim"
-        app:titleTextColor="?android:textColorPrimary"
+        app:title="@string/feedback_title"
+        app:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="?android:textColorPrimary" />
+        app:navigationIconTint="@android:color/white" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -31,22 +30,20 @@
             android:paddingTop="16dp"
             android:paddingBottom="32dp">
 
-            <!-- Header -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Görüşleriniz bizim için değerli"
-                android:textColor="?android:textColorSecondary"
+                android:text="@string/feedback_header"
+                android:textColor="#99FFFFFF"
                 android:textSize="14sp"
                 android:gravity="center"
                 android:layout_marginBottom="20dp" />
 
-            <!-- Subject Buttons -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="KONU"
-                android:textColor="?android:textColorSecondary"
+                android:text="@string/feedback_subject_label"
+                android:textColor="#66FFFFFF"
                 android:textSize="11sp"
                 android:letterSpacing="0.15"
                 android:layout_marginBottom="8dp" />
@@ -63,7 +60,7 @@
                     android:layout_height="40dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Öneri"
+                    android:text="@string/feedback_subject_suggestion"
                     android:textColor="@android:color/white"
                     android:textSize="13sp"
                     android:textStyle="bold"
@@ -78,8 +75,8 @@
                     android:layout_height="40dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Hata"
-                    android:textColor="?android:textColorSecondary"
+                    android:text="@string/feedback_subject_bug"
+                    android:textColor="#99FFFFFF"
                     android:textSize="13sp"
                     android:background="@drawable/bg_input"
                     android:layout_marginEnd="6dp"
@@ -92,20 +89,19 @@
                     android:layout_height="40dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Görüş"
-                    android:textColor="?android:textColorSecondary"
+                    android:text="@string/feedback_subject_opinion"
+                    android:textColor="#99FFFFFF"
                     android:textSize="13sp"
                     android:background="@drawable/bg_input"
                     android:clickable="true"
                     android:focusable="true" />
             </LinearLayout>
 
-            <!-- Name -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="AD"
-                android:textColor="?android:textColorSecondary"
+                android:text="@string/feedback_name_label"
+                android:textColor="#66FFFFFF"
                 android:textSize="11sp"
                 android:letterSpacing="0.15"
                 android:layout_marginBottom="6dp" />
@@ -115,21 +111,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/bg_input"
-                android:hint="Adınız"
+                android:hint="@string/feedback_name_hint"
                 android:textColorHint="#4DFFFFFF"
-                android:textColor="?android:textColorPrimary"
+                android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:paddingHorizontal="14dp"
                 android:inputType="textPersonName"
                 android:singleLine="true"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Email -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="E-POSTA"
-                android:textColor="?android:textColorSecondary"
+                android:text="@string/feedback_email_label"
+                android:textColor="#66FFFFFF"
                 android:textSize="11sp"
                 android:letterSpacing="0.15"
                 android:layout_marginBottom="6dp" />
@@ -139,21 +134,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/bg_input"
-                android:hint="E-posta adresiniz"
+                android:hint="@string/feedback_email_hint"
                 android:textColorHint="#4DFFFFFF"
-                android:textColor="?android:textColorPrimary"
+                android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:paddingHorizontal="14dp"
                 android:inputType="textEmailAddress"
                 android:singleLine="true"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Message -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="MESAJINIZ"
-                android:textColor="?android:textColorSecondary"
+                android:text="@string/feedback_message_label"
+                android:textColor="#66FFFFFF"
                 android:textSize="11sp"
                 android:letterSpacing="0.15"
                 android:layout_marginBottom="6dp" />
@@ -163,9 +157,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="140dp"
                 android:background="@drawable/bg_input"
-                android:hint="Mesajınızı yazın..."
+                android:hint="@string/feedback_message_hint"
                 android:textColorHint="#4DFFFFFF"
-                android:textColor="?android:textColorPrimary"
+                android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:paddingHorizontal="14dp"
                 android:paddingVertical="12dp"
@@ -173,13 +167,12 @@
                 android:inputType="textMultiLine"
                 android:layout_marginBottom="24dp" />
 
-            <!-- Send Button -->
             <Button
                 android:id="@+id/btnSend"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:background="@drawable/bg_button_primary"
-                android:text="GÖNDER"
+                android:text="@string/feedback_send"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:textStyle="bold"

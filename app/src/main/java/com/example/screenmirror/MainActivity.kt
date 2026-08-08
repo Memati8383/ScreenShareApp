@@ -34,11 +34,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navigationView: NavigationView
     private lateinit var btnHostMode: LinearLayout
     private lateinit var btnClientMode: LinearLayout
-    private lateinit var btnThemeToggle: ImageView
     private var isHostMode = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppSettings.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mpm = getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
@@ -52,18 +50,11 @@ class MainActivity : AppCompatActivity() {
         navigationView = findViewById(R.id.navigationView)
         btnHostMode = findViewById(R.id.btnHostMode)
         btnClientMode = findViewById(R.id.btnClientMode)
-        btnThemeToggle = findViewById(R.id.btnThemeToggle)
 
-        updateThemeIcon()
         updateCardStyles()
 
         findViewById<ImageView>(R.id.btnMenuDrawer).setOnClickListener {
             drawerLayout.open()
-        }
-
-        btnThemeToggle.setOnClickListener {
-            AppSettings.toggleTheme(this)
-            AppSettings.restartActivity(this)
         }
 
         btnHostMode.setOnClickListener { switchMode(true) }
@@ -117,24 +108,9 @@ class MainActivity : AppCompatActivity() {
         requestPermissions()
     }
 
-    private fun updateThemeIcon() {
-        if (AppSettings.isDarkTheme(this)) {
-            btnThemeToggle.setImageResource(R.drawable.ic_sun)
-        } else {
-            btnThemeToggle.setImageResource(R.drawable.ic_moon)
-        }
-    }
-
     private fun updateCardStyles() {
-        if (AppSettings.isDarkTheme(this)) {
-            btnHostMode.setBackgroundResource(R.drawable.bg_card)
-            btnClientMode.setBackgroundResource(R.drawable.bg_card)
-            bottomNav.setBackgroundColor(resources.getColor(R.color.dark_nav_bg, null))
-        } else {
-            btnHostMode.setBackgroundResource(R.drawable.bg_card_light)
-            btnClientMode.setBackgroundResource(R.drawable.bg_card_light)
-            bottomNav.setBackgroundColor(resources.getColor(R.color.light_nav_bg, null))
-        }
+        btnHostMode.setBackgroundResource(R.drawable.bg_card)
+        btnClientMode.setBackgroundResource(R.drawable.bg_card)
     }
 
     private fun switchMode(hostMode: Boolean) {
@@ -169,7 +145,7 @@ class MainActivity : AppCompatActivity() {
     private fun validateInput(): Boolean {
         val room = etRoom.text.toString().trim()
         if (room.isBlank()) {
-            showStatus("Oda adını girin")
+            showStatus(getString(R.string.main_error_empty_room))
             return false
         }
         return true
@@ -209,10 +185,10 @@ class MainActivity : AppCompatActivity() {
     private fun shareApp() {
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "Screen Mirror")
-            putExtra(Intent.EXTRA_TEXT, "Screen Mirror ile ekranınızı paylaşın!\n\nİndir: https://play.google.com/store/apps/details?id=com.example.screenmirror")
+            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_subject))
+            putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text))
         }
-        startActivity(Intent.createChooser(intent, "Uygulamayı Paylaş"))
+        startActivity(Intent.createChooser(intent, getString(R.string.share_chooser)))
     }
 
     override fun onDestroy() {

@@ -42,7 +42,6 @@ class ViewerActivity : AppCompatActivity() {
     private var statsCheckerRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppSettings.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_viewer)
 
@@ -73,7 +72,7 @@ class ViewerActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 "viewer_channel",
-                "Ekran İzleme",
+                getString(R.string.viewer_channel_name),
                 NotificationManager.IMPORTANCE_LOW
             )
             val manager = getSystemService(NotificationManager::class.java)
@@ -88,7 +87,7 @@ class ViewerActivity : AppCompatActivity() {
                     "com.example.screenmirror.SENDER_DISCONNECTED" -> {
                         runOnUiThread {
                             tvViewerStatus.text = getString(R.string.status_disconnected)
-                            Toast.makeText(context, "Yayın sona erdi", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(R.string.viewer_broadcast_ended), Toast.LENGTH_SHORT).show()
                             handler.postDelayed({ finish() }, 2000)
                         }
                     }
@@ -106,7 +105,7 @@ class ViewerActivity : AppCompatActivity() {
                                 return@runOnUiThread
                             }
                             tvConnectionQuality.visibility = View.VISIBLE
-                            tvConnectionQuality.text = "RTT: ${rtt}ms | FPS: $fps | Kayıp: %.1f%%".format(packetLoss)
+                            tvConnectionQuality.text = getString(R.string.quality_stats_format, rtt, fps, packetLoss)
 
                             val color = when {
                                 rtt < 100 && packetLoss < 1 -> ContextCompat.getColor(context, R.color.dark_status_good)
@@ -134,16 +133,11 @@ class ViewerActivity : AppCompatActivity() {
     }
 
     private fun showDisconnectConfirmation() {
-        val dialogTheme = if (AppSettings.isDarkTheme(this)) {
-            R.style.Theme_ScreenShare_Dialog
-        } else {
-            R.style.Theme_ScreenShare_Light_Dialog
-        }
-        AlertDialog.Builder(this, dialogTheme)
-            .setTitle("Bağlantıyı Kes")
-            .setMessage("Yayından ayrılmak istediğinize emin misiniz?")
-            .setPositiveButton("Ayrıl") { _, _ -> cleanupAndFinish() }
-            .setNegativeButton("İptal", null)
+        AlertDialog.Builder(this, R.style.Theme_ScreenShare_Dialog)
+            .setTitle(getString(R.string.viewer_disconnect_title))
+            .setMessage(getString(R.string.viewer_disconnect_msg))
+            .setPositiveButton(getString(R.string.viewer_disconnect_confirm)) { _, _ -> cleanupAndFinish() }
+            .setNegativeButton(getString(R.string.btn_cancel), null)
             .show()
     }
 
@@ -192,7 +186,7 @@ class ViewerActivity : AppCompatActivity() {
         FileOutputStream(file).use { out ->
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
         }
-        Toast.makeText(this, "Ekran görüntüsü kaydedildi: $filename", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.viewer_screenshot_saved, filename), Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroy() {

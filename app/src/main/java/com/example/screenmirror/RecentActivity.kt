@@ -27,7 +27,6 @@ class RecentActivity : AppCompatActivity() {
     private lateinit var historyManager: RoomHistoryManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppSettings.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recent)
 
@@ -82,8 +81,8 @@ class RecentActivity : AppCompatActivity() {
     private fun deleteRoom(room: RoomHistory) {
         historyManager.deleteRoom(room.id)
         loadRooms()
-        Snackbar.make(recyclerView, "${room.roomName} silindi", Snackbar.LENGTH_LONG)
-            .setAction("Geri Al") {
+        Snackbar.make(recyclerView, getString(R.string.recent_deleted, room.roomName), Snackbar.LENGTH_LONG)
+            .setAction(getString(R.string.recent_undo)) {
                 historyManager.saveRoom(room)
                 loadRooms()
             }
@@ -91,16 +90,11 @@ class RecentActivity : AppCompatActivity() {
     }
 
     private fun showDeleteDialog(room: RoomHistory) {
-        val dialogTheme = if (AppSettings.isDarkTheme(this)) {
-            R.style.Theme_ScreenShare_Dialog
-        } else {
-            R.style.Theme_ScreenShare_Light_Dialog
-        }
-        AlertDialog.Builder(this, dialogTheme)
-            .setTitle("Oda Sil")
-            .setMessage("${room.roomName} odasını silmek istediğinize emin misiniz?")
-            .setPositiveButton("Sil") { _, _ -> deleteRoom(room) }
-            .setNegativeButton("İptal", null)
+        AlertDialog.Builder(this, R.style.Theme_ScreenShare_Dialog)
+            .setTitle(getString(R.string.recent_delete_title))
+            .setMessage(getString(R.string.recent_delete_msg, room.roomName))
+            .setPositiveButton(getString(R.string.recent_delete_confirm)) { _, _ -> deleteRoom(room) }
+            .setNegativeButton(getString(R.string.btn_cancel), null)
             .show()
     }
 
@@ -148,7 +142,7 @@ class RecentActivity : AppCompatActivity() {
                 tvRoomName.text = room.roomName
                 tvTime.text = formatDate(room.endTime)
                 tvDuration.text = formatDuration(room.duration)
-                tvParticipants.text = "Katılımcı: ${room.participantCount}"
+                tvParticipants.text = itemView.context.getString(R.string.recent_participants, room.participantCount)
 
                 val dotColor = if (room.role == "sender") {
                     ContextCompat.getColor(itemView.context, R.color.dark_accent)
@@ -163,7 +157,7 @@ class RecentActivity : AppCompatActivity() {
     }
 
     private fun formatDate(timestamp: Long): String {
-        val sdf = SimpleDateFormat("dd MMM, HH:mm", Locale("tr"))
+        val sdf = SimpleDateFormat("dd MMM, HH:mm", Locale.forLanguageTag("tr"))
         return sdf.format(Date(timestamp))
     }
 

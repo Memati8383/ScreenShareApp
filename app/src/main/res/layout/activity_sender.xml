@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:text="Ekran paylaşılıyor"
+                android:text="@string/status_live"
                 android:textColor="@color/text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="6dp"
-                android:text="Hazırlanıyor..."
+                android:text="@string/status_connecting"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 
@@ -96,7 +96,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text=" izleyici"
+                android:text="@string/sender_viewer_label"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp" />
 
@@ -161,7 +161,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Ekran Goruntusu"
+                    android:text="@string/sender_screenshot"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -193,7 +193,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Kaydet"
+                    android:text="@string/sender_record"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -230,7 +230,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Dondur"
+                    android:text="@string/sender_freeze"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -260,7 +260,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Kalite"
+                    android:text="@string/sender_quality"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -273,7 +273,7 @@
             android:layout_height="44dp"
             android:layout_marginTop="12dp"
             android:background="@drawable/bg_button_outline"
-            android:text="Yayini Durdur"
+            android:text="@string/sender_stop_broadcast"
             android:textColor="@color/status_bad"
             android:textSize="14sp"
             android:stateListAnimator="@null" />

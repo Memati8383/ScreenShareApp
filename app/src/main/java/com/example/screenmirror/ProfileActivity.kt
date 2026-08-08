@@ -28,7 +28,6 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var createForm: ScrollView
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppSettings.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
@@ -38,7 +37,7 @@ class ProfileActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
-        supportActionBar?.title = getString(R.string.nav_profile)
+        supportActionBar?.title = getString(R.string.profile_title)
 
         toolbar.setNavigationOnClickListener { finish() }
 
@@ -58,17 +57,17 @@ class ProfileActivity : AppCompatActivity() {
             val name = nameInput.text.toString().trim()
             val email = emailInput.text.toString().trim()
             if (name.isEmpty()) {
-                nameInput.error = "İsim gerekli"
+                nameInput.error = getString(R.string.profile_error_name)
                 return@setOnClickListener
             }
             saveProfile(name, email)
-            Toast.makeText(this, if (profileView.visibility == View.VISIBLE) "Profil güncellendi" else "Profil kaydedildi", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, if (profileView.visibility == View.VISIBLE) getString(R.string.profile_updated) else getString(R.string.profile_saved), Toast.LENGTH_SHORT).show()
             showProfile()
         }
 
         findViewById<LinearLayout>(R.id.btnLogout).setOnClickListener {
             clearProfile()
-            Toast.makeText(this, "Profil silindi", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.profile_deleted), Toast.LENGTH_SHORT).show()
             showCreateForm()
         }
 

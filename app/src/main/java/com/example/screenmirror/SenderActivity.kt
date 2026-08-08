@@ -59,7 +59,6 @@ class SenderActivity : AppCompatActivity() {
     private var recordRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppSettings.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sender)
 
@@ -81,7 +80,7 @@ class SenderActivity : AppCompatActivity() {
         val toolbar = findViewById<MaterialToolbar?>(R.id.toolbar)
 
         val code = intent.getStringExtra(EXTRA_ROOM_CODE) ?: "000000"
-        tvSenderRoom.text = "Oda: $code"
+        tvSenderRoom.text = getString(R.string.sender_room_prefix, code)
 
         val captureWidth = intent.getIntExtra(EXTRA_CAPTURE_WIDTH, 1280)
         val captureHeight = intent.getIntExtra(EXTRA_CAPTURE_HEIGHT, 720)
@@ -95,8 +94,8 @@ class SenderActivity : AppCompatActivity() {
             ScreenShareService.isFrozen = !ScreenShareService.isFrozen
             isFrozen = ScreenShareService.isFrozen
             val freezeText = btnFreeze.findViewById<TextView>(R.id.tvFreeze)
-            freezeText?.text = if (isFrozen) "Devam" else "Dondur"
-            Toast.makeText(this, if (isFrozen) "Yayın duraklatıldı" else "Yayın devam ediyor", Toast.LENGTH_SHORT).show()
+            freezeText?.text = if (isFrozen) getString(R.string.sender_unfreeze) else getString(R.string.sender_freeze)
+            Toast.makeText(this, if (isFrozen) getString(R.string.sender_frozen) else getString(R.string.sender_resumed), Toast.LENGTH_SHORT).show()
         }
 
         btnScreenshot.setOnClickListener { takeScreenshot() }
@@ -119,7 +118,7 @@ class SenderActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
-                "Ekran Paylaşımı",
+                getString(R.string.sender_channel_name),
                 NotificationManager.IMPORTANCE_LOW
             )
             val manager = getSystemService(NotificationManager::class.java)
@@ -136,7 +135,7 @@ class SenderActivity : AppCompatActivity() {
             override fun onReceive(context: Context, intent: Intent) {
                 when (intent.action) {
                     "com.example.screenmirror.PEER_LEFT" -> {
-                        Toast.makeText(context, "İzleyici ayrıldı", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, getString(R.string.sender_peer_left), Toast.LENGTH_SHORT).show()
                         val count = intent.getIntExtra("viewer_count", 0)
                         updateViewerCount(count)
                     }
@@ -171,20 +170,15 @@ class SenderActivity : AppCompatActivity() {
     }
 
     private fun showStopConfirmation() {
-        val dialogTheme = if (AppSettings.isDarkTheme(this)) {
-            R.style.Theme_ScreenShare_Dialog
-        } else {
-            R.style.Theme_ScreenShare_Light_Dialog
-        }
-        AlertDialog.Builder(this, dialogTheme)
-            .setTitle("Yayını Durdur")
-            .setMessage("Yayını sonlandırmak istediğinize emin misiniz?")
-            .setPositiveButton("Durdur") { _, _ ->
+        AlertDialog.Builder(this, R.style.Theme_ScreenShare_Dialog)
+            .setTitle(getString(R.string.sender_stop_title))
+            .setMessage(getString(R.string.sender_stop_msg))
+            .setPositiveButton(getString(R.string.sender_stop_confirm)) { _, _ ->
                 stopService(Intent(this, ScreenShareService::class.java))
                 isSharing = false
                 finish()
             }
-            .setNegativeButton("İptal", null)
+            .setNegativeButton(getString(R.string.btn_cancel), null)
             .show()
     }
 
@@ -220,7 +214,7 @@ class SenderActivity : AppCompatActivity() {
             }
 
             tvConnectionQuality.visibility = View.VISIBLE
-            tvConnectionQuality.text = "RTT: ${rtt}ms | FPS: $fps | Kayıp: %.1f%%".format(packetLoss)
+            tvConnectionQuality.text = getString(R.string.quality_stats_format, rtt, fps, packetLoss)
 
             val color = when {
                 rtt < 100 && packetLoss < 1 -> ContextCompat.getColor(this, R.color.dark_status_good)
@@ -253,7 +247,7 @@ class SenderActivity : AppCompatActivity() {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
         }
 
-        Toast.makeText(this, "Ekran görüntüsü kaydedildi: $filename", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.sender_screenshot_saved, filename), Toast.LENGTH_SHORT).show()
     }
 
     private fun startRecording() {
@@ -267,10 +261,10 @@ class SenderActivity : AppCompatActivity() {
         })
         isRecording = false
         val recordText = btnRecord.findViewById<TextView>(R.id.tvRecord)
-        recordText?.text = "Kaydet"
+        recordText?.text = getString(R.string.sender_record)
         tvTimer.visibility = View.GONE
         recordRunnable?.let { handler.removeCallbacks(it) }
-        Toast.makeText(this, "Kayıt durduruldu", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.sender_record_stopped), Toast.LENGTH_SHORT).show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -294,10 +288,10 @@ class SenderActivity : AppCompatActivity() {
             sendBroadcast(recordIntent)
             isRecording = true
             val recordText = btnRecord.findViewById<TextView>(R.id.tvRecord)
-            recordText?.text = "Durdur"
+            recordText?.text = getString(R.string.sender_stop_record)
             tvTimer.visibility = View.VISIBLE
             startRecordTimer()
-            Toast.makeText(this, "Kayıt başladı", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.sender_record_started), Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:fitsSystemWindows="true"
-        android:background="?android:windowBackground">
+        android:background="@color/bg_dark">
 
         <!-- Top Bar -->
         <LinearLayout
@@ -27,20 +27,6 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:src="@drawable/ic_menu"
-                android:padding="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?selectableItemBackgroundBorderless" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <ImageView
-                android:id="@+id/btnThemeToggle"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
                 android:padding="8dp"
                 android:clickable="true"
                 android:focusable="true"
@@ -60,8 +46,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Screen Mirror"
-                android:textColor="?android:textColorPrimary"
+                android:text="@string/app_name"
+                android:textColor="@android:color/white"
                 android:textSize="32sp"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium"
@@ -72,7 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/main_share_desc"
-                android:textColor="?android:textColorSecondary"
+                android:textColor="@color/text_secondary"
                 android:textSize="15sp"
                 android:layout_marginBottom="48dp" />
 
@@ -106,7 +92,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/main_share"
-                        android:textColor="?android:textColorPrimary"
+                        android:textColor="@android:color/white"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:letterSpacing="0.1" />
@@ -115,7 +101,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/main_share_desc"
-                        android:textColor="?android:textColorSecondary"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
@@ -143,7 +129,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/main_watch"
-                        android:textColor="?android:textColorPrimary"
+                        android:textColor="@android:color/white"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:letterSpacing="0.1" />
@@ -152,7 +138,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/main_watch_desc"
-                        android:textColor="?android:textColorSecondary"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
@@ -162,8 +148,8 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ODA ADI"
-                android:textColor="?android:textColorHint"
+                android:text="@string/main_room_label"
+                android:textColor="@color/text_hint"
                 android:textSize="11sp"
                 android:letterSpacing="0.15"
                 android:layout_marginBottom="8dp" />
@@ -173,8 +159,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:hint="@string/main_room_hint"
-                android:textColorHint="?android:textColorHint"
-                android:textColor="?android:textColorPrimary"
+                android:textColorHint="@color/text_hint"
+                android:textColor="@android:color/white"
                 android:textSize="15sp"
                 android:paddingHorizontal="16dp"
                 android:inputType="text"
@@ -213,7 +199,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:gravity="center"
-                android:textColor="?android:textColorSecondary"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:visibility="gone" />
 

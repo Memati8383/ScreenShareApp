@@ -15,7 +15,6 @@ class HelpActivity : AppCompatActivity() {
     private var expandedArrow: ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppSettings.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_help)
 
