@@ -73,6 +73,9 @@ class ViewerActivity : AppCompatActivity() {
 
         roomCode = intent.getStringExtra("room") ?: ""
 
+        val viewerSurface = findViewById<org.webrtc.SurfaceViewRenderer>(R.id.viewerSurface)
+        ScreenShareService.renderer = viewerSurface
+
         startTime = System.currentTimeMillis()
         registerReceiver()
         startStatsChecker()

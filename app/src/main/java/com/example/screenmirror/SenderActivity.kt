@@ -112,6 +112,9 @@ class SenderActivity : AppCompatActivity() {
         roomCode = intent.getStringExtra(EXTRA_ROOM_CODE) ?: "000000"
         tvSenderRoom.text = getString(R.string.sender_room_prefix, roomCode)
 
+        val senderSurface = findViewById<org.webrtc.SurfaceViewRenderer>(R.id.senderSurface)
+        ScreenShareService.renderer = senderSurface
+
         btnFreeze.setOnClickListener {
             ScreenShareService.isFrozen = !ScreenShareService.isFrozen
             isFrozen = ScreenShareService.isFrozen
