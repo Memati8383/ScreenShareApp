@@ -4,14 +4,17 @@ import android.app.AlertDialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.util.Log
+import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -22,7 +25,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.example.screenmirror.model.ConnectionQuality
+import com.example.screenmirror.model.ServiceEvent
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
@@ -54,7 +60,8 @@ class SenderActivity : AppCompatActivity() {
 
     private lateinit var recordLauncher: ActivityResultLauncher<Intent>
 
-    private var receiver: BroadcastReceiver? = null
+    private var service: ScreenShareService? = null
+    private var isBound = false
     private var isSharing = false
     private var isRecording = false
     private var isFrozen = false
@@ -69,6 +76,22 @@ class SenderActivity : AppCompatActivity() {
     private lateinit var skeletonStatus: View
     private lateinit var skeletonProgress: View
     private lateinit var skeletonHint: TextView
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+            val localBinder = binder as ScreenShareService.LocalBinder
+            service = localBinder.getService()
+            isBound = true
+            observeServiceEvents()
+            Log.i("SenderActivity", "Servise baglandi")
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            service = null
+            isBound = false
+            Log.i("SenderActivity", "Servis baglantisi kesildi")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,8 +137,6 @@ class SenderActivity : AppCompatActivity() {
         tvSenderRoom.text = getString(R.string.sender_room_prefix, roomCode)
 
         val senderSurface = findViewById<org.webrtc.SurfaceViewRenderer>(R.id.senderSurface)
-        ScreenShareService.renderer = senderSurface
-        Log.i("SenderActivity", "renderer atandi: ${senderSurface != null}")
 
         btnFreeze.setOnClickListener {
             val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
@@ -140,10 +161,104 @@ class SenderActivity : AppCompatActivity() {
 
         tvConnectionQuality.visibility = if (AppSettings.isQualityStatsEnabled(this)) View.VISIBLE else View.GONE
 
-        showSkeleton("Ekran paylaşımı başlatılıyor...")
+        showSkeleton("Ekran paylasimi baslatiliyor...")
         startService()
-        registerBroadcastReceiver()
         startStatsChecker()
+    }
+
+    private fun observeServiceEvents() {
+        val svc = service ?: return
+        lifecycleScope.launch {
+            svc.getStateManager().event.collectLatest { event ->
+                when (event) {
+                    is ServiceEvent.WebRtcReady -> {
+                        tvSenderStats.text = getString(R.string.state_webrtc_ready)
+                        hideSkeleton()
+                    }
+                    is ServiceEvent.ViewerWaiting -> {
+                        tvSenderStats.text = getString(R.string.state_viewer_waiting)
+                        hideSkeleton()
+                    }
+                    is ServiceEvent.ScreenBroadcasting -> {
+                        tvSenderStats.text = getString(R.string.state_screen_broadcasting)
+                        hideSkeleton()
+                    }
+                    is ServiceEvent.PeerConnected -> {
+                        tvSenderStats.text = getString(R.string.state_peer_connected)
+                        hideSkeleton()
+                    }
+                    is ServiceEvent.LiveReceived -> {
+                        tvSenderStats.text = getString(R.string.state_live_received)
+                        hideSkeleton()
+                    }
+                    is ServiceEvent.OfferSent -> {
+                        tvSenderStats.text = getString(R.string.state_offer_sent)
+                        hideSkeleton()
+                    }
+                    is ServiceEvent.AnswerSent -> {
+                        tvSenderStats.text = getString(R.string.state_answer_sent)
+                        hideSkeleton()
+                    }
+                    is ServiceEvent.BroadcastPaused -> {
+                        tvSenderStats.text = getString(R.string.state_broadcast_paused)
+                    }
+                    is ServiceEvent.BroadcastResumed -> {
+                        tvSenderStats.text = getString(R.string.state_broadcast_resumed)
+                    }
+                    is ServiceEvent.ConnectionBroken -> {
+                        tvSenderStats.text = getString(R.string.state_connection_broken)
+                        hideSkeleton()
+                    }
+                    is ServiceEvent.ViewerCountChanged -> {
+                        tvViewerCount.text = event.count.toString()
+                    }
+                    is ServiceEvent.ConnectionQualityChanged -> {
+                        updateConnectionQuality(event.quality, event.rtt, event.fps, event.packetLoss)
+                    }
+                    is ServiceEvent.Error -> {
+                        tvSenderStats.text = event.type.displayMessage
+                        hideSkeleton()
+                    }
+                    is ServiceEvent.SdpError -> {
+                        tvSenderStats.text = getString(R.string.state_sdp_error, event.detail)
+                        hideSkeleton()
+                    }
+                    is ServiceEvent.WebRtcError -> {
+                        tvSenderStats.text = getString(R.string.state_webrtc_error, event.detail)
+                        hideSkeleton()
+                    }
+                    is ServiceEvent.SignalingStatus -> {
+                        tvSenderStats.text = event.message
+                    }
+                    is ServiceEvent.SurfaceWaiting -> {
+                        tvSenderStats.text = getString(R.string.state_surface_waiting)
+                    }
+                    is ServiceEvent.SurfaceNotFound -> {
+                        tvSenderStats.text = getString(R.string.state_surface_not_found)
+                        hideSkeleton()
+                    }
+                    is ServiceEvent.RecordingStarted -> {
+                        isRecording = true
+                        tvTimer.visibility = View.VISIBLE
+                        startRecordTimer()
+                    }
+                    is ServiceEvent.RecordingStopped -> {
+                        isRecording = false
+                        tvTimer.visibility = View.GONE
+                    }
+                    is ServiceEvent.SenderDisconnected -> {
+                        tvSenderStats.text = event.message
+                    }
+                    else -> {}
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            svc.getStateManager().viewerCount.collectLatest { count ->
+                tvViewerCount.text = count.toString()
+            }
+        }
     }
 
     private fun initSkeleton() {
@@ -183,12 +298,7 @@ class SenderActivity : AppCompatActivity() {
 
     private fun startService() {
         val resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, 0)
-        val projectionData = if (Build.VERSION.SDK_INT >= 33) {
-            intent.getParcelableExtra(EXTRA_PROJECTION_DATA, Intent::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(EXTRA_PROJECTION_DATA)
-        }
+        val projectionData = getParcelableExtraCompat(intent, EXTRA_PROJECTION_DATA)
 
         if (resultCode == 0 || projectionData == null) {
             showSkeleton(getString(R.string.state_screen_permission_error))
@@ -203,58 +313,20 @@ class SenderActivity : AppCompatActivity() {
         }
         startForegroundService(serviceIntent)
 
+        val senderSurface = findViewById<org.webrtc.SurfaceViewRenderer>(R.id.senderSurface)
+        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+
         isSharing = true
         startTime = System.currentTimeMillis()
         tvSenderStatus.text = getString(R.string.status_live)
     }
 
-    private fun registerBroadcastReceiver() {
-        receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                when (intent.action) {
-                    "com.example.screenmirror.PEER_LEFT" -> {
-                        val count = intent.getIntExtra("viewer_count", 0)
-                        updateViewerCount(count)
-                    }
-                    "com.example.screenmirror.VIEWER_COUNT_CHANGED" -> {
-                        val count = intent.getIntExtra("viewer_count", 0)
-                        updateViewerCount(count)
-                    }
-                    "com.example.screenmirror.CONNECTION_QUALITY" -> {
-                        val quality = intent.getStringExtra("quality") ?: ""
-                        val rtt = intent.getIntExtra("rtt", 0)
-                        val fps = intent.getIntExtra("fps", 0)
-                        val packetLoss = intent.getDoubleExtra("packet_loss", 0.0)
-                        updateConnectionQuality(quality, rtt, fps, packetLoss)
-                    }
-                    "com.example.screenmirror.STATE_CHANGED" -> {
-                        val state = intent.getStringExtra("state") ?: ""
-                        tvSenderStats.text = state
-                        if (state in listOf("WebRTC hazir", "Izleyici bekleniyor...", "Ekran yayinda", "Es cihaz baglandi", "Canli goruntu aliniyor")) {
-                            hideSkeleton()
-                        }
-                        if (state.startsWith("Teklif") || state.startsWith("Yanit") || state.startsWith("Baglanti kuruldu")) {
-                            hideSkeleton()
-                        }
-                        if (state.startsWith("HATA") || state.startsWith("WebRTC hatasi") || state.startsWith("SDP hatasi") || state.startsWith("Baglanti hatasi")) {
-                            hideSkeleton()
-                        }
-                    }
-                }
-            }
-        }
-
-        val filter = IntentFilter().apply {
-            addAction("com.example.screenmirror.PEER_LEFT")
-            addAction("com.example.screenmirror.VIEWER_COUNT_CHANGED")
-            addAction("com.example.screenmirror.CONNECTION_QUALITY")
-            addAction("com.example.screenmirror.STATE_CHANGED")
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
+    @Suppress("DEPRECATION")
+    private fun getParcelableExtraCompat(intent: Intent, key: String): Intent? {
+        return if (Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra(key, Intent::class.java)
         } else {
-            registerReceiver(receiver, filter)
+            intent.getParcelableExtra(key)
         }
     }
 
@@ -279,22 +351,12 @@ class SenderActivity : AppCompatActivity() {
                     delay(2000)
                     continue
                 }
-                val intent = Intent("com.example.screenmirror.REQUEST_STATS").apply {
-                    setPackage(packageName)
-                }
-                sendBroadcast(intent)
                 delay(2000)
             }
         }
     }
 
-    private fun updateViewerCount(count: Int) {
-        runOnUiThread {
-            tvViewerCount.text = count.toString()
-        }
-    }
-
-    private fun updateConnectionQuality(quality: String, rtt: Int, fps: Int, packetLoss: Double) {
+    private fun updateConnectionQuality(quality: ConnectionQuality, rtt: Int, fps: Int, packetLoss: Double) {
         runOnUiThread {
             if (!AppSettings.isQualityStatsEnabled(this)) {
                 tvConnectionQuality.visibility = View.GONE
@@ -307,9 +369,9 @@ class SenderActivity : AppCompatActivity() {
             tvConnectionQuality.text = getString(R.string.quality_stats_format, rtt, fps, packetLoss)
 
             val (colorRes, iconRes) = when (quality) {
-                "IYI" -> R.color.dark_status_good to R.drawable.ic_signal
-                "ORTA" -> R.color.dark_status_warning to R.drawable.ic_signal
-                else -> R.color.dark_status_error to R.drawable.ic_signal
+                ConnectionQuality.GOOD -> R.color.dark_status_good to R.drawable.ic_signal
+                ConnectionQuality.MEDIUM -> R.color.dark_status_warning to R.drawable.ic_signal
+                ConnectionQuality.BAD -> R.color.dark_status_error to R.drawable.ic_signal
             }
 
             val color = ContextCompat.getColor(this, colorRes)
@@ -401,6 +463,9 @@ class SenderActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         skeletonHelper.stopAnimation()
-        receiver?.let { unregisterReceiver(it) }
+        if (isBound) {
+            unbindService(serviceConnection)
+            isBound = false
+        }
     }
 }
