@@ -176,9 +176,11 @@ class ScreenShareService : Service() {
             } else {
                 Log.i(TAG, "surface hazir degil, bekleniyor...")
                 postState("Surface bekleniyor...")
+                var surfaceCallbackFired = false
                 sv?.holder?.addCallback(object : SurfaceHolder.Callback {
                     override fun surfaceCreated(h: SurfaceHolder) {
                         Log.i(TAG, "surfaceCreated - WebRTC baslatiliyor")
+                        surfaceCallbackFired = true
                         mainHandler.post { startWebRtc(r) }
                     }
                     override fun surfaceChanged(h: SurfaceHolder, f: Int, w: Int, ht: Int) {}
@@ -186,6 +188,15 @@ class ScreenShareService : Service() {
                         Log.w(TAG, "surfaceDestroyed")
                     }
                 })
+                mainHandler.postDelayed({
+                    if (!surfaceCallbackFired && !webRtcReady) {
+                        Log.w(TAG, "surface callback 3sn icinde tetiklenmedi, yeniden deneniyor")
+                        val retryRenderer = renderer
+                        if (retryRenderer != null) {
+                            startWebRtc(retryRenderer)
+                        }
+                    }
+                }, 3000)
             }
         } catch (e: Exception) {
             Log.e(TAG, "onStartCommand hatasi", e)
@@ -380,6 +391,15 @@ class ScreenShareService : Service() {
                         } else {
                             Log.i(TAG, "sender: localTrack henuz hazir degil, offer bekleniyor")
                             offerPending = true
+                            mainHandler.postDelayed({
+                                if (offerPending && role == "sender") {
+                                    Log.w(TAG, "sender: offer hala bekleniyor, yeniden deneniyor")
+                                    if (localTrack != null) {
+                                        offerPending = false
+                                        executor.execute { createOffer() }
+                                    }
+                                }
+                            }, 5000)
                         }
                     }
                 },

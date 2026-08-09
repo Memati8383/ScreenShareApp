@@ -45,6 +45,7 @@ class ViewerActivity : AppCompatActivity() {
     private var startTime = 0L
     private var roomCode = ""
     private var isDisconnecting = false
+    private var skeletonTimeoutJob: kotlinx.coroutines.Job? = null
 
     private lateinit var skeletonHelper: SkeletonAnimHelper
     private lateinit var skeletonContainer: View
@@ -116,9 +117,23 @@ class ViewerActivity : AppCompatActivity() {
         skeletonHelper.startSkeletonAnimation(
             skeletonIcon, skeletonTitle, skeletonSubtitle, skeletonStatus
         )
+        startSkeletonTimeout()
+    }
+
+    private fun startSkeletonTimeout() {
+        skeletonTimeoutJob?.cancel()
+        skeletonTimeoutJob = lifecycleScope.launch {
+            delay(15_000)
+            if (!isDisconnecting && skeletonContainer.visibility == View.VISIBLE) {
+                hideSkeleton()
+                tvViewerStatus.text = "Baglanti zaman asimi"
+                Toast.makeText(this@ViewerActivity, "Yayin bulunamadi, tekrar deneyin", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun hideSkeleton() {
+        skeletonTimeoutJob?.cancel()
         skeletonHelper.hideSkeleton(skeletonContainer)
     }
 
@@ -199,6 +214,10 @@ class ViewerActivity : AppCompatActivity() {
                                     finish()
                                 }
                             }
+                            if (state.startsWith("HATA") || state.startsWith("WebRTC hatasi") || state == "SDP hatasi") {
+                                hideSkeleton()
+                                tvViewerStatus.text = state
+                            }
                         }
                     }
                 }
@@ -274,6 +293,7 @@ class ViewerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        skeletonTimeoutJob?.cancel()
         skeletonHelper.stopAnimation()
         try { receiver?.let { unregisterReceiver(it) } } catch (_: Exception) {}
     }
