@@ -48,7 +48,12 @@ class SplashActivity : AppCompatActivity() {
         lifecycleScope.launch {
             delay(2200)
             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            if (android.os.Build.VERSION.SDK_INT >= 34) {
+                overrideActivityTransition(android.app.Activity.OVERRIDE_TRANSITION_OPEN, R.anim.fade_in, R.anim.fade_out)
+            } else {
+                @Suppress("DEPRECATION")
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            }
             finish()
         }
     }

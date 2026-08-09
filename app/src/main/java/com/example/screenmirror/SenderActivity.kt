@@ -183,10 +183,15 @@ class SenderActivity : AppCompatActivity() {
 
     private fun startService() {
         val resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, 0)
-        val projectionData = intent.getParcelableExtra<Intent>(EXTRA_PROJECTION_DATA)
+        val projectionData = if (Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra(EXTRA_PROJECTION_DATA, Intent::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(EXTRA_PROJECTION_DATA)
+        }
 
         if (resultCode == 0 || projectionData == null) {
-            showSkeleton("HATA: Ekran paylaşımı izni alınamadı")
+            showSkeleton(getString(R.string.state_screen_permission_error))
             return
         }
 
@@ -322,20 +327,45 @@ class SenderActivity : AppCompatActivity() {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val filename = "screenmirror_$timestamp.png"
 
-        val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(
-            android.os.Environment.DIRECTORY_PICTURES
-        )
-        val screenmirrorDir = File(picturesDir, "ScreenMirror")
-        if (!screenmirrorDir.exists()) {
-            screenmirrorDir.mkdirs()
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val contentValues = android.content.ContentValues().apply {
+                    put(android.provider.MediaStore.Images.Media.DISPLAY_NAME, filename)
+                    put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/png")
+                    put(android.provider.MediaStore.Images.Media.RELATIVE_PATH, "Pictures/ScreenMirror")
+                    put(android.provider.MediaStore.Images.Media.IS_PENDING, 1)
+                }
+                val resolver = contentResolver
+                val uri = resolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                if (uri != null) {
+                    resolver.openOutputStream(uri)?.use { out ->
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                    }
+                    contentValues.clear()
+                    contentValues.put(android.provider.MediaStore.Images.Media.IS_PENDING, 0)
+                    resolver.update(uri, contentValues, null, null)
+                    Toast.makeText(this, getString(R.string.sender_screenshot_saved, filename), Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, getString(R.string.screenshot_error_io), Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(
+                    android.os.Environment.DIRECTORY_PICTURES
+                )
+                val screenmirrorDir = File(picturesDir, "ScreenMirror")
+                if (!screenmirrorDir.exists()) {
+                    screenmirrorDir.mkdirs()
+                }
+                val file = File(screenmirrorDir, filename)
+                FileOutputStream(file).use { out ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                }
+                Toast.makeText(this, getString(R.string.sender_screenshot_saved, filename), Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            Log.e("SenderActivity", "Screenshot hatasi", e)
+            Toast.makeText(this, getString(R.string.screenshot_error_io), Toast.LENGTH_SHORT).show()
         }
-
-        val file = File(screenmirrorDir, filename)
-        FileOutputStream(file).use { out ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-        }
-
-        Toast.makeText(this, getString(R.string.sender_screenshot_saved, filename), Toast.LENGTH_SHORT).show()
     }
 
     private fun startRecording() {

@@ -11,6 +11,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
@@ -129,8 +130,8 @@ class ViewerActivity : AppCompatActivity() {
             delay(15_000)
             if (!isDisconnecting && skeletonContainer.visibility == View.VISIBLE) {
                 hideSkeleton()
-                tvViewerStatus.text = "Baglanti zaman asimi"
-                Toast.makeText(this@ViewerActivity, "Yayin bulunamadi, tekrar deneyin", Toast.LENGTH_LONG).show()
+                tvViewerStatus.text = getString(R.string.state_connection_timeout)
+                Toast.makeText(this@ViewerActivity, getString(R.string.state_broadcast_not_found), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -289,17 +290,43 @@ class ViewerActivity : AppCompatActivity() {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val filename = "screenmirror_viewer_$timestamp.png"
 
-        val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(
-            android.os.Environment.DIRECTORY_PICTURES
-        )
-        val screenmirrorDir = File(picturesDir, "ScreenMirror")
-        if (!screenmirrorDir.exists()) screenmirrorDir.mkdirs()
-
-        val file = File(screenmirrorDir, filename)
-        FileOutputStream(file).use { out ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val contentValues = android.content.ContentValues().apply {
+                    put(android.provider.MediaStore.Images.Media.DISPLAY_NAME, filename)
+                    put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/png")
+                    put(android.provider.MediaStore.Images.Media.RELATIVE_PATH, "Pictures/ScreenMirror")
+                    put(android.provider.MediaStore.Images.Media.IS_PENDING, 1)
+                }
+                val resolver = contentResolver
+                val uri = resolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                if (uri != null) {
+                    resolver.openOutputStream(uri)?.use { out ->
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                    }
+                    contentValues.clear()
+                    contentValues.put(android.provider.MediaStore.Images.Media.IS_PENDING, 0)
+                    resolver.update(uri, contentValues, null, null)
+                    Toast.makeText(this, getString(R.string.viewer_screenshot_saved, filename), Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, getString(R.string.screenshot_error_io), Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(
+                    android.os.Environment.DIRECTORY_PICTURES
+                )
+                val screenmirrorDir = File(picturesDir, "ScreenMirror")
+                if (!screenmirrorDir.exists()) screenmirrorDir.mkdirs()
+                val file = File(screenmirrorDir, filename)
+                FileOutputStream(file).use { out ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                }
+                Toast.makeText(this, getString(R.string.viewer_screenshot_saved, filename), Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            Log.e("ViewerActivity", "Screenshot hatasi", e)
+            Toast.makeText(this, getString(R.string.screenshot_error_io), Toast.LENGTH_SHORT).show()
         }
-        Toast.makeText(this, getString(R.string.viewer_screenshot_saved, filename), Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroy() {

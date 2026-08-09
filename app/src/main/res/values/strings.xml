@@ -137,13 +137,13 @@
     <string name="help_troubleshoot_title">Sorun Giderme</string>
     <string name="help_troubleshoot_desc">• Bağlantı sorunu: İnternet bağlantınızı kontrol edin\n• Gecikme: WiFi ağına bağlanmayı deneyin\n• Ekran paylaşımı başlamadı: İzinleri kontrol edin\n• Uygulama çöktü: Uygulamayı yeniden başlatın</string>
     <string name="help_faq_title">Sıkça Sorulan Sorular</string>
-    <string name="help_faq_desc">S: Aynı anda kaç cihaz bağlanabilir?\nC: Bir yayıncıya birden fazla izleyici bağlanabilir.\n\nS: İnternet bağlantısı gerekli mi?\nC: Evet, her cihazın internete bağlı olması gerekir\n\nS: Ücretsiz mi?\nC: Evet, uygulama tamamen ücretsizdir</string>
+    <string name="help_faq_desc">S: Aynı anda kaç cihaz bağlanabilir?\nC: Şu anda 2 cihaz (1 yayıncı + 1 izleyici)\n\nS: İnternet bağlantısı gerekli mi?\nC: Evet, her cihazın internete bağlı olması gerekir\n\nS: Ücretsiz mi?\nC: Evet, uygulama tamamen ücretsizdir</string>
 
     <!-- Hakkında -->
-    <string name="about_version">Sürüm 1.0.0 (Build 1)</string>
+    <string name="about_version">Sürüm 2.0 (Build 2)</string>
     <string name="about_desc">WebRTC tabanlı gerçek zamanlı ekran paylaşımı. Kolay kurulum, düşük gecikme, güvenli bağlantı.</string>
     <string name="about_whats_new">YENİLİKLER</string>
-    <string name="about_whats_new_list">✓ Çoklu izleyici desteği\n✓ Bulut üzerinden ekran paylaşımı\n✓ Düşük gecikme süresi\n✓ Güvenli SSL/WSS bağlantısı\n✓ Kolay oda oluşturma\n✓ Son oturum geçmişi</string>
+    <string name="about_whats_new_list">✓ Bulut üzerinden ekran paylaşımı\n✓ Düşük gecikme süresi\n✓ Güvenli SSL/WSS bağlantısı\n✓ Kolay oda oluşturma\n✓ Son oturum geçmişi</string>
     <string name="about_features">ÖZELLİKLER</string>
     <string name="about_feature_screenshot_title">Anlık Ekran Paylaşımı</string>
     <string name="about_feature_screenshot_desc">Gerçek zamanlı HD ekran yayını</string>
@@ -187,4 +187,50 @@
     <string name="share_subject">Screen Mirror</string>
     <string name="share_text">Screen Mirror ile ekranınızı paylaşın!\n\nİndir: https://play.google.com/store/apps/details?id=com.example.screenmirror</string>
     <string name="share_chooser">Uygulamayı Paylaş</string>
+
+    <!-- Bildirimler -->
+    <string name="notif_broadcast_active">Yayın aktif</string>
+    <string name="notif_viewing_active">İzleme aktif</string>
+    <string name="notif_joined">Birisi odaya katıldı!</string>
+    <string name="notif_broadcast_started">Yayın başlatıldı - Bağlantı bekleniyor</string>
+
+    <!-- Durum Mesajları -->
+    <string name="state_surface_waiting">Surface bekleniyor…</string>
+    <string name="state_surface_not_found">HATA: SurfaceView bulunamadı</string>
+    <string name="state_webrtc_ready">WebRTC hazır</string>
+    <string name="state_viewer_waiting">İzleyici bekleniyor…</string>
+    <string name="state_screen_broadcasting">Ekran yayında</string>
+    <string name="state_peer_connected">Eş cihaz bağlandı</string>
+    <string name="state_live_received">Canlı görüntü alınıyor</string>
+    <string name="state_connection_established">Bağlantı kuruldu</string>
+    <string name="state_offer_received">Teklif alındı, yanıt oluşturuluyor…</string>
+    <string name="state_answer_received">Yanıt alındı, bağlantı kuruluyor…</string>
+    <string name="state_offer_sent">Teklif gönderildi, yanıt bekleniyor…</string>
+    <string name="state_answer_sent">Yanıt gönderildi, bağlantı bekleniyor…</string>
+    <string name="state_connection_broken">Bağlantı kesildi</string>
+    <string name="state_viewer_left">İzleyici ayrıldı</string>
+    <string name="state_broadcast_paused">Yayın donduruldu</string>
+    <string name="state_broadcast_resumed">Yayın devam ediyor</string>
+    <string name="state_broadcast_ready">Yayın hazır değil</string>
+    <string name="state_recording_started">Kayıt başlatıldı</string>
+    <string name="state_recording_stopped">Kayıt durduruldu: %s</string>
+    <string name="state_signaling_connecting">Signaling sunucusuna bağlanılıyor…</string>
+    <string name="state_signaling_connected">Signaling bağlandı, odaya katılıyor…</string>
+    <string name="state_joining_room">Odaya katılıyor: %s</string>
+    <string name="state_server_error">Sunucu hatası: %s</string>
+    <string name="state_reconnecting">Yeniden bağlanılıyor… (deneme: %d)</string>
+    <string name="state_connection_timeout">Bağlantı zaman aşımı</string>
+    <string name="state_broadcast_not_found">Yayın bulunamadı, tekrar deneyin</string>
+    <string name="state_webrtc_error">WebRTC hatası: %s</string>
+    <string name="state_sdp_error">SDP hatası: %s</string>
+    <string name="state_screen_permission_error">HATA: Ekran paylaşımı izni alınamadı</string>
+    <string name="state_general_error">HATA: %s</string>
+    <string name="state_recording_error">Kayıt hatası: %s</string>
+
+    <!-- Ekran Görüntüsü -->
+    <string name="screenshot_error_io">Ekran görüntüsü kaydedilemedi</string>
+
+    <!-- Tüm Oda Geçmişi Silme -->
+    <string name="recent_delete_all_msg">Tüm oda geçmişini silmek istediğinize emin misiniz?</string>
+    <string name="recent_cleared">Geçmiş temizlendi</string>
 </resources>

@@ -14,7 +14,3 @@
 -keepattributes *Annotation*
 -keep class com.google.gson.** { *; }
 -keep class com.example.screenmirror.data.** { *; }
-
-# Room
--keep class * extends androidx.room.RoomDatabase
--dontwarn androidx.room.paging.**

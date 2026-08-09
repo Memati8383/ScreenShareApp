@@ -73,6 +73,7 @@ class ScreenShareService : Service() {
     private var offerPending = false
     private var startTime = 0L
     @Volatile private var participantCount = 1
+    private val lock = Any()
     private var statsCheckerRunnable: Runnable? = null
 
     override fun onBind(intent: Intent): IBinder? = null
@@ -107,8 +108,12 @@ class ScreenShareService : Service() {
                 when (action) {
                     "com.example.screenmirror.START_RECORDING" -> {
                         val resultCode = intent.getIntExtra("resultCode", 0)
-                        @Suppress("DEPRECATION")
-                        val data = intent.getParcelableExtra<Intent>("data")
+                        val data = if (Build.VERSION.SDK_INT >= 33) {
+                            intent.getParcelableExtra("data", Intent::class.java)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            intent.getParcelableExtra("data")
+                        }
                         executor.execute { startRecording(resultCode, data) }
                         return START_STICKY
                     }
@@ -129,8 +134,12 @@ class ScreenShareService : Service() {
 
                 if (role == "sender") {
                     val rc = intent.getIntExtra("resultCode", 0)
-                    @Suppress("DEPRECATION")
-                    val d = intent.getParcelableExtra<Intent>("data")
+                    val d = if (Build.VERSION.SDK_INT >= 33) {
+                        intent.getParcelableExtra("data", Intent::class.java)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        intent.getParcelableExtra("data")
+                    }
                     if (rc != 0 && d != null) {
                         pendingResultCode = rc
                         pendingData = d
@@ -143,7 +152,7 @@ class ScreenShareService : Service() {
             captureHeight = AppSettings.getCaptureHeight(this)
             captureFps = AppSettings.getCaptureFps(this)
 
-            showNotification(if (role == "sender") "Yayin aktif" else "Izleme aktif")
+            showNotification(if (role == "sender") getString(R.string.notif_broadcast_active) else getString(R.string.notif_viewing_active))
 
             if (role == "sender") {
                 showBroadcastStartNotification()
@@ -152,7 +161,7 @@ class ScreenShareService : Service() {
             val r = renderer
             if (r == null) {
                 Log.e(TAG, "renderer NULL, 5 kez 1sn aralikla denenecek")
-                postState("Surface bekleniyor...")
+                postState(getString(R.string.state_surface_waiting))
                 retryRenderer(1, 5)
                 return START_STICKY
             }
@@ -175,7 +184,7 @@ class ScreenShareService : Service() {
                 startWebRtc(r)
             } else {
                 Log.i(TAG, "surface hazir degil, bekleniyor...")
-                postState("Surface bekleniyor...")
+                postState(getString(R.string.state_surface_waiting))
                 var surfaceCallbackFired = false
                 sv?.holder?.addCallback(object : SurfaceHolder.Callback {
                     override fun surfaceCreated(h: SurfaceHolder) {
@@ -200,7 +209,7 @@ class ScreenShareService : Service() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "onStartCommand hatasi", e)
-            postState("HATA: ${e.message}")
+            postState(getString(R.string.state_general_error, e.message ?: "Unknown"))
         }
         return START_STICKY
     }
@@ -232,7 +241,7 @@ class ScreenShareService : Service() {
             val notif = Notification.Builder(this, NotificationConstants.CHANNEL_ID_SCREEN)
                 .setSmallIcon(android.R.drawable.ic_menu_send)
                 .setContentTitle("Screen Mirror")
-                .setContentText("Birisi odaya katildi!")
+                .setContentText(getString(R.string.notif_joined))
                 .setAutoCancel(true)
                 .build()
             val nm = getSystemService(NotificationManager::class.java)
@@ -247,7 +256,7 @@ class ScreenShareService : Service() {
             val notif = Notification.Builder(this, NotificationConstants.CHANNEL_ID_SCREEN)
                 .setSmallIcon(android.R.drawable.ic_menu_camera)
                 .setContentTitle("Screen Mirror")
-                .setContentText("Yayın başlatıldı - Bağlantı bekleniyor")
+                .setContentText(getString(R.string.notif_broadcast_started))
                 .setAutoCancel(true)
                 .build()
             val nm = getSystemService(NotificationManager::class.java)
@@ -268,7 +277,7 @@ class ScreenShareService : Service() {
                 retryRenderer(attempt + 1, maxAttempts)
             } else {
                 Log.e(TAG, "renderer $maxAttempts deneme sonra hala NULL")
-                postState("HATA: SurfaceView bulunamadi")
+                postState(getString(R.string.state_surface_not_found))
             }
         }, 1000)
     }
@@ -333,7 +342,7 @@ class ScreenShareService : Service() {
                         PeerConnection.IceConnectionState.DISCONNECTED,
                         PeerConnection.IceConnectionState.FAILED -> {
                             Log.w(TAG, "ICE baglantisi koptu: $state")
-                            postState("Baglanti kesildi")
+                            postState(getString(R.string.state_connection_broken))
                             if (role == "viewer") {
                                 sendBroadcast(Intent("com.example.screenmirror.SENDER_DISCONNECTED").apply {
                                     setPackage(packageName)
@@ -341,7 +350,7 @@ class ScreenShareService : Service() {
                             }
                         }
                         PeerConnection.IceConnectionState.CONNECTED -> {
-                            postState("Baglanti kuruldu")
+                            postState(getString(R.string.state_connection_established))
                         }
                         else -> {}
                     }
@@ -366,9 +375,9 @@ class ScreenShareService : Service() {
                     if (track is VideoTrack) {
                         remoteTrack = track
                         mainHandler.post {
-                            renderer?.let { remoteTrack?.addSink(it) }
+                            renderer?.let { r -> remoteTrack?.addSink(r) }
                         }
-                        postState("Canli goruntu aliniyor")
+                        postState(getString(R.string.state_live_received))
                     }
                 }
                 override fun onTrack(transceiver: RtpTransceiver) {
@@ -376,9 +385,9 @@ class ScreenShareService : Service() {
                     if (track is VideoTrack) {
                         remoteTrack = track
                         mainHandler.post {
-                            renderer?.let { remoteTrack?.addSink(it) }
+                            renderer?.let { r -> remoteTrack?.addSink(r) }
                         }
-                        postState("Canli goruntu aliniyor")
+                        postState(getString(R.string.state_live_received))
                     }
                 }
             })
@@ -388,12 +397,12 @@ class ScreenShareService : Service() {
                 roomId, role,
                 onRemoteDescription = { sdp ->
                     Log.i(TAG, "Cloud: remote sdp alindi: ${sdp.type}")
-                    postState("Es cihaz baglandi")
+                    postState(getString(R.string.state_peer_connected))
                     executor.execute { handleRemoteDescription(sdp) }
                 },
                 onRemoteIce = { c -> executor.execute { handleRemoteIce(c) } },
                 onPeerJoined = {
-                    postState("Es cihaz baglandi")
+                    postState(getString(R.string.state_peer_connected))
                     participantCount = 2
                     showJoinNotification()
                     if (role == "sender") {
@@ -416,7 +425,7 @@ class ScreenShareService : Service() {
                 },
                 onPeerLeft = {
                     participantCount = 1
-                    postState("Izleyici ayrildi")
+                    postState(getString(R.string.state_viewer_left))
                     if (role == "viewer") {
                         sendBroadcast(Intent("com.example.screenmirror.SENDER_DISCONNECTED").apply {
                             setPackage(packageName)
@@ -433,7 +442,7 @@ class ScreenShareService : Service() {
             Log.i(TAG, "cloud signaling objesi olusturuldu")
 
             webRtcReady = true
-            postState("WebRTC hazir")
+            postState(getString(R.string.state_webrtc_ready))
 
             startStatsChecker()
 
@@ -445,7 +454,7 @@ class ScreenShareService : Service() {
                     Log.i(TAG, "sender: signaling baglandi, capture baslatiliyor...")
                     startCapture(code, data)
                     Log.i(TAG, "sender: capture baslatildi, izleyici bekleniyor")
-                    postState("Izleyici bekleniyor...")
+                    postState(getString(R.string.state_viewer_waiting))
                 }
             } else {
                 cloudSignaling?.connect()
@@ -453,7 +462,7 @@ class ScreenShareService : Service() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "startWebRtc HATA", e)
-            postState("WebRTC hatasi: ${e.message}")
+            postState(getString(R.string.state_webrtc_error, e.message ?: "Unknown"))
         }
     }
 
@@ -478,7 +487,7 @@ class ScreenShareService : Service() {
             localTrack = f.createVideoTrack("screen0", videoSource)
             peerConnection?.addTrack(localTrack, listOf("stream0"))
             Log.i(TAG, "capture baslatildi, localTrack eklenmis")
-            postState("Ekran yayinda")
+            postState(getString(R.string.state_screen_broadcasting))
 
             if (offerPending && role == "sender") {
                 offerPending = false
@@ -494,18 +503,18 @@ class ScreenShareService : Service() {
         isFrozen = !isFrozen
         if (isFrozen) {
             try { capturer?.stopCapture() } catch (_: Exception) {}
-            postState("Yayin donduruldu")
+            postState(getString(R.string.state_broadcast_paused))
         } else {
             if (capturer != null) {
                 try {
                     capturer?.startCapture(captureWidth, captureHeight, captureFps)
-                    postState("Yayin devam ediyor")
+                    postState(getString(R.string.state_broadcast_resumed))
                 } catch (e: Exception) {
                     Log.e(TAG, "Yeniden baslatma hatasi", e)
-                    postState("Yayin hatasi: ${e.message}")
+                    postState(getString(R.string.state_webrtc_error, e.message ?: "Unknown"))
                 }
             } else {
-                postState("Yayin hazir degil")
+                postState(getString(R.string.state_broadcast_ready))
             }
         }
     }
@@ -547,11 +556,11 @@ class ScreenShareService : Service() {
 
             isRecording = true
             mainHandler.post { onRecordingStateChanged?.invoke(true) }
-            postState("Kayit baslatildi")
+            postState(getString(R.string.state_recording_started))
             Log.i(TAG, "Kayit baslatildi: ${recordingFile?.absolutePath}")
         } catch (e: Exception) {
             Log.e(TAG, "Kayit baslatma hatasi", e)
-            postState("Kayit hatasi: ${e.message}")
+            postState(getString(R.string.state_recording_error, e.message ?: "Unknown"))
         }
     }
 
@@ -563,11 +572,11 @@ class ScreenShareService : Service() {
             mediaRecorder = null
             isRecording = false
             mainHandler.post { onRecordingStateChanged?.invoke(false) }
-            postState("Kayit durduruldu: ${recordingFile?.name}")
+            postState(getString(R.string.state_recording_stopped, recordingFile?.name ?: ""))
             Log.i(TAG, "Kayit durduruldu: ${recordingFile?.absolutePath}")
         } catch (e: Exception) {
             Log.e(TAG, "Kayit durdurma hatasi", e)
-            postState("Kayit durdurma hatasi")
+            postState(getString(R.string.state_recording_error, e.message ?: "Unknown"))
         }
     }
 
@@ -578,13 +587,13 @@ class ScreenShareService : Service() {
             val sdpTypeStr = if (sdp.type == SessionDescription.Type.OFFER) "offer" else "answer"
             Log.i(TAG, "handleRemoteDescription: $sdpTypeStr alindi")
             if (sdp.type == SessionDescription.Type.OFFER) {
-                postState("Teklif alindi, yanit olusturuluyor...")
+                postState(getString(R.string.state_offer_received))
             } else {
-                postState("Yanit alindi, baglanti kuruluyor...")
+                postState(getString(R.string.state_answer_received))
             }
             if (peerConnection == null) {
                 Log.e(TAG, "handleRemoteDescription: peerConnection null!")
-                postState("HATA: WebRTC baglantisi yok")
+                postState(getString(R.string.state_webrtc_error, "peerConnection null"))
                 return
             }
             peerConnection?.setRemoteDescription(sdpObserver(
@@ -608,29 +617,29 @@ class ScreenShareService : Service() {
                                     onSetSuccess = {
                                         Log.i(TAG, "Answer localDescription ayarlandi, gonderiliyor")
                                         cloudSignaling?.sendAnswer(ans)
-                                        postState("Yanit gonderildi, baglanti bekleniyor...")
+                                        postState(getString(R.string.state_answer_sent))
                                     },
                                     onSetFailure = { error ->
                                         Log.e(TAG, "setLocalDescription (answer) basarisiz: $error")
-                                        postState("HATA: Yanit SDP ayarlanamadi: $error")
+                                        postState(getString(R.string.state_sdp_error, error ?: "Unknown"))
                                     }
                                 ), ans)
                             },
                             onCreateFailure = { error ->
                                 Log.e(TAG, "createAnswer basarisiz: $error")
-                                postState("HATA: Yanit olusturulamadi: $error")
+                                postState(getString(R.string.state_sdp_error, error ?: "Unknown"))
                             }
                         ), MediaConstraints())
                     }
                 },
                 onSetFailure = { error ->
                     Log.e(TAG, "setRemoteDescription basarisiz: $error")
-                    postState("HATA: SDP hatasi: $error")
+                    postState(getString(R.string.state_sdp_error, error ?: "Unknown"))
                 }
             ), sdp)
         } catch (e: Exception) {
             Log.e(TAG, "handleRemoteDescription HATA", e)
-            postState("HATA: SDP isleme hatasi")
+            postState(getString(R.string.state_sdp_error, e.message ?: "Unknown"))
         }
     }
 
@@ -652,16 +661,16 @@ class ScreenShareService : Service() {
     private fun createOffer() {
         if (localTrack == null) {
             Log.w(TAG, "createOffer: localTrack null, offer olusturulamadi")
-            postState("HATA: Ekran verisi henuz hazir degil")
+            postState(getString(R.string.state_screen_broadcasting))
             return
         }
         if (peerConnection == null) {
             Log.w(TAG, "createOffer: peerConnection null")
-            postState("HATA: WebRTC baglantisi kurulamadi")
+            postState(getString(R.string.state_webrtc_error, "peerConnection null"))
             return
         }
         Log.i(TAG, "createOffer basliyor")
-        postState("Teklif olusturuluyor...")
+        postState(getString(R.string.state_offer_sent))
         peerConnection?.createOffer(sdpObserver(
             onCreateSuccess = { offer ->
                 Log.i(TAG, "createOffer basarili, localDescription ayarlaniyor")
@@ -669,17 +678,17 @@ class ScreenShareService : Service() {
                     onSetSuccess = {
                         Log.i(TAG, "localDescription ayarlandi, offer gonderiliyor")
                         cloudSignaling?.sendOffer(offer)
-                        postState("Teklif gonderildi, yanit bekleniyor...")
+                        postState(getString(R.string.state_offer_sent))
                     },
                     onSetFailure = { error ->
                         Log.e(TAG, "setLocalDescription (offer) basarisiz: $error")
-                        postState("HATA: SDP ayarlanamadi: $error")
+                        postState(getString(R.string.state_sdp_error, error ?: "Unknown"))
                     }
                 ), offer)
             },
             onCreateFailure = { error ->
                 Log.e(TAG, "createOffer basarisiz: $error")
-                postState("HATA: Teklif olusturulamadi: $error")
+                postState(getString(R.string.state_sdp_error, error ?: "Unknown"))
             }
         ), MediaConstraints())
     }
@@ -747,16 +756,18 @@ class ScreenShareService : Service() {
                         else -> "IYI"
                     }
 
-                    if (quality == "KOTU" && captureWidth > 854) {
-                        captureWidth = 854
-                        captureHeight = 480
-                        capturer?.changeCaptureFormat(captureWidth, captureHeight, captureFps)
-                        Log.i(TAG, "Kalite dusuruldu: ${captureWidth}x${captureHeight}")
-                    } else if (quality == "IYI" && captureWidth < 1280) {
-                        captureWidth = 1280
-                        captureHeight = 720
-                        capturer?.changeCaptureFormat(captureWidth, captureHeight, captureFps)
-                        Log.i(TAG, "Kalite artirildi: ${captureWidth}x${captureHeight}")
+                    synchronized(lock) {
+                        if (quality == "KOTU" && captureWidth > 854) {
+                            captureWidth = 854
+                            captureHeight = 480
+                            capturer?.changeCaptureFormat(captureWidth, captureHeight, captureFps)
+                            Log.i(TAG, "Kalite dusuruldu: ${captureWidth}x${captureHeight}")
+                        } else if (quality == "IYI" && captureWidth < 1280) {
+                            captureWidth = 1280
+                            captureHeight = 720
+                            capturer?.changeCaptureFormat(captureWidth, captureHeight, captureFps)
+                            Log.i(TAG, "Kalite artirildi: ${captureWidth}x${captureHeight}")
+                        }
                     }
 
                     val statsText = String.format(

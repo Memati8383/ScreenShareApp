@@ -96,8 +96,12 @@ class ProfileActivity : AppCompatActivity() {
 
         val name = prefs.getString("name", "") ?: ""
         val email = prefs.getString("email", "") ?: ""
-        val roomsHosted = prefs.getInt("rooms_hosted", 0)
-        val hoursShared = prefs.getInt("hours_shared", 0)
+
+        val roomHistoryManager = (application as ScreenMirrorApp).roomHistoryManager
+        val allRooms = roomHistoryManager.getAll()
+        val roomsHosted = allRooms.count { it.role == "sender" }
+        val totalDurationMs = allRooms.sumOf { it.duration }
+        val hoursShared = (totalDurationMs / 3600000).toInt()
 
         findViewById<TextView>(R.id.profileName).text = name
         findViewById<TextView>(R.id.profileEmail).text = email

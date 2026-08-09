@@ -124,10 +124,10 @@ class RecentActivity : AppCompatActivity() {
     private fun showDeleteAllDialog() {
         AlertDialog.Builder(this, R.style.Theme_ScreenShare_Dialog)
             .setTitle(getString(R.string.recent_delete_title))
-            .setMessage("Tum oda gecmisini silmek istediginize emin misiniz?")
+            .setMessage(getString(R.string.recent_delete_all_msg))
             .setPositiveButton(getString(R.string.recent_delete_confirm)) { _, _ ->
                 viewModel.deleteAll()
-                Snackbar.make(recyclerView, "Gecmis temizlendi", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(recyclerView, getString(R.string.recent_cleared), Snackbar.LENGTH_SHORT).show()
             }
             .setNegativeButton(getString(R.string.btn_cancel), null)
             .show()

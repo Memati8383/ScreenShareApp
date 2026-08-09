@@ -110,6 +110,11 @@ object AppSettings {
         val intent = activity.intent
         activity.finish()
         activity.startActivity(intent)
-        activity.overridePendingTransition(0, 0)
+        if (android.os.Build.VERSION.SDK_INT >= 34) {
+            activity.overrideActivityTransition(android.app.Activity.OVERRIDE_TRANSITION_OPEN, 0, 0)
+        } else {
+            @Suppress("DEPRECATION")
+            activity.overridePendingTransition(0, 0)
+        }
     }
 }
