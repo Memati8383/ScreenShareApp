@@ -57,6 +57,7 @@ class ViewerActivity : AppCompatActivity() {
     private lateinit var skeletonHint: TextView
     private lateinit var tvLog: TextView
     private lateinit var logOverlay: View
+    private lateinit var waitingOverlay: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,6 +91,7 @@ class ViewerActivity : AppCompatActivity() {
 
         logOverlay = findViewById(R.id.logOverlay)
         tvLog = findViewById(R.id.tvLog)
+        waitingOverlay = findViewById(R.id.waitingOverlay)
         OnScreenLog.clear()
         OnScreenLog.onUpdate = { text -> runOnUiThread { tvLog.text = text } }
 
@@ -210,9 +212,11 @@ class ViewerActivity : AppCompatActivity() {
                             tvStats.text = state
                             if (state in listOf("Es cihaz baglandi", "Canli goruntu aliniyor", "WebRTC hazir")) {
                                 hideSkeleton()
+                                waitingOverlay.visibility = View.GONE
                             }
                             if (state.startsWith("Teklif") || state.startsWith("Yanit") || state.startsWith("Baglanti kuruldu")) {
                                 hideSkeleton()
+                                waitingOverlay.visibility = View.GONE
                             }
                             if (state in listOf("Izleyici ayrildi", "Baglanti kesildi") && !isDisconnecting) {
                                 isDisconnecting = true
