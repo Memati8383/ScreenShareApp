@@ -18,6 +18,7 @@ import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import org.webrtc.*
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executors
 import com.example.screenmirror.data.RoomHistory
 import java.io.File
@@ -71,7 +72,7 @@ class ScreenShareService : Service() {
     private var webRtcReady = false
     private var offerPending = false
     private var startTime = 0L
-    private var participantCount = 1
+    @Volatile private var participantCount = 1
     private var statsCheckerRunnable: Runnable? = null
 
     override fun onBind(intent: Intent): IBinder? = null
@@ -113,6 +114,10 @@ class ScreenShareService : Service() {
                     }
                     "com.example.screenmirror.STOP_RECORDING" -> {
                         executor.execute { stopRecording() }
+                        return START_STICKY
+                    }
+                    "com.example.screenmirror.TOGGLE_FREEZE" -> {
+                        executor.execute { toggleFreeze() }
                         return START_STICKY
                     }
                 }
@@ -313,6 +318,22 @@ class ScreenShareService : Service() {
                 override fun onIceConnectionChange(state: PeerConnection.IceConnectionState) {
                     Log.i(TAG, "ICE: $state")
                     postState("ICE: $state")
+                    when (state) {
+                        PeerConnection.IceConnectionState.DISCONNECTED,
+                        PeerConnection.IceConnectionState.FAILED -> {
+                            Log.w(TAG, "ICE baglantisi koptu: $state")
+                            postState("Baglanti kesildi")
+                            if (role == "viewer") {
+                                sendBroadcast(Intent("com.example.screenmirror.SENDER_DISCONNECTED").apply {
+                                    setPackage(packageName)
+                                })
+                            }
+                        }
+                        PeerConnection.IceConnectionState.CONNECTED -> {
+                            postState("Baglanti kuruldu")
+                        }
+                        else -> {}
+                    }
                 }
                 override fun onIceConnectionReceivingChange(receiving: Boolean) {}
                 override fun onIceGatheringChange(state: PeerConnection.IceGatheringState) {}
@@ -320,7 +341,12 @@ class ScreenShareService : Service() {
                 override fun onAddStream(stream: MediaStream) {}
                 override fun onRemoveStream(stream: MediaStream) {}
                 override fun onDataChannel(channel: DataChannel) {}
-                override fun onRenegotiationNeeded() {}
+                override fun onRenegotiationNeeded() {
+                    Log.i(TAG, "Renegotiation needed")
+                    if (role == "sender" && localTrack != null) {
+                        executor.execute { createOffer() }
+                    }
+                }
                 override fun onIceCandidate(candidate: IceCandidate) {
                     cloudSignaling?.sendIce(candidate)
                 }
@@ -360,9 +386,17 @@ class ScreenShareService : Service() {
                 onPeerLeft = {
                     participantCount = 1
                     postState("Izleyici ayrildi")
+                    if (role == "viewer") {
+                        sendBroadcast(Intent("com.example.screenmirror.SENDER_DISCONNECTED").apply {
+                            setPackage(packageName)
+                        })
+                    }
                 },
                 onViewerCountChanged = { count ->
                     postViewerCount(count)
+                },
+                onDisconnect = { reason ->
+                    postState(reason)
                 }
             )
             Log.i(TAG, "cloud signaling objesi olusturuldu")
@@ -378,7 +412,6 @@ class ScreenShareService : Service() {
                 executor.execute {
                     cloudSignaling?.connect()
                     Log.i(TAG, "sender: signaling baglandi, capture baslatiliyor...")
-                    Thread.sleep(2000)
                     startCapture(code, data)
                     Log.i(TAG, "sender: capture baslatildi, izleyici bekleniyor")
                     postState("Izleyici bekleniyor...")
@@ -432,9 +465,16 @@ class ScreenShareService : Service() {
             try { capturer?.stopCapture() } catch (_: Exception) {}
             postState("Yayin donduruldu")
         } else {
-            if (pendingResultCode != 0 || pendingData != null) {
+            if (capturer != null) {
+                try {
+                    capturer?.startCapture(captureWidth, captureHeight, captureFps)
+                    postState("Yayin devam ediyor")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Yeniden baslatma hatasi", e)
+                    postState("Yayin hatasi: ${e.message}")
+                }
             } else {
-                postState("Yayin devam ediyor")
+                postState("Yayin hazir degil")
             }
         }
     }
@@ -503,32 +543,53 @@ class ScreenShareService : Service() {
     fun isRecording(): Boolean = isRecording
 
     private fun handleRemoteDescription(sdp: SessionDescription) {
-        peerConnection?.setRemoteDescription(sdpObserver(
-            onSetSuccess = {
-                remoteDescriptionSet = true
-                pendingCandidates.forEach { peerConnection?.addIceCandidate(it) }
-                pendingCandidates.clear()
-                if (sdp.type == SessionDescription.Type.OFFER) {
-                    peerConnection?.createAnswer(sdpObserver(
-                        onCreateSuccess = { ans ->
-                            peerConnection?.setLocalDescription(sdpObserver(
-                                onSetSuccess = {
-                                    cloudSignaling?.sendAnswer(ans)
-                                }
-                            ), ans)
+        try {
+            peerConnection?.setRemoteDescription(sdpObserver(
+                onSetSuccess = {
+                    remoteDescriptionSet = true
+                    pendingCandidates.forEach { candidate ->
+                        try {
+                            peerConnection?.addIceCandidate(candidate)
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Pending ICE candidate ekleme hatasi", e)
                         }
-                    ), MediaConstraints())
+                    }
+                    pendingCandidates.clear()
+                    if (sdp.type == SessionDescription.Type.OFFER) {
+                        peerConnection?.createAnswer(sdpObserver(
+                            onCreateSuccess = { ans ->
+                                peerConnection?.setLocalDescription(sdpObserver(
+                                    onSetSuccess = {
+                                        cloudSignaling?.sendAnswer(ans)
+                                    }
+                                ), ans)
+                            }
+                        ), MediaConstraints())
+                    }
+                },
+                onSetFailure = { error ->
+                    Log.e(TAG, "setRemoteDescription basarisiz: $error")
+                    postState("SDP hatasi: $error")
                 }
-            }
-        ), sdp)
+            ), sdp)
+        } catch (e: Exception) {
+            Log.e(TAG, "handleRemoteDescription HATA", e)
+        }
     }
 
-    private var remoteDescriptionSet = false
-    private val pendingCandidates = mutableListOf<IceCandidate>()
+    @Volatile private var remoteDescriptionSet = false
+    private val pendingCandidates = CopyOnWriteArrayList<IceCandidate>()
 
     private fun handleRemoteIce(candidate: IceCandidate) {
-        if (remoteDescriptionSet) peerConnection?.addIceCandidate(candidate)
-        else pendingCandidates.add(candidate)
+        try {
+            if (remoteDescriptionSet) {
+                peerConnection?.addIceCandidate(candidate)
+            } else {
+                pendingCandidates.add(candidate)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "ICE candidate ekleme hatasi", e)
+        }
     }
 
     private fun createOffer() {
@@ -645,6 +706,14 @@ class ScreenShareService : Service() {
     override fun onDestroy() {
         Log.i(TAG, "onDestroy")
         super.onDestroy()
+
+        if (role == "sender") {
+            try {
+                sendBroadcast(Intent("com.example.screenmirror.SENDER_DISCONNECTED").apply {
+                    setPackage(packageName)
+                })
+            } catch (_: Exception) {}
+        }
 
         statsCheckerRunnable?.let { mainHandler.removeCallbacks(it) }
 

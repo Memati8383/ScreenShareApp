@@ -118,8 +118,11 @@ class SenderActivity : AppCompatActivity() {
         Log.i("SenderActivity", "renderer atandi: ${senderSurface != null}")
 
         btnFreeze.setOnClickListener {
-            ScreenShareService.isFrozen = !ScreenShareService.isFrozen
-            isFrozen = ScreenShareService.isFrozen
+            val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
+                action = "com.example.screenmirror.TOGGLE_FREEZE"
+            }
+            startService(serviceIntent)
+            isFrozen = !isFrozen
             val freezeText = btnFreeze.findViewById<TextView>(R.id.tvFreeze)
             freezeText?.text = if (isFrozen) getString(R.string.sender_unfreeze) else getString(R.string.sender_freeze)
             Toast.makeText(this, if (isFrozen) getString(R.string.sender_frozen) else getString(R.string.sender_resumed), Toast.LENGTH_SHORT).show()

@@ -14,13 +14,14 @@ class CloudSignalingClient(
     private val onRemoteIce: (IceCandidate) -> Unit,
     private val onPeerJoined: () -> Unit,
     private val onPeerLeft: () -> Unit = {},
-    private val onViewerCountChanged: (Int) -> Unit = {}
+    private val onViewerCountChanged: (Int) -> Unit = {},
+    private val onDisconnect: ((String) -> Unit)? = null
 ) {
     private var client: OkHttpClient? = null
     private var ws: WebSocket? = null
     private val peerId = "${role}_${System.currentTimeMillis()}"
     private var registered = false
-    private var connected = false
+    @Volatile private var connected = false
     private var peerCount = 0
     private var closed = false
     private var reconnectAttempt = 0
@@ -31,9 +32,16 @@ class CloudSignalingClient(
         val url = "wss://wss.getlost.ovh"
         Log.i("CloudSig", "Baglaniliyor: $url, peer: $peerId")
 
-        client = OkHttpClient.Builder()
-            .readTimeout(0, TimeUnit.MILLISECONDS)
-            .build()
+        try {
+            ws?.close(1000, "yeniden baglaniliyor")
+            ws = null
+        } catch (_: Exception) {}
+
+        if (client == null) {
+            client = OkHttpClient.Builder()
+                .readTimeout(0, TimeUnit.MILLISECONDS)
+                .build()
+        }
 
         val request = Request.Builder().url(url).build()
         ws = client!!.newWebSocket(request, object : WebSocketListener() {
@@ -54,6 +62,7 @@ class CloudSignalingClient(
                 Log.e("CloudSig", "HATA: ${t.message}", t)
                 connected = false
                 registered = false
+                onDisconnect?.invoke("Baglanti hatasi: ${t.message}")
                 scheduleReconnect()
             }
 
@@ -62,6 +71,7 @@ class CloudSignalingClient(
                 connected = false
                 registered = false
                 if (!closed) {
+                    onDisconnect?.invoke("Baglanti kesildi")
                     scheduleReconnect()
                 }
             }
@@ -221,6 +231,7 @@ class CloudSignalingClient(
         val delay = minOf(1000L * (1 shl reconnectAttempt), maxReconnectDelay)
         reconnectAttempt++
         Log.i("CloudSig", "${delay}ms sonra yeniden baglanacak (deneme: $reconnectAttempt)")
+        onDisconnect?.invoke("Yeniden baglaniliyor... (deneme: $reconnectAttempt)")
         reconnectHandler.postDelayed({
             if (!closed && !connected) {
                 Log.i("CloudSig", "Yeniden baglaniyor...")
@@ -231,11 +242,14 @@ class CloudSignalingClient(
 
     fun close() {
         closed = true
+        reconnectHandler.removeCallbacksAndMessages(null)
         try {
             registered = false
             ws?.close(1000, "kapat")
+            ws = null
             client?.dispatcher?.executorService?.shutdown()
             client?.connectionPool?.evictAll()
+            client = null
         } catch (_: Exception) {}
     }
 }

@@ -44,6 +44,7 @@ class ViewerActivity : AppCompatActivity() {
     private var receiver: BroadcastReceiver? = null
     private var startTime = 0L
     private var roomCode = ""
+    private var isDisconnecting = false
 
     private lateinit var skeletonHelper: SkeletonAnimHelper
     private lateinit var skeletonContainer: View
@@ -138,13 +139,16 @@ class ViewerActivity : AppCompatActivity() {
             override fun onReceive(context: Context, intent: Intent) {
                 when (intent.action) {
                     "com.example.screenmirror.SENDER_DISCONNECTED" -> {
-                        runOnUiThread {
-                            hideSkeleton()
-                            tvViewerStatus.text = getString(R.string.status_disconnected)
-                            Toast.makeText(context, getString(R.string.viewer_broadcast_ended), Toast.LENGTH_SHORT).show()
-                            lifecycleScope.launch {
-                                delay(2000)
-                                finish()
+                        if (!isDisconnecting) {
+                            isDisconnecting = true
+                            runOnUiThread {
+                                hideSkeleton()
+                                tvViewerStatus.text = getString(R.string.status_disconnected)
+                                Toast.makeText(context, getString(R.string.viewer_broadcast_ended), Toast.LENGTH_SHORT).show()
+                                lifecycleScope.launch {
+                                    delay(2000)
+                                    finish()
+                                }
                             }
                         }
                     }
@@ -184,6 +188,16 @@ class ViewerActivity : AppCompatActivity() {
                             tvStats.text = state
                             if (state in listOf("Es cihaz baglandi", "Canli goruntu aliniyor", "WebRTC hazir")) {
                                 hideSkeleton()
+                            }
+                            if (state in listOf("Izleyici ayrildi", "Baglanti kesildi") && !isDisconnecting) {
+                                isDisconnecting = true
+                                hideSkeleton()
+                                tvViewerStatus.text = getString(R.string.status_disconnected)
+                                Toast.makeText(this@ViewerActivity, getString(R.string.viewer_broadcast_ended), Toast.LENGTH_SHORT).show()
+                                lifecycleScope.launch {
+                                    delay(2000)
+                                    finish()
+                                }
                             }
                         }
                     }
