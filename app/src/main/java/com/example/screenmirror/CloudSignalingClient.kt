@@ -76,7 +76,7 @@ class CloudSignalingClient(
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {
-                Log.d("CloudSig", "MESAJ: $text")
+                Log.d("CloudSig", "MESAJ alindi (${text.length} bytes)")
                 handle(text)
             }
 
@@ -116,7 +116,7 @@ class CloudSignalingClient(
             .put("from", peerId)
             .put("announce", true)
             .toString()
-        Log.i("CloudSig", "REGISTER gonderiliyor: $msg")
+        Log.i("CloudSig", "REGISTER gonderiliyor: roomId=$room")
         val sent = send(msg)
         Log.i("CloudSig", "REGISTER gonderildi: sent=$sent, ws=${ws != null}, connected=$connected")
         onDisconnect?.invoke("Odaya katiliyor: $room")
@@ -139,7 +139,7 @@ class CloudSignalingClient(
                         rosterTimeoutHandler.removeCallbacksAndMessages(null)
                         val roster = msg.getJSONArray("roster")
                         val newCount = roster.length()
-                        Log.i("CloudSig", "ROSTER: $newCount peer var (onceki: $peerCount)")
+                    Log.i("CloudSig", "ROSTER: $newCount peer var (onceki: $peerCount)")
                         val viewers = if (newCount > 1) newCount - 1 else 0
                         onViewerCountChanged(viewers)
                         if (newCount > peerCount && newCount > 1) {
@@ -229,7 +229,7 @@ class CloudSignalingClient(
             .toString()
         Log.i("CloudSig", "OFFER gonderiliyor")
         val sent = send(msg)
-        Log.i("CloudSig", "OFFER gonderildi: $sent")
+        Log.i("CloudSig", "OFFER gonderildi: sent=$sent")
     }
 
     fun sendAnswer(sdp: SessionDescription) {
@@ -245,7 +245,7 @@ class CloudSignalingClient(
             .toString()
         Log.i("CloudSig", "ANSWER gonderiliyor")
         val sent = send(msg)
-        Log.i("CloudSig", "ANSWER gonderildi: $sent")
+        Log.i("CloudSig", "ANSWER gonderildi: sent=$sent")
     }
 
     fun sendIce(candidate: IceCandidate) {
@@ -268,9 +268,9 @@ class CloudSignalingClient(
         return try {
             val sent = ws?.send(text) ?: false
             if (!sent) {
-                Log.w("CloudSig", "MESAJ GONDERILEMEDI (ws=$ws, connected=$connected): $text")
+                Log.w("CloudSig", "MESAJ GONDERILEMEDI (ws=$ws, connected=$connected)")
             }
-            Log.d("CloudSig", "Gonderildi($sent): $text")
+            Log.d("CloudSig", "Gonderildi($sent)")
             sent
         } catch (e: Exception) {
             Log.e("CloudSig", "Gonderme hatasi: ${e.message}")

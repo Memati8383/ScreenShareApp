@@ -1,14 +1,10 @@
 package com.example.screenmirror
 
 import android.app.AlertDialog
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -28,8 +24,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -52,13 +46,6 @@ class ViewerActivity : AppCompatActivity() {
     private var skeletonTimeoutJob: kotlinx.coroutines.Job? = null
 
     private lateinit var skeletonHelper: SkeletonAnimHelper
-    private lateinit var skeletonContainer: View
-    private lateinit var skeletonIcon: View
-    private lateinit var skeletonTitle: View
-    private lateinit var skeletonSubtitle: View
-    private lateinit var skeletonStatus: View
-    private lateinit var skeletonProgress: View
-    private lateinit var skeletonHint: TextView
     private lateinit var waitingOverlay: View
 
     private val serviceConnection = object : ServiceConnection {
@@ -67,13 +54,13 @@ class ViewerActivity : AppCompatActivity() {
             service = localBinder.getService()
             isBound = true
             observeServiceEvents()
-            Log.i("ViewerActivity", "Servise baglandi")
+            Log.i("ViewerActivity", getString(R.string.state_service_connected))
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
             service = null
             isBound = false
-            Log.i("ViewerActivity", "Servis baglantisi kesildi")
+            Log.i("ViewerActivity", getString(R.string.state_service_disconnected))
         }
     }
 
@@ -81,7 +68,7 @@ class ViewerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_viewer)
 
-        createNotificationChannel()
+        NotificationHelper.createViewerChannel(this)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         initSkeleton()
 
@@ -96,8 +83,6 @@ class ViewerActivity : AppCompatActivity() {
 
         roomCode = intent.getStringExtra("room") ?: ""
 
-        val viewerSurface = findViewById<org.webrtc.SurfaceViewRenderer>(R.id.viewerSurface)
-
         startTime = System.currentTimeMillis()
 
         tvConnectionQuality.visibility = if (AppSettings.isQualityStatsEnabled(this)) View.VISIBLE else View.GONE
@@ -105,7 +90,7 @@ class ViewerActivity : AppCompatActivity() {
 
         waitingOverlay = findViewById(R.id.waitingOverlay)
 
-        showSkeleton("Yayin bekleniyor...")
+        showSkeleton(getString(R.string.viewer_waiting))
         startViewerService()
         btnDisconnect.setOnClickListener { showDisconnectConfirmation() }
         btnScreenshot.setOnClickListener { takeScreenshot() }
@@ -210,21 +195,18 @@ class ViewerActivity : AppCompatActivity() {
 
     private fun initSkeleton() {
         skeletonHelper = SkeletonAnimHelper()
-        skeletonContainer = findViewById(R.id.skeletonContainer)
-        skeletonIcon = findViewById(R.id.skeletonIcon)
-        skeletonTitle = findViewById(R.id.skeletonTitle)
-        skeletonSubtitle = findViewById(R.id.skeletonSubtitle)
-        skeletonStatus = findViewById(R.id.skeletonStatus)
-        skeletonProgress = findViewById(R.id.skeletonProgress)
-        skeletonHint = findViewById(R.id.skeletonHint)
+        skeletonHelper.init(
+            container = findViewById(R.id.skeletonContainer),
+            icon = findViewById(R.id.skeletonIcon),
+            title = findViewById(R.id.skeletonTitle),
+            subtitle = findViewById(R.id.skeletonSubtitle),
+            status = findViewById(R.id.skeletonStatus),
+            hint = findViewById(R.id.skeletonHint)
+        )
     }
 
     private fun showSkeleton(hint: String) {
-        skeletonContainer.visibility = View.VISIBLE
-        skeletonHelper.updateHintText(skeletonHint, hint)
-        skeletonHelper.startSkeletonAnimation(
-            skeletonIcon, skeletonTitle, skeletonSubtitle, skeletonStatus
-        )
+        skeletonHelper.show(hint)
         startSkeletonTimeout()
     }
 
@@ -232,7 +214,8 @@ class ViewerActivity : AppCompatActivity() {
         skeletonTimeoutJob?.cancel()
         skeletonTimeoutJob = lifecycleScope.launch {
             delay(15_000)
-            if (!isDisconnecting && skeletonContainer.visibility == View.VISIBLE) {
+            val c = skeletonHelper.container
+            if (!isDisconnecting && c != null && c.visibility == View.VISIBLE) {
                 hideSkeleton()
                 tvViewerStatus.text = getString(R.string.state_connection_timeout)
                 Toast.makeText(this@ViewerActivity, getString(R.string.state_broadcast_not_found), Toast.LENGTH_LONG).show()
@@ -242,19 +225,7 @@ class ViewerActivity : AppCompatActivity() {
 
     private fun hideSkeleton() {
         skeletonTimeoutJob?.cancel()
-        skeletonHelper.hideSkeleton(skeletonContainer)
-    }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                NotificationConstants.CHANNEL_ID_VIEWER,
-                NotificationConstants.CHANNEL_NAME_VIEWER,
-                NotificationManager.IMPORTANCE_LOW
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-        }
+        skeletonHelper.hide()
     }
 
     private fun showDisconnectConfirmation() {
@@ -299,50 +270,10 @@ class ViewerActivity : AppCompatActivity() {
 
     private fun takeScreenshot() {
         val screenView = window.decorView.rootView
-        val bitmap = Bitmap.createBitmap(screenView.width, screenView.height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        screenView.draw(canvas)
-
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val filename = "screenmirror_viewer_$timestamp.png"
-
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val contentValues = android.content.ContentValues().apply {
-                    put(android.provider.MediaStore.Images.Media.DISPLAY_NAME, filename)
-                    put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/png")
-                    put(android.provider.MediaStore.Images.Media.RELATIVE_PATH, "Pictures/ScreenMirror")
-                    put(android.provider.MediaStore.Images.Media.IS_PENDING, 1)
-                }
-                val resolver = contentResolver
-                val uri = resolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-                if (uri != null) {
-                    resolver.openOutputStream(uri)?.use { out ->
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-                    }
-                    contentValues.clear()
-                    contentValues.put(android.provider.MediaStore.Images.Media.IS_PENDING, 0)
-                    resolver.update(uri, contentValues, null, null)
-                    Toast.makeText(this, getString(R.string.viewer_screenshot_saved, filename), Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, getString(R.string.screenshot_error_io), Toast.LENGTH_SHORT).show()
-                }
-            } else {
-                val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(
-                    android.os.Environment.DIRECTORY_PICTURES
-                )
-                val screenmirrorDir = File(picturesDir, "ScreenMirror")
-                if (!screenmirrorDir.exists()) screenmirrorDir.mkdirs()
-                val file = File(screenmirrorDir, filename)
-                FileOutputStream(file).use { out ->
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-                }
-                Toast.makeText(this, getString(R.string.viewer_screenshot_saved, filename), Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
-            Log.e("ViewerActivity", "Screenshot hatasi", e)
-            Toast.makeText(this, getString(R.string.screenshot_error_io), Toast.LENGTH_SHORT).show()
-        }
+        val success = ScreenshotHelper.takeScreenshot(this, screenView, "screenmirror_viewer")
+        ScreenshotHelper.showResult(this, success, filename)
     }
 
     override fun onDestroy() {

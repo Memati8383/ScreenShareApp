@@ -5,11 +5,58 @@ import android.animation.ObjectAnimator
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
+import android.widget.TextView
 
 class SkeletonAnimHelper {
 
     private var animatorSet: AnimatorSet? = null
     private val animatedViews = mutableListOf<View>()
+
+    var container: View? = null
+        private set
+    var iconView: View? = null
+        private set
+    var titleView: View? = null
+        private set
+    var subtitleView: View? = null
+        private set
+    var statusView: View? = null
+        private set
+    var hintView: TextView? = null
+        private set
+
+    fun init(
+        container: View,
+        icon: View,
+        title: View,
+        subtitle: View,
+        status: View,
+        hint: TextView
+    ) {
+        this.container = container
+        this.iconView = icon
+        this.titleView = title
+        this.subtitleView = subtitle
+        this.statusView = status
+        this.hintView = hint
+    }
+
+    fun show(hint: String) {
+        val c = container ?: return
+        c.visibility = View.VISIBLE
+        hintView?.text = hint
+        startSkeletonAnimation(
+            iconView ?: return,
+            titleView ?: return,
+            subtitleView ?: return,
+            statusView ?: return
+        )
+    }
+
+    fun hide() {
+        val c = container ?: return
+        hideSkeleton(c)
+    }
 
     fun startSkeletonAnimation(vararg views: View) {
         stopAnimation()
@@ -82,11 +129,5 @@ class SkeletonAnimHelper {
         animatorSet?.cancel()
         animatorSet = null
         animatedViews.clear()
-    }
-
-    fun updateHintText(hintView: View, message: String) {
-        if (hintView is android.widget.TextView) {
-            hintView.text = message
-        }
     }
 }

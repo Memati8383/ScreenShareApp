@@ -140,7 +140,7 @@
     <string name="help_faq_desc">S: Aynı anda kaç cihaz bağlanabilir?\nC: Şu anda 2 cihaz (1 yayıncı + 1 izleyici)\n\nS: İnternet bağlantısı gerekli mi?\nC: Evet, her cihazın internete bağlı olması gerekir\n\nS: Ücretsiz mi?\nC: Evet, uygulama tamamen ücretsizdir</string>
 
     <!-- Hakkında -->
-    <string name="about_version">Sürüm 2.0 (Build 2)</string>
+    <string name="about_version">Sürüm 3.0 (Build 3)</string>
     <string name="about_desc">WebRTC tabanlı gerçek zamanlı ekran paylaşımı. Kolay kurulum, düşük gecikme, güvenli bağlantı.</string>
     <string name="about_whats_new">YENİLİKLER</string>
     <string name="about_whats_new_list">✓ Bulut üzerinden ekran paylaşımı\n✓ Düşük gecikme süresi\n✓ Güvenli SSL/WSS bağlantısı\n✓ Kolay oda oluşturma\n✓ Son oturum geçmişi</string>
@@ -226,6 +226,12 @@
     <string name="state_screen_permission_error">HATA: Ekran paylaşımı izni alınamadı</string>
     <string name="state_general_error">HATA: %s</string>
     <string name="state_recording_error">Kayıt hatası: %s</string>
+    <string name="state_service_connected">Servise bağlandı</string>
+    <string name="state_service_disconnected">Servis bağlantısı kesildi</string>
+    <string name="state_screen_sharing_starting">Ekran paylaşımı başlatılıyor…</string>
+    <string name="state_turn_added">TURN sunucusu eklendi</string>
+    <string name="state_yayinci_ayrildi">Yayınıcı ayrıldı</string>
+    <string name="state_yayinci_baglantisi_koptu">Yayınıcı bağlantısı koptu</string>
 
     <!-- Ekran Görüntüsü -->
     <string name="screenshot_error_io">Ekran görüntüsü kaydedilemedi</string>

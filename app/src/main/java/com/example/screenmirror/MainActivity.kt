@@ -240,8 +240,5 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        try {
-            stopService(Intent(this, ScreenShareService::class.java))
-        } catch (_: Exception) {}
     }
 }

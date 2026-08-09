@@ -133,7 +133,7 @@
     <string name="help_faq_desc">Q: How many devices can connect at once?\nA: Currently 2 devices (1 broadcaster + 1 viewer)\n\nQ: Is internet connection required?\nA: Yes, both devices need to be connected to the internet\n\nQ: Is it free?\nA: Yes, the app is completely free</string>
 
     <!-- About -->
-    <string name="about_version">Version 2.0 (Build 2)</string>
+    <string name="about_version">Version 3.0 (Build 3)</string>
     <string name="about_desc">Real-time screen sharing powered by WebRTC. Easy setup, low latency, secure connection.</string>
     <string name="about_whats_new">WHAT\'S NEW</string>
     <string name="about_whats_new_list">✓ Cloud-based screen sharing\n✓ Low latency\n✓ Secure SSL/WSS connection\n✓ Easy room creation\n✓ Session history</string>
@@ -219,6 +219,12 @@
     <string name="state_screen_permission_error">ERROR: Screen sharing permission denied</string>
     <string name="state_general_error">ERROR: %s</string>
     <string name="state_recording_error">Recording error: %s</string>
+    <string name="state_service_connected">Service connected</string>
+    <string name="state_service_disconnected">Service disconnected</string>
+    <string name="state_screen_sharing_starting">Starting screen share…</string>
+    <string name="state_turn_added">TURN server added</string>
+    <string name="state_yayinci_ayrildi">Broadcaster left</string>
+    <string name="state_yayinci_baglantisi_koptu">Broadcaster disconnected</string>
 
     <!-- Screenshot -->
     <string name="screenshot_error_io">Could not save screenshot</string>

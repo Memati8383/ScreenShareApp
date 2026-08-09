@@ -1,16 +1,12 @@
 package com.example.screenmirror
 
 import android.app.AlertDialog
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -31,8 +27,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -69,13 +63,6 @@ class SenderActivity : AppCompatActivity() {
     private var roomCode = ""
 
     private lateinit var skeletonHelper: SkeletonAnimHelper
-    private lateinit var skeletonContainer: View
-    private lateinit var skeletonIcon: View
-    private lateinit var skeletonTitle: View
-    private lateinit var skeletonSubtitle: View
-    private lateinit var skeletonStatus: View
-    private lateinit var skeletonProgress: View
-    private lateinit var skeletonHint: TextView
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
@@ -83,13 +70,13 @@ class SenderActivity : AppCompatActivity() {
             service = localBinder.getService()
             isBound = true
             observeServiceEvents()
-            Log.i("SenderActivity", "Servise baglandi")
+            Log.i("SenderActivity", getString(R.string.state_service_connected))
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
             service = null
             isBound = false
-            Log.i("SenderActivity", "Servis baglantisi kesildi")
+            Log.i("SenderActivity", getString(R.string.state_service_disconnected))
         }
     }
 
@@ -97,7 +84,7 @@ class SenderActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sender)
 
-        createNotificationChannel()
+        NotificationHelper.createScreenShareChannel(this)
         initSkeleton()
 
         tvSenderStatus = findViewById(R.id.tvSenderStatus)
@@ -161,7 +148,7 @@ class SenderActivity : AppCompatActivity() {
 
         tvConnectionQuality.visibility = if (AppSettings.isQualityStatsEnabled(this)) View.VISIBLE else View.GONE
 
-        showSkeleton("Ekran paylasimi baslatiliyor...")
+        showSkeleton(getString(R.string.state_screen_sharing_starting))
         startService()
         startStatsChecker()
     }
@@ -263,37 +250,22 @@ class SenderActivity : AppCompatActivity() {
 
     private fun initSkeleton() {
         skeletonHelper = SkeletonAnimHelper()
-        skeletonContainer = findViewById(R.id.skeletonContainer)
-        skeletonIcon = findViewById(R.id.skeletonIcon)
-        skeletonTitle = findViewById(R.id.skeletonTitle)
-        skeletonSubtitle = findViewById(R.id.skeletonSubtitle)
-        skeletonStatus = findViewById(R.id.skeletonStatus)
-        skeletonProgress = findViewById(R.id.skeletonProgress)
-        skeletonHint = findViewById(R.id.skeletonHint)
-    }
-
-    private fun showSkeleton(hint: String) {
-        skeletonContainer.visibility = View.VISIBLE
-        skeletonHelper.updateHintText(skeletonHint, hint)
-        skeletonHelper.startSkeletonAnimation(
-            skeletonIcon, skeletonTitle, skeletonSubtitle, skeletonStatus
+        skeletonHelper.init(
+            container = findViewById(R.id.skeletonContainer),
+            icon = findViewById(R.id.skeletonIcon),
+            title = findViewById(R.id.skeletonTitle),
+            subtitle = findViewById(R.id.skeletonSubtitle),
+            status = findViewById(R.id.skeletonStatus),
+            hint = findViewById(R.id.skeletonHint)
         )
     }
 
-    private fun hideSkeleton() {
-        skeletonHelper.hideSkeleton(skeletonContainer)
+    private fun showSkeleton(hint: String) {
+        skeletonHelper.show(hint)
     }
 
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                NotificationConstants.CHANNEL_ID_SCREEN,
-                NotificationConstants.CHANNEL_NAME_SCREEN,
-                NotificationManager.IMPORTANCE_LOW
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-        }
+    private fun hideSkeleton() {
+        skeletonHelper.hide()
     }
 
     private fun startService() {
@@ -313,7 +285,6 @@ class SenderActivity : AppCompatActivity() {
         }
         startForegroundService(serviceIntent)
 
-        val senderSurface = findViewById<org.webrtc.SurfaceViewRenderer>(R.id.senderSurface)
         bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
 
         isSharing = true
@@ -382,52 +353,10 @@ class SenderActivity : AppCompatActivity() {
 
     private fun takeScreenshot() {
         val screenView = window.decorView.rootView
-        val bitmap = Bitmap.createBitmap(screenView.width, screenView.height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        screenView.draw(canvas)
-
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val filename = "screenmirror_$timestamp.png"
-
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val contentValues = android.content.ContentValues().apply {
-                    put(android.provider.MediaStore.Images.Media.DISPLAY_NAME, filename)
-                    put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/png")
-                    put(android.provider.MediaStore.Images.Media.RELATIVE_PATH, "Pictures/ScreenMirror")
-                    put(android.provider.MediaStore.Images.Media.IS_PENDING, 1)
-                }
-                val resolver = contentResolver
-                val uri = resolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-                if (uri != null) {
-                    resolver.openOutputStream(uri)?.use { out ->
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-                    }
-                    contentValues.clear()
-                    contentValues.put(android.provider.MediaStore.Images.Media.IS_PENDING, 0)
-                    resolver.update(uri, contentValues, null, null)
-                    Toast.makeText(this, getString(R.string.sender_screenshot_saved, filename), Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, getString(R.string.screenshot_error_io), Toast.LENGTH_SHORT).show()
-                }
-            } else {
-                val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(
-                    android.os.Environment.DIRECTORY_PICTURES
-                )
-                val screenmirrorDir = File(picturesDir, "ScreenMirror")
-                if (!screenmirrorDir.exists()) {
-                    screenmirrorDir.mkdirs()
-                }
-                val file = File(screenmirrorDir, filename)
-                FileOutputStream(file).use { out ->
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-                }
-                Toast.makeText(this, getString(R.string.sender_screenshot_saved, filename), Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
-            Log.e("SenderActivity", "Screenshot hatasi", e)
-            Toast.makeText(this, getString(R.string.screenshot_error_io), Toast.LENGTH_SHORT).show()
-        }
+        val success = ScreenshotHelper.takeScreenshot(this, screenView, "screenmirror")
+        ScreenshotHelper.showResult(this, success, filename)
     }
 
     private fun startRecording() {

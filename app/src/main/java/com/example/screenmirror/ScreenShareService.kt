@@ -21,6 +21,8 @@ import android.view.SurfaceView
 import org.webrtc.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import com.example.screenmirror.data.RoomHistory
 import com.example.screenmirror.model.ConnectionQuality
 import com.example.screenmirror.model.ErrorType
@@ -28,6 +30,8 @@ import com.example.screenmirror.model.ServiceEvent
 import com.example.screenmirror.service.ServiceStateManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
@@ -38,11 +42,6 @@ class ScreenShareService : Service() {
 
     companion object {
         private const val TAG = "ScreenShareSvc"
-        private const val CHANNEL_ID = "screen_share_channel"
-        private const val CHANNEL_NAME = "Screen Share"
-        private const val NOTIFICATION_ID = 1
-        private const val NOTIFICATION_ID_JOIN = 2
-        private const val NOTIFICATION_ID_BROADCAST = 3
     }
 
     inner class LocalBinder : Binder() {
@@ -67,15 +66,16 @@ class ScreenShareService : Service() {
     private var remoteTrack: VideoTrack? = null
 
     private var mediaRecorder: MediaRecorder? = null
-    private var isRecording = false
+    private val isRecording = AtomicBoolean(false)
     private var recordingFile: File? = null
 
     private val executor = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
-    private var webRtcReady = false
-    private var offerPending = false
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val webRtcReady = AtomicBoolean(false)
+    private val offerPending = AtomicBoolean(false)
     private var startTime = 0L
-    @Volatile private var participantCount = 1
+    private val participantCount = AtomicInteger(1)
     private val lock = Any()
     private var statsCheckerRunnable: Runnable? = null
 
@@ -86,7 +86,7 @@ class ScreenShareService : Service() {
     private var captureWidth = 1280
     private var captureHeight = 720
     private var captureFps = 30
-    private var isFrozen = false
+    private val isFrozen = AtomicBoolean(false)
 
     @Volatile private var remoteDescriptionSet = false
     private val pendingCandidates = CopyOnWriteArrayList<IceCandidate>()
@@ -172,7 +172,7 @@ class ScreenShareService : Service() {
                 return START_STICKY
             }
 
-            if (webRtcReady) {
+            if (webRtcReady.get()) {
                 Log.i(TAG, "WebRTC zaten baslatilmis")
                 if (role == "sender" && pendingResultCode != 0 && pendingData != null) {
                     val code = pendingResultCode; val data = pendingData
@@ -204,7 +204,7 @@ class ScreenShareService : Service() {
                     }
                 })
                 mainHandler.postDelayed({
-                    if (!surfaceCallbackFired && !webRtcReady) {
+                    if (!surfaceCallbackFired && !webRtcReady.get()) {
                         Log.w(TAG, "surface callback 3sn icinde tetiklenmedi, yeniden deneniyor")
                         val retryRenderer = renderer
                         if (retryRenderer != null) {
@@ -231,14 +231,14 @@ class ScreenShareService : Service() {
 
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
-            CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT
+            NotificationConstants.CHANNEL_ID_SCREEN, NotificationConstants.CHANNEL_NAME_SCREEN, NotificationManager.IMPORTANCE_DEFAULT
         )
         getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
     }
 
     private fun showNotification(text: String) {
         try {
-            val notif = Notification.Builder(this, CHANNEL_ID)
+            val notif = Notification.Builder(this, NotificationConstants.CHANNEL_ID_SCREEN)
                 .setSmallIcon(android.R.drawable.ic_menu_camera)
                 .setContentTitle("ScreenShare")
                 .setContentText(text)
@@ -249,9 +249,9 @@ class ScreenShareService : Service() {
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
                 else
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-                startForeground(NOTIFICATION_ID, notif, type)
+                startForeground(NotificationConstants.NOTIFICATION_ID_FOREGROUND, notif, type)
             } else {
-                startForeground(NOTIFICATION_ID, notif)
+                startForeground(NotificationConstants.NOTIFICATION_ID_FOREGROUND, notif)
             }
         } catch (e: Exception) {
             Log.e(TAG, "foreground hatasi", e)
@@ -260,13 +260,13 @@ class ScreenShareService : Service() {
 
     private fun showJoinNotification() {
         try {
-            val notif = Notification.Builder(this, CHANNEL_ID)
+            val notif = Notification.Builder(this, NotificationConstants.CHANNEL_ID_SCREEN)
                 .setSmallIcon(android.R.drawable.ic_menu_send)
                 .setContentTitle("Screen Mirror")
                 .setContentText(getString(R.string.notif_joined))
                 .setAutoCancel(true)
                 .build()
-            getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID_JOIN, notif)
+            getSystemService(NotificationManager::class.java).notify(NotificationConstants.NOTIFICATION_ID_JOIN, notif)
         } catch (e: Exception) {
             Log.e(TAG, "bildirim hatasi", e)
         }
@@ -274,13 +274,13 @@ class ScreenShareService : Service() {
 
     private fun showBroadcastStartNotification() {
         try {
-            val notif = Notification.Builder(this, CHANNEL_ID)
+            val notif = Notification.Builder(this, NotificationConstants.CHANNEL_ID_SCREEN)
                 .setSmallIcon(android.R.drawable.ic_menu_camera)
                 .setContentTitle("Screen Mirror")
                 .setContentText(getString(R.string.notif_broadcast_started))
                 .setAutoCancel(true)
                 .build()
-            getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID_BROADCAST, notif)
+            getSystemService(NotificationManager::class.java).notify(NotificationConstants.NOTIFICATION_ID_BROADCAST, notif)
         } catch (e: Exception) {
             Log.e(TAG, "bildirim hatasi", e)
         }
@@ -346,7 +346,7 @@ class ScreenShareService : Service() {
                         .setPassword(turnPass)
                         .createIceServer()
                 )
-                Log.i(TAG, "TURN sunucusu eklendi: $turnUrl")
+                Log.i(TAG, getString(R.string.state_turn_added))
             }
 
             val config = PeerConnection.RTCConfiguration(iceServers)
@@ -366,19 +366,19 @@ class ScreenShareService : Service() {
                 onRemoteIce = { c -> executor.execute { handleRemoteIce(c) } },
                 onPeerJoined = {
                     stateManager.emitEvent(ServiceEvent.PeerConnected)
-                    participantCount = 2
+                    participantCount.set(2)
                     showJoinNotification()
                     if (role == "sender") {
                         if (localTrack != null) {
                             executor.execute { createOffer() }
                         } else {
                             Log.i(TAG, "sender: localTrack henuz hazir degil, offer bekleniyor")
-                            offerPending = true
+                            offerPending.set(true)
                             mainHandler.postDelayed({
-                                if (offerPending && role == "sender") {
+                                if (offerPending.get() && role == "sender") {
                                     Log.w(TAG, "sender: offer hala bekleniyor, yeniden deneniyor")
                                     if (localTrack != null) {
-                                        offerPending = false
+                                        offerPending.set(false)
                                         executor.execute { createOffer() }
                                     }
                                 }
@@ -387,10 +387,10 @@ class ScreenShareService : Service() {
                     }
                 },
                 onPeerLeft = {
-                    participantCount = 1
+                    participantCount.set(1)
                     stateManager.emitEvent(ServiceEvent.ViewerLeft)
                     if (role == "viewer") {
-                        stateManager.emitEvent(ServiceEvent.SenderDisconnected("Yayinci ayrildi"))
+                        stateManager.emitEvent(ServiceEvent.SenderDisconnected(getString(R.string.state_yayinci_ayrildi)))
                     }
                 },
                 onViewerCountChanged = { count ->
@@ -402,7 +402,7 @@ class ScreenShareService : Service() {
             )
             Log.i(TAG, "cloud signaling objesi olusturuldu")
 
-            webRtcReady = true
+            webRtcReady.set(true)
             stateManager.emitEvent(ServiceEvent.WebRtcReady)
 
             startStatsChecker()
@@ -437,7 +437,7 @@ class ScreenShareService : Service() {
                     Log.w(TAG, "ICE baglantisi koptu: $state")
                     stateManager.emitEvent(ServiceEvent.ConnectionBroken(state.name))
                     if (role == "viewer") {
-                        stateManager.emitEvent(ServiceEvent.SenderDisconnected("Yayinci baglantisi koptu"))
+                        stateManager.emitEvent(ServiceEvent.SenderDisconnected(getString(R.string.state_yayinci_baglantisi_koptu)))
                     }
                 }
                 PeerConnection.IceConnectionState.CONNECTED -> {
@@ -506,8 +506,8 @@ class ScreenShareService : Service() {
             Log.i(TAG, "capture baslatildi, localTrack eklenmis")
             stateManager.emitEvent(ServiceEvent.ScreenBroadcasting)
 
-            if (offerPending && role == "sender") {
-                offerPending = false
+            if (offerPending.get() && role == "sender") {
+                offerPending.set(false)
                 Log.i(TAG, "sender: localTrack hazir, beklenen offer olusturuluyor")
                 createOffer()
             }
@@ -518,8 +518,8 @@ class ScreenShareService : Service() {
     }
 
     fun toggleFreeze() {
-        isFrozen = !isFrozen
-        if (isFrozen) {
+        isFrozen.set(!isFrozen.get())
+        if (isFrozen.get()) {
             try { capturer?.stopCapture() } catch (_: Exception) {}
             stateManager.emitEvent(ServiceEvent.BroadcastPaused)
         } else {
@@ -538,7 +538,7 @@ class ScreenShareService : Service() {
     }
 
     fun startRecording(resultCode: Int, data: Intent?) {
-        if (isRecording) return
+        if (isRecording.get()) return
         try {
             val projectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
             @Suppress("DEPRECATION")
@@ -572,7 +572,7 @@ class ScreenShareService : Service() {
                 start()
             }
 
-            isRecording = true
+            isRecording.set(true)
             stateManager.emitEvent(ServiceEvent.RecordingStarted)
             Log.i(TAG, "Kayit baslatildi: ${recordingFile?.absolutePath}")
         } catch (e: Exception) {
@@ -582,12 +582,12 @@ class ScreenShareService : Service() {
     }
 
     fun stopRecording() {
-        if (!isRecording) return
+        if (!isRecording.get()) return
         try {
             mediaRecorder?.stop()
             mediaRecorder?.release()
             mediaRecorder = null
-            isRecording = false
+            isRecording.set(false)
             stateManager.emitEvent(ServiceEvent.RecordingStopped)
             stateManager.emitEvent(ServiceEvent.RecordingProgress(recordingFile?.name ?: ""))
             Log.i(TAG, "Kayit durduruldu: ${recordingFile?.absolutePath}")
@@ -597,7 +597,7 @@ class ScreenShareService : Service() {
         }
     }
 
-    fun isRecording(): Boolean = isRecording
+    fun isRecording(): Boolean = isRecording.get()
 
     private fun handleRemoteDescription(sdp: SessionDescription) {
         try {
@@ -722,7 +722,7 @@ class ScreenShareService : Service() {
     private fun startStatsChecker() {
         statsCheckerRunnable = object : Runnable {
             override fun run() {
-                if (!webRtcReady || peerConnection == null) return
+                if (!webRtcReady.get() || peerConnection == null) return
                 peerConnection?.getStats { report ->
                     var framesPerSecond = 0
                     var packetLoss = 0.0
@@ -786,12 +786,12 @@ class ScreenShareService : Service() {
 
         statsCheckerRunnable?.let { mainHandler.removeCallbacks(it) }
 
-        if (isRecording) {
+        if (isRecording.get()) {
             try {
                 mediaRecorder?.stop()
                 mediaRecorder?.release()
                 mediaRecorder = null
-                isRecording = false
+                isRecording.set(false)
             } catch (e: Exception) {
                 Log.e(TAG, "Kayit temizleme hatasi", e)
             }
@@ -806,11 +806,11 @@ class ScreenShareService : Service() {
                         roomName = roomId,
                         role = role,
                         duration = duration,
-                        participantCount = participantCount,
+                        participantCount = participantCount.get(),
                         startTime = startTime,
                         endTime = System.currentTimeMillis()
                     )
-                    CoroutineScope(Dispatchers.IO).launch {
+                    serviceScope.launch {
                         app.roomHistoryManager.saveRoom(room)
                     }
                     Log.i(TAG, "Room history kaydedildi: $roomId")
@@ -820,8 +820,8 @@ class ScreenShareService : Service() {
             }
         }
 
-        webRtcReady = false
-        offerPending = false
+        webRtcReady.set(false)
+        offerPending.set(false)
         pendingResultCode = 0
         pendingData = null
 
@@ -865,9 +865,11 @@ class ScreenShareService : Service() {
 
         try { executor.shutdownNow() } catch (_: Exception) {}
 
+        try { serviceScope.cancel() } catch (_: Exception) {}
+
         try {
             val nm = getSystemService(NotificationManager::class.java)
-            nm.cancel(NOTIFICATION_ID)
+            nm.cancel(NotificationConstants.NOTIFICATION_ID_FOREGROUND)
         } catch (_: Exception) {}
 
         mainHandler.removeCallbacksAndMessages(null)
