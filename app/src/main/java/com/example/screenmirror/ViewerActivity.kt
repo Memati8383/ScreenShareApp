@@ -182,7 +182,9 @@ class ViewerActivity : AppCompatActivity() {
                         val state = intent.getStringExtra("state") ?: ""
                         runOnUiThread {
                             tvStats.text = state
-                            hideSkeleton()
+                            if (state in listOf("Es cihaz baglandi", "Canli goruntu aliniyor", "WebRTC hazir")) {
+                                hideSkeleton()
+                            }
                         }
                     }
                 }

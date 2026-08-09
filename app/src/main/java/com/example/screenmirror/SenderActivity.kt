@@ -198,7 +198,6 @@ class SenderActivity : AppCompatActivity() {
         isSharing = true
         startTime = System.currentTimeMillis()
         tvSenderStatus.text = getString(R.string.status_live)
-        hideSkeleton()
     }
 
     private fun registerBroadcastReceiver() {
@@ -223,6 +222,9 @@ class SenderActivity : AppCompatActivity() {
                     "com.example.screenmirror.STATE_CHANGED" -> {
                         val state = intent.getStringExtra("state") ?: ""
                         tvSenderStats.text = state
+                        if (state in listOf("WebRTC hazir", "Izleyici bekleniyor...", "Ekran yayinda", "Es cihaz baglandi", "Canli goruntu aliniyor")) {
+                            hideSkeleton()
+                        }
                     }
                 }
             }

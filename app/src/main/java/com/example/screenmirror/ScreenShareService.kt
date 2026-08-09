@@ -146,18 +146,9 @@ class ScreenShareService : Service() {
 
             val r = renderer
             if (r == null) {
-                Log.e(TAG, "renderer NULL, 2sn sonra tekrar denenecek")
+                Log.e(TAG, "renderer NULL, 5 kez 1sn aralikla denenecek")
                 postState("Surface bekleniyor...")
-                mainHandler.postDelayed({
-                    val retry = renderer
-                    if (retry == null) {
-                        Log.e(TAG, "renderer hala NULL")
-                        postState("HATA: SurfaceView bulunamadi")
-                    } else {
-                        Log.i(TAG, "renderer bulundu, WebRTC baslatiliyor")
-                        startWebRtc(retry)
-                    }
-                }, 2000)
+                retryRenderer(1, 5)
                 return START_STICKY
             }
 
@@ -248,6 +239,22 @@ class ScreenShareService : Service() {
         } catch (e: Exception) {
             Log.e(TAG, "bildirim hatasi", e)
         }
+    }
+
+    private fun retryRenderer(attempt: Int, maxAttempts: Int) {
+        mainHandler.postDelayed({
+            val retry = renderer
+            if (retry != null) {
+                Log.i(TAG, "renderer bulundu ($attempt/$maxAttempts), WebRTC baslatiliyor")
+                startWebRtc(retry)
+            } else if (attempt < maxAttempts) {
+                Log.w(TAG, "renderer hala NULL ($attempt/$maxAttempts), tekrar deneniyor...")
+                retryRenderer(attempt + 1, maxAttempts)
+            } else {
+                Log.e(TAG, "renderer $maxAttempts deneme sonra hala NULL")
+                postState("HATA: SurfaceView bulunamadi")
+            }
+        }, 1000)
     }
 
     private fun startWebRtc(r: SurfaceViewRenderer) {
@@ -711,6 +718,7 @@ class ScreenShareService : Service() {
         try {
             mainHandler.post {
                 try { renderer?.release() } catch (_: Exception) {}
+                renderer = null
             }
         } catch (_: Exception) {}
 
