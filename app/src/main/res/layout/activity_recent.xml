@@ -19,8 +19,7 @@
             android:background="@color/bg_card"
             app:titleTextColor="@color/text_primary"
             app:navigationIcon="@drawable/ic_back"
-            app:navigationIconTint="@color/text_primary"
-            app:menu="@menu/menu_recent" />
+            app:navigationIconTint="@color/text_primary" />
 
         <TextView
             android:id="@+id/tvEmpty"

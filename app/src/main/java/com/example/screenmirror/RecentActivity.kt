@@ -46,6 +46,14 @@ class RecentActivity : AppCompatActivity() {
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.title = getString(R.string.nav_recent)
 
+        toolbar.inflateMenu(R.menu.menu_recent)
+        toolbar.setOnMenuItemClickListener { item ->
+            if (item.itemId == R.id.action_delete_all) {
+                showDeleteAllDialog()
+                true
+            } else false
+        }
+
         toolbar.setNavigationOnClickListener {
             finish()
         }
