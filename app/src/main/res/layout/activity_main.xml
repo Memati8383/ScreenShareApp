@@ -155,38 +155,48 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Room Input with TextInputLayout -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilRoom"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <!-- Room Input -->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/main_room_label"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxStrokeColor="@color/accent"
-                app:hintTextColor="@color/accent"
-                app:hintEnabled="true"
-                app:startIconDrawable="@drawable/ic_home"
-                app:startIconTint="@color/text_secondary"
-                app:endIconMode="custom"
-                app:endIconDrawable="@drawable/ic_copy"
                 android:layout_marginBottom="20dp">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:id="@+id/etRoom"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="56dp"
+                    android:background="@drawable/bg_room_input"
+                    android:hint="@string/main_room_label"
                     android:inputType="text"
                     android:singleLine="true"
                     android:imeOptions="actionDone"
                     android:textColor="@android:color/white"
                     android:textColorHint="@color/text_hint"
-                    android:textSize="15sp" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:textSize="15sp"
+                    android:paddingStart="48dp"
+                    android:paddingEnd="48dp"
+                    android:layout_gravity="center" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_home"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="14dp"
+                    app:tint="@color/text_secondary" />
+
+                <ImageView
+                    android:id="@+id/btnCopyRoom"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_copy"
+                    android:padding="8dp"
+                    android:layout_gravity="center_vertical|end"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:tint="@color/text_secondary" />
+            </FrameLayout>
 
             <!-- Action Button -->
             <Button

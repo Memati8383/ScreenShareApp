@@ -126,17 +126,17 @@
     <string name="help_start_title">Ekran Yayını Nasıl Başlatılır?</string>
     <string name="help_start_desc">1. Ana sayfada oda adını girin\n2. \'Yayınla (Host)\' seçeneğine tıklayın\n3. \'Yayınla\' butonuna basın\n4. Ekran paylaşım iznini onaylayın\n5. Diğer cihazın bağlanmasını bekleyin</string>
     <string name="help_watch_title">Ekran Yayını Nasıl İzlenir?</string>
-    <string name="help_watch_desc">1. Ana sayfada aynı oda adını girin\n2. \'İzle (Client)\' seçeneğine tıklayın\n3. \'İzle\' butonuna basın\n4. Yayıncı cihazın bağlanmasını bekleyin\n5. Ekran yayını otomatik olarak başlayacak</string>
+    <string name="help_watch_desc">1. Ana sayfada aynı oda adını girin\n2. \'İzle (Client)\' seçeneğine tıklayın\n3. \'İzle\' butonuna basın\n4. Yayıncı cihazın bağlanmasını bekleyin\n5. Ekran yayını otomatik olarak başlayacak\n\nNot: Birden fazla izleyici aynı anda bağlanabilir.</string>
     <string name="help_troubleshoot_title">Sorun Giderme</string>
     <string name="help_troubleshoot_desc">• Bağlantı sorunu: İnternet bağlantınızı kontrol edin\n• Gecikme: WiFi ağına bağlanmayı deneyin\n• Ekran paylaşımı başlamadı: İzinleri kontrol edin\n• Uygulama çöktü: Uygulamayı yeniden başlatın</string>
     <string name="help_faq_title">Sıkça Sorulan Sorular</string>
-    <string name="help_faq_desc">S: Aynı anda kaç cihaz bağlanabilir?\nC: Şu an için 2 cihaz (1 yayıncı + 1 izleyici)\n\nS: İnternet bağlantısı gerekli mi?\nC: Evet, her iki cihazın da internete bağlı olması gerekir\n\nS: Ücretsiz mi?\nC: Evet, uygulama tamamen ücretsizdir</string>
+    <string name="help_faq_desc">S: Aynı anda kaç cihaz bağlanabilir?\nC: Bir yayıncıya birden fazla izleyici bağlanabilir.\n\nS: İnternet bağlantısı gerekli mi?\nC: Evet, her cihazın internete bağlı olması gerekir\n\nS: Ücretsiz mi?\nC: Evet, uygulama tamamen ücretsizdir</string>
 
     <!-- Hakkında -->
     <string name="about_version">Sürüm 1.0.0 (Build 1)</string>
     <string name="about_desc">WebRTC tabanlı gerçek zamanlı ekran paylaşımı. Kolay kurulum, düşük gecikme, güvenli bağlantı.</string>
     <string name="about_whats_new">YENİLİKLER</string>
-    <string name="about_whats_new_list">✓ Bulut üzerinden ekran paylaşımı\n✓ Düşük gecikme süresi\n✓ Güvenli SSL/WSS bağlantısı\n✓ Kolay oda oluşturma\n✓ Son oturum geçmişi</string>
+    <string name="about_whats_new_list">✓ Çoklu izleyici desteği\n✓ Bulut üzerinden ekran paylaşımı\n✓ Düşük gecikme süresi\n✓ Güvenli SSL/WSS bağlantısı\n✓ Kolay oda oluşturma\n✓ Son oturum geçmişi</string>
     <string name="about_features">ÖZELLİKLER</string>
     <string name="about_feature_screenshot_title">Anlık Ekran Paylaşımı</string>
     <string name="about_feature_screenshot_desc">Gerçek zamanlı HD ekran yayını</string>

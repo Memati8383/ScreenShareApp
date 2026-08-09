@@ -79,7 +79,7 @@ class SenderActivity : AppCompatActivity() {
 
         val toolbar = findViewById<MaterialToolbar?>(R.id.toolbar)
 
-        val code = intent.getStringExtra(EXTRA_ROOM_CODE) ?: "000000"
+        val code = intent.getStringExtra("room") ?: intent.getStringExtra(EXTRA_ROOM_CODE) ?: "000000"
         tvSenderRoom.text = getString(R.string.sender_room_prefix, code)
 
         val captureWidth = intent.getIntExtra(EXTRA_CAPTURE_WIDTH, 1280)
@@ -165,8 +165,22 @@ class SenderActivity : AppCompatActivity() {
             registerReceiver(receiver, filter)
         }
 
-        val projectionManager = getSystemService(MEDIA_PROJECTION_SERVICE) as android.media.projection.MediaProjectionManager
-        startActivityForResult(projectionManager.createScreenCaptureIntent(), 1001)
+        val resultCode = intent.getIntExtra("resultCode", 0)
+        val projectionData = intent.getParcelableExtra<Intent>("projectionData")
+
+        if (resultCode == RESULT_OK && projectionData != null) {
+            val roomCode = intent.getStringExtra("room") ?: intent.getStringExtra(EXTRA_ROOM_CODE) ?: ""
+            val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
+                putExtra("role", "sender")
+                putExtra("room", roomCode)
+                putExtra("resultCode", resultCode)
+                putExtra("data", projectionData)
+            }
+            startForegroundService(serviceIntent)
+        } else {
+            Toast.makeText(this, "Ekran paylaşımı izni verilmedi", Toast.LENGTH_SHORT).show()
+            finish()
+        }
     }
 
     private fun showStopConfirmation() {
@@ -269,15 +283,6 @@ class SenderActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == 1001 && resultCode == RESULT_OK && data != null) {
-            val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
-                putExtra("resultCode", resultCode)
-                putExtra("data", data)
-                putExtra(EXTRA_ROOM_CODE, intent.getStringExtra(EXTRA_ROOM_CODE))
-            }
-            startForegroundService(serviceIntent)
-        }
 
         if (requestCode == 1002 && resultCode == RESULT_OK && data != null) {
             val recordIntent = Intent("com.example.screenmirror.START_RECORDING").apply {

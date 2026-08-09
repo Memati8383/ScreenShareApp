@@ -5,6 +5,7 @@ WebRTC ile gerçek zamanlı ekran paylaşımı Android uygulaması.
 ## 📱 Özellikler
 
 - **Anlık Ekran Paylaşımı** - Gerçek zamanlı HD ekran yayını
+- **Çoklu İzleyici** - Tek yayıncıya birden fazla izleyici bağlanabilir
 - **Düşük Gecikme** - WebRTC ile milisaniyeler içinde
 - **Bulut Çözümü** - Her yerden bağlanın, sınır yok
 - **Kolay Bağlantı** - Tek oda adı ile hızlı kurulum
@@ -65,13 +66,14 @@ app/src/main/java/com/example/screenmirror/
 2. Oda adını girin
 3. "BAŞLA" butonuna tıklayın
 4. Ekran paylaşımı izni verin
-5. Diğer kullanıcının bağlanmasını bekleyin
+5. İzleyicilerin bağlanmasını bekleyin
 
 ### Yayın İzleme (Client)
 1. "İZLE" butonuna tıklayın
 2. Aynı oda adını girin
 3. "BAĞLAN" butonuna tıklayın
 4. Yayını izlemeye başlayın
+5. Birden fazla izleyici aynı anda bağlanabilir
 
 ## 🌐 Bağlantı
 

@@ -17,8 +17,7 @@ import androidx.core.app.ActivityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import android.widget.EditText
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
@@ -27,8 +26,7 @@ class MainActivity : AppCompatActivity() {
     private val REQ_PERMISSIONS = 1002
     private lateinit var mpm: MediaProjectionManager
 
-    private lateinit var tilRoom: TextInputLayout
-    private lateinit var etRoom: TextInputEditText
+    private lateinit var etRoom: EditText
     private lateinit var tvStatus: TextView
     private lateinit var btnShare: Button
     private lateinit var btnWatch: Button
@@ -45,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         mpm = getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
 
-        tilRoom = findViewById(R.id.tilRoom)
         etRoom = findViewById(R.id.etRoom)
         tvStatus = findViewById(R.id.tvStatus)
         btnShare = findViewById(R.id.btnShare)
@@ -68,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         btnShare.setOnClickListener { startSender() }
         btnWatch.setOnClickListener { goToViewer() }
 
-        tilRoom.setEndIconOnClickListener {
+        findViewById<ImageView>(R.id.btnCopyRoom).setOnClickListener {
             val room = etRoom.text.toString().trim()
             if (room.isNotEmpty()) {
                 val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
@@ -138,7 +135,7 @@ class MainActivity : AppCompatActivity() {
             btnClientMode.setBackgroundResource(R.drawable.bg_card_inactive)
             btnShare.visibility = View.VISIBLE
             btnWatch.visibility = View.GONE
-            tilRoom.hint = getString(R.string.main_room_hint_create)
+            etRoom.hint = getString(R.string.main_room_hint_create)
             etRoom.setText(generateRoomCode())
             etRoom.isEnabled = false
         } else {
@@ -146,7 +143,7 @@ class MainActivity : AppCompatActivity() {
             btnHostMode.setBackgroundResource(R.drawable.bg_card_inactive)
             btnShare.visibility = View.GONE
             btnWatch.visibility = View.VISIBLE
-            tilRoom.hint = getString(R.string.main_room_hint)
+            etRoom.hint = getString(R.string.main_room_hint)
             etRoom.setText("")
             etRoom.isEnabled = true
         }
