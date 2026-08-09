@@ -16,7 +16,6 @@ import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import org.webrtc.*
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import com.example.screenmirror.data.RoomHistory
 import com.example.screenmirror.data.RoomHistoryManager
@@ -45,19 +44,18 @@ class ScreenShareService : Service() {
 
     private var eglBase: EglBase? = null
     private var factory: PeerConnectionFactory? = null
+    private var peerConnection: PeerConnection? = null
     private var cloudSignaling: CloudSignalingClient? = null
     private var surfaceTextureHelper: SurfaceTextureHelper? = null
     private var videoSource: VideoSource? = null
     private var capturer: ScreenCapturerAndroid? = null
     private var localTrack: VideoTrack? = null
-
-    private val peerConnections = ConcurrentHashMap<String, PeerConnection>()
-    private val pendingIceCandidates = ConcurrentHashMap<String, MutableList<IceCandidate>>()
-    private val remoteDescriptionSet = ConcurrentHashMap<String, Boolean>()
+    private var remoteTrack: VideoTrack? = null
 
     private val executor = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
     private var webRtcReady = false
+    private var offerPending = false
     private var startTime = 0L
     private var participantCount = 1
 
@@ -88,17 +86,6 @@ class ScreenShareService : Service() {
                 role = intent.getStringExtra("role") ?: "viewer"
                 roomId = intent.getStringExtra("room") ?: "oda1"
                 startTime = System.currentTimeMillis()
-
-                if (role == "sender") {
-                    val code = intent.getIntExtra("resultCode", 0)
-                    val data = intent.getParcelableExtra<Intent>("data")
-                    if (code != 0 && data != null) {
-                        pendingResultCode = code
-                        pendingData = data
-                        Log.i(TAG, "sender projection data alindi: code=$code")
-                    }
-                }
-
                 Log.i(TAG, "role=$role room=$roomId")
             }
 
@@ -204,200 +191,97 @@ class ScreenShareService : Service() {
         }
     }
 
-    private fun initFactory() {
-        if (!factoryInitialized) {
-            PeerConnectionFactory.initialize(
-                PeerConnectionFactory.InitializationOptions.builder(this)
-                    .setFieldTrials("WebRTC-Network-DisableNetworkMonitor/Enabled/")
-                    .createInitializationOptions()
-            )
-            factoryInitialized = true
-            Log.i(TAG, "PeerConnectionFactory initialize OK")
-        }
-
-        factory = PeerConnectionFactory.builder()
-            .setVideoEncoderFactory(DefaultVideoEncoderFactory(eglBase!!.eglBaseContext, true, true))
-            .setVideoDecoderFactory(DefaultVideoDecoderFactory(eglBase!!.eglBaseContext))
-            .createPeerConnectionFactory()
-        Log.i(TAG, "factory OK")
-    }
-
-    private fun getRtcConfig(): PeerConnection.RTCConfiguration {
-        val iceServers = listOf(
-            PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer(),
-            PeerConnection.IceServer.builder("stun:stun1.l.google.com:19302").createIceServer(),
-            PeerConnection.IceServer.builder("stun:stun2.l.google.com:19302").createIceServer(),
-            PeerConnection.IceServer.builder("stun:stun3.l.google.com:19302").createIceServer(),
-            PeerConnection.IceServer.builder("stun:stun4.l.google.com:19302").createIceServer()
-        )
-        val config = PeerConnection.RTCConfiguration(iceServers)
-        config.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
-        config.continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY
-        return config
-    }
-
-    private fun createPeerConnectionForPeer(targetPeerId: String): PeerConnection? {
-        val f = factory ?: return null
-
-        val pc = f.createPeerConnection(getRtcConfig(), object : PeerConnection.Observer {
-            override fun onSignalingChange(state: PeerConnection.SignalingState) {}
-            override fun onIceConnectionChange(state: PeerConnection.IceConnectionState) {
-                Log.i(TAG, "ICE [$targetPeerId]: $state")
-                if (state == PeerConnection.IceConnectionState.DISCONNECTED ||
-                    state == PeerConnection.IceConnectionState.FAILED) {
-                    Log.i(TAG, "Peer baglantisi kesildi: $targetPeerId")
-                    cleanupPeerConnection(targetPeerId)
-                }
-            }
-            override fun onIceConnectionReceivingChange(receiving: Boolean) {}
-            override fun onIceGatheringChange(state: PeerConnection.IceGatheringState) {}
-            override fun onIceCandidatesRemoved(candidates: Array<out IceCandidate>) {}
-            override fun onAddStream(stream: MediaStream) {}
-            override fun onRemoveStream(stream: MediaStream) {}
-            override fun onDataChannel(channel: DataChannel) {}
-            override fun onRenegotiationNeeded() {}
-            override fun onIceCandidate(candidate: IceCandidate) {
-                cloudSignaling?.sendIce(candidate, targetPeerId)
-            }
-            override fun onAddTrack(receiver: RtpReceiver, mediaStreams: Array<out MediaStream>) {}
-            override fun onTrack(transceiver: RtpTransceiver) {
-                val track = transceiver.receiver.track()
-                if (track is VideoTrack) {
-                    mainHandler.post {
-                        renderer?.let { track.addSink(it) }
-                    }
-                    postState("Canli goruntu aliniyor")
-                }
-            }
-        })
-
-        if (pc != null) {
-            peerConnections[targetPeerId] = pc
-            pendingIceCandidates[targetPeerId] = mutableListOf()
-            remoteDescriptionSet[targetPeerId] = false
-            Log.i(TAG, "PeerConnection olusturuldu: $targetPeerId")
-        }
-        return pc
-    }
-
-    private fun cleanupPeerConnection(targetPeerId: String) {
-        peerConnections.remove(targetPeerId)?.let { pc ->
-            try { pc.close() } catch (_: Exception) {}
-        }
-        pendingIceCandidates.remove(targetPeerId)
-        remoteDescriptionSet.remove(targetPeerId)
-        Log.i(TAG, "PeerConnection temizlendi: $targetPeerId")
-    }
-
-    private fun handlePeerDescription(fromPeerId: String, sdp: SessionDescription) {
-        var pc = peerConnections[fromPeerId]
-
-        if (sdp.type == SessionDescription.Type.OFFER && pc == null) {
-            Log.i(TAG, "Offer alindi, PeerConnection olusturuluyor: $fromPeerId")
-            pc = createPeerConnectionForPeer(fromPeerId)
-        }
-
-        if (pc == null) {
-            Log.e(TAG, "PeerConnection bulunamadi: $fromPeerId")
-            return
-        }
-
-        pc.setRemoteDescription(sdpObserver(
-            onSetSuccess = {
-                remoteDescriptionSet[fromPeerId] = true
-                pendingIceCandidates[fromPeerId]?.forEach { candidate ->
-                    pc.addIceCandidate(candidate)
-                }
-                pendingIceCandidates[fromPeerId]?.clear()
-
-                if (sdp.type == SessionDescription.Type.OFFER) {
-                    Log.i(TAG, "Offer alindi, answer olusturuluyor: $fromPeerId")
-                    pc.createAnswer(sdpObserver(
-                        onCreateSuccess = { ans ->
-                            pc.setLocalDescription(sdpObserver(
-                                onSetSuccess = {
-                                    Log.i(TAG, "Answer gonderildi: $fromPeerId")
-                                    cloudSignaling?.sendAnswer(ans, fromPeerId)
-                                }
-                            ), ans)
-                        }
-                    ), MediaConstraints())
-                }
-            },
-            onSetFailure = { error ->
-                Log.e(TAG, "setRemoteDescription hatasi: $error")
-            }
-        ), sdp)
-    }
-
-    private fun handlePeerIce(fromPeerId: String, candidate: IceCandidate) {
-        val pc = peerConnections[fromPeerId]
-        if (pc != null && remoteDescriptionSet[fromPeerId] == true) {
-            pc.addIceCandidate(candidate)
-        } else {
-            pendingIceCandidates[fromPeerId]?.add(candidate)
-        }
-    }
-
-    private fun createOfferForPeer(targetPeerId: String) {
-        val pc = peerConnections[targetPeerId]
-        if (pc == null || localTrack == null) return
-
-        pc.createOffer(sdpObserver(
-            onCreateSuccess = { offer ->
-                pc.setLocalDescription(sdpObserver(
-                    onSetSuccess = {
-                        cloudSignaling?.sendOffer(offer, targetPeerId)
-                    }
-                ), offer)
-            }
-        ), MediaConstraints())
-    }
-
     private fun startWebRtc(r: SurfaceViewRenderer) {
         Log.i(TAG, "startWebRtc basliyor")
         try {
+            remoteDescriptionSet = false
+            pendingCandidates.clear()
+
             eglBase = EglBase.create()
             r.init(eglBase!!.eglBaseContext, null)
             r.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
             r.setZOrderMediaOverlay(true)
             Log.i(TAG, "renderer init OK")
 
-            initFactory()
+            if (!factoryInitialized) {
+                PeerConnectionFactory.initialize(
+                    PeerConnectionFactory.InitializationOptions.builder(this)
+                        .setFieldTrials("WebRTC-Network-DisableNetworkMonitor/Enabled/")
+                        .createInitializationOptions()
+                )
+                factoryInitialized = true
+                Log.i(TAG, "PeerConnectionFactory initialize OK")
+            }
+
+            factory = PeerConnectionFactory.builder()
+                .setVideoEncoderFactory(DefaultVideoEncoderFactory(eglBase!!.eglBaseContext, true, true))
+                .setVideoDecoderFactory(DefaultVideoDecoderFactory(eglBase!!.eglBaseContext))
+                .createPeerConnectionFactory()
+            Log.i(TAG, "factory OK")
+
+            val iceServers = listOf(
+                PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer(),
+                PeerConnection.IceServer.builder("stun:stun1.l.google.com:19302").createIceServer(),
+                PeerConnection.IceServer.builder("stun:stun2.l.google.com:19302").createIceServer(),
+                PeerConnection.IceServer.builder("stun:stun3.l.google.com:19302").createIceServer(),
+                PeerConnection.IceServer.builder("stun:stun4.l.google.com:19302").createIceServer()
+            )
+            val config = PeerConnection.RTCConfiguration(iceServers)
+            config.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
+            config.continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY
+
+            peerConnection = factory!!.createPeerConnection(config, object : PeerConnection.Observer {
+                override fun onSignalingChange(state: PeerConnection.SignalingState) {}
+                override fun onIceConnectionChange(state: PeerConnection.IceConnectionState) {
+                    Log.i(TAG, "ICE: $state")
+                    postState("ICE: $state")
+                }
+                override fun onIceConnectionReceivingChange(receiving: Boolean) {}
+                override fun onIceGatheringChange(state: PeerConnection.IceGatheringState) {}
+                override fun onIceCandidatesRemoved(candidates: Array<out IceCandidate>) {}
+                override fun onAddStream(stream: MediaStream) {}
+                override fun onRemoveStream(stream: MediaStream) {}
+                override fun onDataChannel(channel: DataChannel) {}
+                override fun onRenegotiationNeeded() {}
+                override fun onIceCandidate(candidate: IceCandidate) {
+                    cloudSignaling?.sendIce(candidate)
+                }
+                override fun onAddTrack(receiver: RtpReceiver, mediaStreams: Array<out MediaStream>) {}
+                override fun onTrack(transceiver: RtpTransceiver) {
+                    val track = transceiver.receiver.track()
+                    if (track is VideoTrack) {
+                        remoteTrack = track
+                        mainHandler.post { renderer?.let { remoteTrack?.addSink(it) } }
+                        postState("Canli goruntu aliniyor")
+                    }
+                }
+            })
+            Log.i(TAG, "peerConnection OK")
 
             cloudSignaling = CloudSignalingClient(
-                room = roomId,
-                role = role,
-                onRemoteDescription = { peerId, sdp ->
-                    Log.i(TAG, "Cloud: remote sdp alindi: ${sdp.type} from $peerId")
+                roomId, role,
+                onRemoteDescription = { sdp ->
+                    Log.i(TAG, "Cloud: remote sdp alindi: ${sdp.type}")
                     postState("Es cihaz baglandi")
-                    executor.execute { handlePeerDescription(peerId, sdp) }
+                    executor.execute { handleRemoteDescription(sdp) }
                 },
-                onRemoteIce = { peerId, candidate ->
-                    executor.execute { handlePeerIce(peerId, candidate) }
-                },
-                onPeerJoined = { peerId ->
-                    Log.i(TAG, "Peer katildi: $peerId")
-                    postState("Yeni izleyici: $peerId")
+                onRemoteIce = { c -> executor.execute { handleRemoteIce(c) } },
+                onPeerJoined = {
+                    postState("Es cihaz baglandi")
+                    participantCount = 2
                     showJoinNotification()
-                    participantCount++
-
                     if (role == "sender") {
-                        executor.execute {
-                            val pc = createPeerConnectionForPeer(peerId)
-                            if (pc != null && localTrack != null) {
-                                pc.addTrack(localTrack, listOf("stream0"))
-                                createOfferForPeer(peerId)
-                            } else if (pc != null) {
-                                Log.i(TAG, "localTrack henuz hazir, offer bekleniyor")
-                            }
+                        if (localTrack != null) {
+                            executor.execute { createOffer() }
+                        } else {
+                            Log.i(TAG, "sender: localTrack henuz hazir degil, offer bekleniyor")
+                            offerPending = true
                         }
                     }
                 },
-                onPeerLeft = { peerId ->
-                    Log.i(TAG, "Peer ayrildi: $peerId")
-                    participantCount = maxOf(1, participantCount - 1)
-                    executor.execute { cleanupPeerConnection(peerId) }
+                onPeerLeft = {
+                    participantCount = 1
+                    postState("Izleyici ayrildi")
                 },
                 onViewerCountChanged = { count ->
                     mainHandler.post { onViewerCountChanged?.invoke(count) }
@@ -410,17 +294,19 @@ class ScreenShareService : Service() {
 
             startStatsChecker()
 
-            cloudSignaling?.connect()
-
             if (role == "sender" && pendingResultCode != 0 && pendingData != null) {
                 val code = pendingResultCode; val data = pendingData
                 pendingResultCode = 0; pendingData = null
                 executor.execute {
+                    cloudSignaling?.connect()
+                    Log.i(TAG, "sender: signaling baglandi, capture baslatiliyor...")
+                    Thread.sleep(2000)
                     startCapture(code, data)
                     Log.i(TAG, "sender: capture baslatildi, izleyici bekleniyor")
                     postState("Izleyici bekleniyor...")
                 }
             } else {
+                cloudSignaling?.connect()
                 Log.i(TAG, "viewer: signaling baglandi, offer bekleniyor")
             }
         } catch (e: Exception) {
@@ -448,19 +334,15 @@ class ScreenShareService : Service() {
             capturer?.initialize(surfaceTextureHelper, this, videoSource?.capturerObserver)
             capturer?.startCapture(w, h, captureFps)
             localTrack = f.createVideoTrack("screen0", videoSource)
-            Log.i(TAG, "capture baslatildi, localTrack olusturuldu")
-
-            peerConnections.forEach { (peerId, pc) ->
-                try {
-                    pc.addTrack(localTrack, listOf("stream0"))
-                    createOfferForPeer(peerId)
-                    Log.i(TAG, "localTrack eklendi: $peerId")
-                } catch (e: Exception) {
-                    Log.e(TAG, "localTrack ekleme hatasi: $peerId", e)
-                }
-            }
-
+            peerConnection?.addTrack(localTrack, listOf("stream0"))
+            Log.i(TAG, "capture baslatildi, localTrack eklenmis")
             postState("Ekran yayinda")
+
+            if (offerPending && role == "sender") {
+                offerPending = false
+                Log.i(TAG, "sender: localTrack hazir, beklenen offer olusturuluyor")
+                createOffer()
+            }
         } catch (e: Exception) {
             Log.e(TAG, "startCapture HATA", e)
         }
@@ -479,6 +361,48 @@ class ScreenShareService : Service() {
         }
     }
 
+    private fun handleRemoteDescription(sdp: SessionDescription) {
+        peerConnection?.setRemoteDescription(sdpObserver(
+            onSetSuccess = {
+                remoteDescriptionSet = true
+                pendingCandidates.forEach { peerConnection?.addIceCandidate(it) }
+                pendingCandidates.clear()
+                if (sdp.type == SessionDescription.Type.OFFER) {
+                    peerConnection?.createAnswer(sdpObserver(
+                        onCreateSuccess = { ans ->
+                            peerConnection?.setLocalDescription(sdpObserver(
+                                onSetSuccess = {
+                                    cloudSignaling?.sendAnswer(ans)
+                                }
+                            ), ans)
+                        }
+                    ), MediaConstraints())
+                }
+            }
+        ), sdp)
+    }
+
+    private var remoteDescriptionSet = false
+    private val pendingCandidates = mutableListOf<IceCandidate>()
+
+    private fun handleRemoteIce(candidate: IceCandidate) {
+        if (remoteDescriptionSet) peerConnection?.addIceCandidate(candidate)
+        else pendingCandidates.add(candidate)
+    }
+
+    private fun createOffer() {
+        if (localTrack == null) return
+        peerConnection?.createOffer(sdpObserver(
+            onCreateSuccess = { offer ->
+                peerConnection?.setLocalDescription(sdpObserver(
+                    onSetSuccess = {
+                        cloudSignaling?.sendOffer(offer)
+                    }
+                ), offer)
+            }
+        ), MediaConstraints())
+    }
+
     private fun sdpObserver(
         onCreateSuccess: (SessionDescription) -> Unit = {},
         onCreateFailure: (String) -> Unit = { Log.e(TAG, "SDP hata: $it") },
@@ -494,70 +418,48 @@ class ScreenShareService : Service() {
     private fun postState(s: String) {
         Log.i(TAG, s)
         mainHandler.post { onState?.invoke(s) }
-        try {
-            val intent = Intent("com.example.screenmirror.STATE_CHANGED").apply {
-                putExtra("state", s)
-                setPackage(packageName)
-            }
-            sendBroadcast(intent)
-        } catch (_: Exception) {}
     }
 
     private fun startStatsChecker() {
         val statsRunnable = object : Runnable {
             override fun run() {
-                if (!webRtcReady) return
+                if (!webRtcReady || peerConnection == null) return
+                peerConnection?.getStats { report ->
+                    var bitrate = 0L
+                    var framesPerSecond = 0
+                    var packetLoss = 0.0
+                    var roundTripTime = 0.0
 
-                var totalFps = 0
-                var totalPacketLoss = 0.0
-                var totalRtt = 0.0
-                var activeConnections = 0
-
-                peerConnections.forEach { (peerId, pc) ->
-                    pc.getStats { report ->
-                        var framesPerSecond = 0
-                        var packetLoss = 0.0
-                        var roundTripTime = 0.0
-
-                        report.statsMap.forEach { (key, stats) ->
-                            when (stats.type) {
-                                "inbound-rtp" -> {
-                                    framesPerSecond = stats.members["framesPerSecond"] as? Int ?: 0
-                                    val packetsLost = stats.members["packetsLost"] as? Long ?: 0
-                                    val packetsReceived = stats.members["packetsReceived"] as? Long ?: 1
-                                    if (packetsReceived > 0) {
-                                        packetLoss = (packetsLost.toDouble() / packetsReceived) * 100
-                                    }
+                    report.statsMap.forEach { (key, stats) ->
+                        when (stats.type) {
+                            "inbound-rtp" -> {
+                                val bytesReceived = stats.members["bytesReceived"] as? Long ?: 0
+                                val framesDecoded = stats.members["framesDecoded"] as? Long ?: 0
+                                framesPerSecond = stats.members["framesPerSecond"] as? Int ?: 0
+                                val packetsLost = stats.members["packetsLost"] as? Long ?: 0
+                                val packetsReceived = stats.members["packetsReceived"] as? Long ?: 1
+                                if (packetsReceived > 0) {
+                                    packetLoss = (packetsLost.toDouble() / packetsReceived) * 100
                                 }
-                                "candidate-pair" -> {
-                                    val state = stats.members["state"] as? String
-                                    if (state == "succeeded") {
-                                        roundTripTime = stats.members["currentRoundTripTime"] as? Double ?: 0.0
-                                    }
+                            }
+                            "candidate-pair" -> {
+                                val state = stats.members["state"] as? String
+                                if (state == "succeeded") {
+                                    roundTripTime = stats.members["currentRoundTripTime"] as? Double ?: 0.0
                                 }
                             }
                         }
-
-                        totalFps += framesPerSecond
-                        totalPacketLoss += packetLoss
-                        totalRtt += roundTripTime
-                        activeConnections++
                     }
-                }
-
-                if (activeConnections > 0) {
-                    val avgRtt = totalRtt / activeConnections
-                    val avgPacketLoss = totalPacketLoss / activeConnections
 
                     val quality = when {
-                        avgPacketLoss > 5 || avgRtt > 0.5 -> "KOTU"
-                        avgPacketLoss > 2 || avgRtt > 0.3 -> "ORTA"
+                        packetLoss > 5 || roundTripTime > 0.5 -> "KOTU"
+                        packetLoss > 2 || roundTripTime > 0.3 -> "ORTA"
                         else -> "IYI"
                     }
 
                     val statsText = String.format(
-                        "RTT: %.0fms | Kayip: %.1f%% | FPS: %d | Izleyici: %d",
-                        avgRtt * 1000, avgPacketLoss, totalFps, peerConnections.size
+                        "RTT: %.0fms | Kayip: %.1f%% | FPS: %d",
+                        roundTripTime * 1000, packetLoss, framesPerSecond
                     )
 
                     mainHandler.post {
@@ -596,6 +498,7 @@ class ScreenShareService : Service() {
         }
 
         webRtcReady = false
+        offerPending = false
         pendingResultCode = 0
         pendingData = null
 
@@ -614,12 +517,14 @@ class ScreenShareService : Service() {
 
         localTrack = null
 
-        peerConnections.forEach { (peerId, pc) ->
-            try { pc.close() } catch (_: Exception) {}
-        }
-        peerConnections.clear()
-        pendingIceCandidates.clear()
-        remoteDescriptionSet.clear()
+        try {
+            val r = renderer
+            if (r != null) remoteTrack?.removeSink(r)
+        } catch (_: Exception) {}
+        remoteTrack = null
+
+        try { peerConnection?.close() } catch (_: Exception) {}
+        peerConnection = null
 
         try { factory?.dispose() } catch (_: Exception) {}
         factory = null

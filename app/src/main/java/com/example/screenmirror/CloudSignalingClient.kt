@@ -10,21 +10,20 @@ import java.util.concurrent.TimeUnit
 class CloudSignalingClient(
     private val room: String,
     private val role: String,
-    private val onRemoteDescription: (peerId: String, SessionDescription) -> Unit,
-    private val onRemoteIce: (peerId: String, IceCandidate) -> Unit,
-    private val onPeerJoined: (peerId: String) -> Unit,
-    private val onPeerLeft: (peerId: String) -> Unit = {},
+    private val onRemoteDescription: (SessionDescription) -> Unit,
+    private val onRemoteIce: (IceCandidate) -> Unit,
+    private val onPeerJoined: () -> Unit,
+    private val onPeerLeft: () -> Unit = {},
     private val onViewerCountChanged: (Int) -> Unit = {}
 ) {
     private var client: OkHttpClient? = null
     private var ws: WebSocket? = null
-    val peerId = "${role}_${System.currentTimeMillis()}"
+    private val peerId = "${role}_${System.currentTimeMillis()}"
+    private var registered = false
     private var connected = false
+    private var peerCount = 0
     private var closed = false
     private val reconnectHandler = android.os.Handler(android.os.Looper.getMainLooper())
-
-    private val knownPeers = mutableSetOf<String>()
-    private var firstRosterReceived = false
 
     fun connect() {
         val url = "wss://wss.getlost.ovh"
@@ -39,6 +38,7 @@ class CloudSignalingClient(
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 Log.i("CloudSig", "WS Baglandi, register gonderiliyor")
                 connected = true
+                registered = false
                 sendRegister()
             }
 
@@ -50,12 +50,14 @@ class CloudSignalingClient(
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 Log.e("CloudSig", "HATA: ${t.message}", t)
                 connected = false
+                registered = false
                 scheduleReconnect()
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                 Log.i("CloudSig", "Kapandi: $code $reason")
                 connected = false
+                registered = false
                 if (!closed) {
                     scheduleReconnect()
                 }
@@ -88,39 +90,17 @@ class CloudSignalingClient(
                 if (sys == "roster") {
                     val roster = msg.getJSONArray("roster")
                     val newCount = roster.length()
-                    Log.i("CloudSig", "ROSTER: $newCount peer var")
-
-                    val currentPeers = mutableSetOf<String>()
-                    for (i in 0 until newCount) {
-                        val pid = roster.getString(i)
-                        if (pid != peerId) {
-                            currentPeers.add(pid)
-                        }
-                    }
-
-                    if (firstRosterReceived) {
-                        for (pid in currentPeers) {
-                            if (pid !in knownPeers) {
-                                Log.i("CloudSig", "Yeni peer katildi: $pid")
-                                onPeerJoined(pid)
-                            }
-                        }
-                        for (pid in knownPeers) {
-                            if (pid !in currentPeers) {
-                                Log.i("CloudSig", "Peer ayrildi: $pid")
-                                onPeerLeft(pid)
-                            }
-                        }
-                    } else {
-                        firstRosterReceived = true
-                    }
-
-                    knownPeers.clear()
-                    knownPeers.addAll(currentPeers)
-
-                    val viewers = knownPeers.size
+                    Log.i("CloudSig", "ROSTER: $newCount peer var (onceki: $peerCount)")
+                    val viewers = if (newCount > 1) newCount - 1 else 0
                     onViewerCountChanged(viewers)
-                    Log.i("CloudSig", "Izleyici sayisi: $viewers")
+                    if (newCount > peerCount && newCount > 1) {
+                        Log.i("CloudSig", "Baska peer katildi! onPeerJoined cagiriliyor")
+                        onPeerJoined()
+                    } else if (newCount < peerCount && peerCount > 1) {
+                        Log.i("CloudSig", "Peer ayrildi! onPeerLeft cagiriliyor")
+                        onPeerLeft()
+                    }
+                    peerCount = newCount
                 }
                 return
             }
@@ -145,21 +125,23 @@ class CloudSignalingClient(
                     val sdpStr = payload.getString("sdp")
                     Log.i("CloudSig", "DESC alindi: $sdpType from $from")
 
-                    val sdp = when (sdpType) {
-                        "offer" -> SessionDescription(SessionDescription.Type.OFFER, sdpStr)
-                        "answer" -> SessionDescription(SessionDescription.Type.ANSWER, sdpStr)
-                        else -> null
-                    }
-
-                    if (sdp != null) {
-                        onRemoteDescription(from, sdp)
+                    when (sdpType) {
+                        "offer" -> {
+                            onRemoteDescription(
+                                SessionDescription(SessionDescription.Type.OFFER, sdpStr)
+                            )
+                        }
+                        "answer" -> {
+                            onRemoteDescription(
+                                SessionDescription(SessionDescription.Type.ANSWER, sdpStr)
+                            )
+                        }
                     }
                 }
                 "ice" -> {
                     val payload = msg.getJSONObject("payload")
                     Log.i("CloudSig", "ICE alindi from $from")
                     onRemoteIce(
-                        from,
                         IceCandidate(
                             payload.optString("sdpMid", ""),
                             payload.optInt("sdpMLineIndex", 0),
@@ -176,7 +158,7 @@ class CloudSignalingClient(
         }
     }
 
-    fun sendOffer(sdp: SessionDescription, targetPeerId: String) {
+    fun sendOffer(sdp: SessionDescription) {
         val payload = JSONObject()
             .put("type", "offer")
             .put("sdp", sdp.description)
@@ -187,11 +169,11 @@ class CloudSignalingClient(
             .put("from", peerId)
             .put("payload", payload)
             .toString()
-        Log.i("CloudSig", "OFFER gonderiliyor -> $targetPeerId")
+        Log.i("CloudSig", "OFFER gonderiliyor")
         send(msg)
     }
 
-    fun sendAnswer(sdp: SessionDescription, targetPeerId: String) {
+    fun sendAnswer(sdp: SessionDescription) {
         val payload = JSONObject()
             .put("type", "answer")
             .put("sdp", sdp.description)
@@ -202,11 +184,11 @@ class CloudSignalingClient(
             .put("from", peerId)
             .put("payload", payload)
             .toString()
-        Log.i("CloudSig", "ANSWER gonderiliyor -> $targetPeerId")
+        Log.i("CloudSig", "ANSWER gonderiliyor")
         send(msg)
     }
 
-    fun sendIce(candidate: IceCandidate, targetPeerId: String) {
+    fun sendIce(candidate: IceCandidate) {
         val payload = JSONObject()
             .put("candidate", candidate.sdp)
             .put("sdpMid", candidate.sdpMid)
@@ -218,7 +200,7 @@ class CloudSignalingClient(
             .put("from", peerId)
             .put("payload", payload)
             .toString()
-        Log.i("CloudSig", "ICE gonderiliyor -> $targetPeerId")
+        Log.i("CloudSig", "ICE gonderiliyor")
         send(msg)
     }
 
@@ -245,6 +227,7 @@ class CloudSignalingClient(
     fun close() {
         closed = true
         try {
+            registered = false
             ws?.close(1000, "kapat")
             client?.dispatcher?.executorService?.shutdown()
             client?.connectionPool?.evictAll()

@@ -21,7 +21,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.MaterialToolbar
-import org.webrtc.SurfaceViewRenderer
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -36,14 +35,11 @@ class ViewerActivity : AppCompatActivity() {
     private lateinit var btnScreenshot: View
     private lateinit var btnDisconnect: Button
     private lateinit var controlPanel: View
-    private lateinit var waitingOverlay: LinearLayout
-    private lateinit var viewerSurface: SurfaceViewRenderer
 
     private var receiver: BroadcastReceiver? = null
     private var startTime = 0L
     private val handler = Handler(Looper.getMainLooper())
     private var statsCheckerRunnable: Runnable? = null
-    private var stateReceiver: BroadcastReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,43 +55,17 @@ class ViewerActivity : AppCompatActivity() {
         btnScreenshot = findViewById(R.id.btnScreenshot)
         btnDisconnect = findViewById(R.id.btnDisconnect)
         controlPanel = findViewById(R.id.controlPanel)
-        waitingOverlay = findViewById(R.id.waitingOverlay)
-        viewerSurface = findViewById(R.id.viewerSurface)
 
         startTime = System.currentTimeMillis()
         registerReceiver()
-        registerStateReceiver()
         startStatsChecker()
 
         tvConnectionQuality.visibility = if (AppSettings.isQualityStatsEnabled(this)) View.VISIBLE else View.GONE
+
         tvStats.text = getString(R.string.viewer_stats)
 
         btnDisconnect.setOnClickListener { showDisconnectConfirmation() }
         btnScreenshot.setOnClickListener { takeScreenshot() }
-
-        startViewerService()
-    }
-
-    private fun startViewerService() {
-        val room = intent.getStringExtra("room") ?: ""
-        if (room.isEmpty()) {
-            Toast.makeText(this, "Oda adı bulunamadı", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-
-        try {
-            ScreenShareService.renderer = viewerSurface
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
-            putExtra("role", "viewer")
-            putExtra("room", room)
-        }
-        startForegroundService(serviceIntent)
-        tvViewerStatus.text = getString(R.string.status_connecting)
     }
 
     private fun createNotificationChannel() {
@@ -107,30 +77,6 @@ class ViewerActivity : AppCompatActivity() {
             )
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
-        }
-    }
-
-    private fun registerStateReceiver() {
-        stateReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                val state = intent.getStringExtra("state") ?: return
-                runOnUiThread {
-                    if (state.contains("goruntu") || state.contains("Canli")) {
-                        tvViewerStatus.text = getString(R.string.status_connected)
-                        waitingOverlay.visibility = View.GONE
-                        controlPanel.visibility = View.VISIBLE
-                    } else if (state.contains("HATA") || state.contains("hatasi")) {
-                        tvViewerStatus.text = state
-                    }
-                }
-            }
-        }
-
-        val filter = IntentFilter("com.example.screenmirror.STATE_CHANGED")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(stateReceiver, filter, RECEIVER_NOT_EXPORTED)
-        } else {
-            registerReceiver(stateReceiver, filter)
         }
     }
 
@@ -200,7 +146,6 @@ class ViewerActivity : AppCompatActivity() {
             setPackage(packageName)
         })
         try { receiver?.let { unregisterReceiver(it) } } catch (_: Exception) {}
-        try { stateReceiver?.let { unregisterReceiver(it) } } catch (_: Exception) {}
         statsCheckerRunnable?.let { handler.removeCallbacks(it) }
         finish()
     }
@@ -247,7 +192,6 @@ class ViewerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         try { receiver?.let { unregisterReceiver(it) } } catch (_: Exception) {}
-        try { stateReceiver?.let { unregisterReceiver(it) } } catch (_: Exception) {}
         statsCheckerRunnable?.let { handler.removeCallbacks(it) }
     }
 }
