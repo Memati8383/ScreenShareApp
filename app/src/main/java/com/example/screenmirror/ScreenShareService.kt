@@ -363,13 +363,31 @@ class ScreenShareService : Service() {
                     OnScreenLog.add("WEBRTC", "LOCAL ICE: ${candidate.sdp.take(50)}")
                     cloudSignaling?.sendIce(candidate)
                 }
-                override fun onAddTrack(receiver: RtpReceiver, mediaStreams: Array<out MediaStream>) {}
+                override fun onAddTrack(receiver: RtpReceiver, mediaStreams: Array<out MediaStream>) {
+                    OnScreenLog.add("WEBRTC", "onAddTrack: ${receiver.track()?.id()} streams=${mediaStreams.size}")
+                    val track = receiver.track()
+                    if (track is VideoTrack) {
+                        remoteTrack = track
+                        mainHandler.post {
+                            renderer?.let {
+                                remoteTrack?.addSink(it)
+                                OnScreenLog.add("WEBRTC", "onAddTrack: sink eklendi!")
+                            } ?: OnScreenLog.add("WEBRTC", "onAddTrack: renderer NULL!")
+                        }
+                        postState("Canli goruntu aliniyor")
+                    }
+                }
                 override fun onTrack(transceiver: RtpTransceiver) {
                     OnScreenLog.add("WEBRTC", "onTrack: ${transceiver.receiver.track()?.id()}")
                     val track = transceiver.receiver.track()
                     if (track is VideoTrack) {
                         remoteTrack = track
-                        mainHandler.post { renderer?.let { remoteTrack?.addSink(it) } }
+                        mainHandler.post {
+                            renderer?.let {
+                                remoteTrack?.addSink(it)
+                                OnScreenLog.add("WEBRTC", "onTrack: sink eklendi!")
+                            } ?: OnScreenLog.add("WEBRTC", "onTrack: renderer NULL!")
+                        }
                         postState("Canli goruntu aliniyor")
                     }
                 }
