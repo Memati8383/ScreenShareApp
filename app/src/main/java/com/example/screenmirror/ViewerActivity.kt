@@ -204,6 +204,9 @@ class ViewerActivity : AppCompatActivity() {
                             if (state in listOf("Es cihaz baglandi", "Canli goruntu aliniyor", "WebRTC hazir")) {
                                 hideSkeleton()
                             }
+                            if (state.startsWith("Teklif") || state.startsWith("Yanit") || state.startsWith("Baglanti kuruldu")) {
+                                hideSkeleton()
+                            }
                             if (state in listOf("Izleyici ayrildi", "Baglanti kesildi") && !isDisconnecting) {
                                 isDisconnecting = true
                                 hideSkeleton()
@@ -214,8 +217,11 @@ class ViewerActivity : AppCompatActivity() {
                                     finish()
                                 }
                             }
-                            if (state.startsWith("HATA") || state.startsWith("WebRTC hatasi") || state == "SDP hatasi") {
+                            if (state.startsWith("HATA") || state.startsWith("WebRTC hatasi") || state.startsWith("SDP hatasi") || state.startsWith("Baglanti hatasi")) {
                                 hideSkeleton()
+                                tvViewerStatus.text = state
+                            }
+                            if (state == "Yayin bulunamadi, tekrar deneyin" || state.startsWith("Signaling")) {
                                 tvViewerStatus.text = state
                             }
                         }

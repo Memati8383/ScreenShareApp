@@ -43,6 +43,7 @@ class CloudSignalingClient(
                 .build()
         }
 
+        onDisconnect?.invoke("Signaling sunucusuna baglaniliyor...")
         val request = Request.Builder().url(url).build()
         ws = client!!.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -50,6 +51,7 @@ class CloudSignalingClient(
                 connected = true
                 registered = false
                 reconnectAttempt = 0
+                onDisconnect?.invoke("Signaling baglandi, odaya katiliyor...")
                 sendRegister()
             }
 
@@ -92,6 +94,7 @@ class CloudSignalingClient(
             .toString()
         Log.i("CloudSig", "REGISTER: $msg")
         send(msg)
+        onDisconnect?.invoke("Odaya katiliyor: $room")
     }
 
     private fun handle(text: String) {
@@ -183,7 +186,8 @@ class CloudSignalingClient(
             .put("payload", payload)
             .toString()
         Log.i("CloudSig", "OFFER gonderiliyor")
-        send(msg)
+        val sent = send(msg)
+        Log.i("CloudSig", "OFFER gonderildi: $sent")
     }
 
     fun sendAnswer(sdp: SessionDescription) {
@@ -198,7 +202,8 @@ class CloudSignalingClient(
             .put("payload", payload)
             .toString()
         Log.i("CloudSig", "ANSWER gonderiliyor")
-        send(msg)
+        val sent = send(msg)
+        Log.i("CloudSig", "ANSWER gonderildi: $sent")
     }
 
     fun sendIce(candidate: IceCandidate) {
@@ -217,12 +222,17 @@ class CloudSignalingClient(
         send(msg)
     }
 
-    private fun send(text: String) {
-        try {
-            val sent = ws?.send(text)
+    private fun send(text: String): Boolean {
+        return try {
+            val sent = ws?.send(text) ?: false
+            if (!sent) {
+                Log.w("CloudSig", "MESAJ GONDERILEMEDI (ws=$ws, connected=$connected): $text")
+            }
             Log.d("CloudSig", "Gonderildi($sent): $text")
+            sent
         } catch (e: Exception) {
             Log.e("CloudSig", "Gonderme hatasi: ${e.message}")
+            false
         }
     }
 

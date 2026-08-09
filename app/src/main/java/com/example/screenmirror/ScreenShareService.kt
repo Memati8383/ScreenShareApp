@@ -564,9 +564,22 @@ class ScreenShareService : Service() {
 
     private fun handleRemoteDescription(sdp: SessionDescription) {
         try {
+            val sdpTypeStr = if (sdp.type == SessionDescription.Type.OFFER) "offer" else "answer"
+            Log.i(TAG, "handleRemoteDescription: $sdpTypeStr alindi")
+            if (sdp.type == SessionDescription.Type.OFFER) {
+                postState("Teklif alindi, yanit olusturuluyor...")
+            } else {
+                postState("Yanit alindi, baglanti kuruluyor...")
+            }
+            if (peerConnection == null) {
+                Log.e(TAG, "handleRemoteDescription: peerConnection null!")
+                postState("HATA: WebRTC baglantisi yok")
+                return
+            }
             peerConnection?.setRemoteDescription(sdpObserver(
                 onSetSuccess = {
                     remoteDescriptionSet = true
+                    Log.i(TAG, "setRemoteDescription basarili ($sdpTypeStr)")
                     pendingCandidates.forEach { candidate ->
                         try {
                             peerConnection?.addIceCandidate(candidate)
@@ -576,24 +589,37 @@ class ScreenShareService : Service() {
                     }
                     pendingCandidates.clear()
                     if (sdp.type == SessionDescription.Type.OFFER) {
+                        Log.i(TAG, "Answer olusturuluyor...")
                         peerConnection?.createAnswer(sdpObserver(
                             onCreateSuccess = { ans ->
+                                Log.i(TAG, "Answer olusturuldu, localDescription ayarlaniyor")
                                 peerConnection?.setLocalDescription(sdpObserver(
                                     onSetSuccess = {
+                                        Log.i(TAG, "Answer localDescription ayarlandi, gonderiliyor")
                                         cloudSignaling?.sendAnswer(ans)
+                                        postState("Yanit gonderildi, baglanti bekleniyor...")
+                                    },
+                                    onSetFailure = { error ->
+                                        Log.e(TAG, "setLocalDescription (answer) basarisiz: $error")
+                                        postState("HATA: Yanit SDP ayarlanamadi: $error")
                                     }
                                 ), ans)
+                            },
+                            onCreateFailure = { error ->
+                                Log.e(TAG, "createAnswer basarisiz: $error")
+                                postState("HATA: Yanit olusturulamadi: $error")
                             }
                         ), MediaConstraints())
                     }
                 },
                 onSetFailure = { error ->
                     Log.e(TAG, "setRemoteDescription basarisiz: $error")
-                    postState("SDP hatasi: $error")
+                    postState("HATA: SDP hatasi: $error")
                 }
             ), sdp)
         } catch (e: Exception) {
             Log.e(TAG, "handleRemoteDescription HATA", e)
+            postState("HATA: SDP isleme hatasi")
         }
     }
 
@@ -613,14 +639,36 @@ class ScreenShareService : Service() {
     }
 
     private fun createOffer() {
-        if (localTrack == null) return
+        if (localTrack == null) {
+            Log.w(TAG, "createOffer: localTrack null, offer olusturulamadi")
+            postState("HATA: Ekran verisi henuz hazir degil")
+            return
+        }
+        if (peerConnection == null) {
+            Log.w(TAG, "createOffer: peerConnection null")
+            postState("HATA: WebRTC baglantisi kurulamadi")
+            return
+        }
+        Log.i(TAG, "createOffer basliyor")
+        postState("Teklif olusturuluyor...")
         peerConnection?.createOffer(sdpObserver(
             onCreateSuccess = { offer ->
+                Log.i(TAG, "createOffer basarili, localDescription ayarlaniyor")
                 peerConnection?.setLocalDescription(sdpObserver(
                     onSetSuccess = {
+                        Log.i(TAG, "localDescription ayarlandi, offer gonderiliyor")
                         cloudSignaling?.sendOffer(offer)
+                        postState("Teklif gonderildi, yanit bekleniyor...")
+                    },
+                    onSetFailure = { error ->
+                        Log.e(TAG, "setLocalDescription (offer) basarisiz: $error")
+                        postState("HATA: SDP ayarlanamadi: $error")
                     }
                 ), offer)
+            },
+            onCreateFailure = { error ->
+                Log.e(TAG, "createOffer basarisiz: $error")
+                postState("HATA: Teklif olusturulamadi: $error")
             }
         ), MediaConstraints())
     }

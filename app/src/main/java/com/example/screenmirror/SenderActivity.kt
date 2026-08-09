@@ -228,6 +228,12 @@ class SenderActivity : AppCompatActivity() {
                         if (state in listOf("WebRTC hazir", "Izleyici bekleniyor...", "Ekran yayinda", "Es cihaz baglandi", "Canli goruntu aliniyor")) {
                             hideSkeleton()
                         }
+                        if (state.startsWith("Teklif") || state.startsWith("Yanit") || state.startsWith("Baglanti kuruldu")) {
+                            hideSkeleton()
+                        }
+                        if (state.startsWith("HATA") || state.startsWith("WebRTC hatasi") || state.startsWith("SDP hatasi") || state.startsWith("Baglanti hatasi")) {
+                            hideSkeleton()
+                        }
                     }
                 }
             }
