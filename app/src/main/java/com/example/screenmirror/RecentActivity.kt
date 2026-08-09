@@ -9,13 +9,17 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.snackbar.Snackbar
 import com.example.screenmirror.data.RoomHistory
-import com.example.screenmirror.data.RoomHistoryManager
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,7 +28,7 @@ class RecentActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var tvEmpty: TextView
     private lateinit var adapter: RoomAdapter
-    private lateinit var historyManager: RoomHistoryManager
+    private lateinit var viewModel: RecentViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +38,8 @@ class RecentActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         tvEmpty = findViewById(R.id.tvEmpty)
 
-        historyManager = RoomHistoryManager(this)
+        val manager = (application as ScreenMirrorApp).roomHistoryManager
+        viewModel = ViewModelProvider(this, RecentViewModelFactory(manager))[RecentViewModel::class.java]
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -68,23 +73,24 @@ class RecentActivity : AppCompatActivity() {
 
         ItemTouchHelper(swipeHandler).attachToRecyclerView(recyclerView)
 
-        loadRooms()
-    }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.rooms.collect { rooms ->
+                    adapter.submitList(rooms)
+                    tvEmpty.visibility = if (rooms.isEmpty()) View.VISIBLE else View.GONE
+                    recyclerView.visibility = if (rooms.isEmpty()) View.GONE else View.VISIBLE
+                }
+            }
+        }
 
-    private fun loadRooms() {
-        val rooms = historyManager.getAll()
-        adapter.submitList(rooms)
-        tvEmpty.visibility = if (rooms.isEmpty()) View.VISIBLE else View.GONE
-        recyclerView.visibility = if (rooms.isEmpty()) View.GONE else View.VISIBLE
+        viewModel.loadRooms()
     }
 
     private fun deleteRoom(room: RoomHistory) {
-        historyManager.deleteRoom(room.id)
-        loadRooms()
+        viewModel.deleteRoom(room)
         Snackbar.make(recyclerView, getString(R.string.recent_deleted, room.roomName), Snackbar.LENGTH_LONG)
             .setAction(getString(R.string.recent_undo)) {
-                historyManager.saveRoom(room)
-                loadRooms()
+                viewModel.undoDelete(room)
             }
             .show()
     }

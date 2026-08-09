@@ -8,6 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.media.projection.MediaProjection
+import android.media.projection.MediaProjectionManager
+import android.media.MediaRecorder
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -18,7 +20,10 @@ import android.view.SurfaceView
 import org.webrtc.*
 import java.util.concurrent.Executors
 import com.example.screenmirror.data.RoomHistory
-import com.example.screenmirror.data.RoomHistoryManager
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ScreenShareService : Service() {
 
@@ -37,6 +42,11 @@ class ScreenShareService : Service() {
         @Volatile var captureHeight: Int = 720
         @Volatile var captureFps: Int = 30
         @Volatile var isFrozen: Boolean = false
+        @Volatile var onRecordingStateChanged: ((Boolean) -> Unit)? = null
+    }
+
+    private val roomHistoryManager by lazy {
+        (application as ScreenMirrorApp).roomHistoryManager
     }
 
     private var role = "viewer"
@@ -52,14 +62,19 @@ class ScreenShareService : Service() {
     private var localTrack: VideoTrack? = null
     private var remoteTrack: VideoTrack? = null
 
+    private var mediaRecorder: MediaRecorder? = null
+    private var isRecording = false
+    private var recordingFile: File? = null
+
     private val executor = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
     private var webRtcReady = false
     private var offerPending = false
     private var startTime = 0L
     private var participantCount = 1
+    private var statsCheckerRunnable: Runnable? = null
 
-    override fun onBind(intent: Intent?): IBinder? = null
+    override fun onBind(intent: Intent): IBinder? = null
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         Log.i(TAG, "onTaskRemoved - uygulama silindi")
@@ -71,7 +86,11 @@ class ScreenShareService : Service() {
     override fun onCreate() {
         super.onCreate()
         try {
-            val ch = NotificationChannel("screen", "ScreenShare", NotificationManager.IMPORTANCE_DEFAULT)
+            val ch = NotificationChannel(
+                NotificationConstants.CHANNEL_ID_SCREEN,
+                NotificationConstants.CHANNEL_NAME_SCREEN,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
             getSystemService(NotificationManager::class.java).createNotificationChannel(ch)
             Log.i(TAG, "onCreate - kanal olusturuldu")
         } catch (e: Exception) {
@@ -83,11 +102,30 @@ class ScreenShareService : Service() {
         Log.i(TAG, "onStartCommand")
         try {
             if (intent != null) {
+                val action = intent.action
+                when (action) {
+                    "com.example.screenmirror.START_RECORDING" -> {
+                        val resultCode = intent.getIntExtra("resultCode", 0)
+                        @Suppress("DEPRECATION")
+                        val data = intent.getParcelableExtra<Intent>("data")
+                        executor.execute { startRecording(resultCode, data) }
+                        return START_STICKY
+                    }
+                    "com.example.screenmirror.STOP_RECORDING" -> {
+                        executor.execute { stopRecording() }
+                        return START_STICKY
+                    }
+                }
+
                 role = intent.getStringExtra("role") ?: "viewer"
                 roomId = intent.getStringExtra("room") ?: "oda1"
                 startTime = System.currentTimeMillis()
                 Log.i(TAG, "role=$role room=$roomId")
             }
+
+            captureWidth = AppSettings.getCaptureWidth(this)
+            captureHeight = AppSettings.getCaptureHeight(this)
+            captureFps = AppSettings.getCaptureFps(this)
 
             showNotification(if (role == "sender") "Yayin aktif" else "Izleme aktif")
 
@@ -141,7 +179,7 @@ class ScreenShareService : Service() {
 
     private fun showNotification(text: String) {
         try {
-            val notif = Notification.Builder(this, "screen")
+            val notif = Notification.Builder(this, NotificationConstants.CHANNEL_ID_SCREEN)
                 .setSmallIcon(android.R.drawable.ic_menu_camera)
                 .setContentTitle("ScreenShare")
                 .setContentText(text)
@@ -152,9 +190,9 @@ class ScreenShareService : Service() {
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
                 else
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-                startForeground(1, notif, type)
+                startForeground(NotificationConstants.NOTIFICATION_ID_FOREGROUND, notif, type)
             } else {
-                startForeground(1, notif)
+                startForeground(NotificationConstants.NOTIFICATION_ID_FOREGROUND, notif)
             }
         } catch (e: Exception) {
             Log.e(TAG, "foreground hatasi", e)
@@ -163,14 +201,14 @@ class ScreenShareService : Service() {
 
     private fun showJoinNotification() {
         try {
-            val notif = Notification.Builder(this, "screen")
+            val notif = Notification.Builder(this, NotificationConstants.CHANNEL_ID_SCREEN)
                 .setSmallIcon(android.R.drawable.ic_menu_send)
                 .setContentTitle("Screen Mirror")
                 .setContentText("Birisi odaya katildi!")
                 .setAutoCancel(true)
                 .build()
             val nm = getSystemService(NotificationManager::class.java)
-            nm.notify(2, notif)
+            nm.notify(NotificationConstants.NOTIFICATION_ID_JOIN, notif)
         } catch (e: Exception) {
             Log.e(TAG, "bildirim hatasi", e)
         }
@@ -178,14 +216,14 @@ class ScreenShareService : Service() {
 
     private fun showBroadcastStartNotification() {
         try {
-            val notif = Notification.Builder(this, "screen")
+            val notif = Notification.Builder(this, NotificationConstants.CHANNEL_ID_SCREEN)
                 .setSmallIcon(android.R.drawable.ic_menu_camera)
                 .setContentTitle("Screen Mirror")
                 .setContentText("Yayın başlatıldı - Bağlantı bekleniyor")
                 .setAutoCancel(true)
                 .build()
             val nm = getSystemService(NotificationManager::class.java)
-            nm.notify(3, notif)
+            nm.notify(NotificationConstants.NOTIFICATION_ID_BROADCAST, notif)
         } catch (e: Exception) {
             Log.e(TAG, "bildirim hatasi", e)
         }
@@ -219,13 +257,25 @@ class ScreenShareService : Service() {
                 .createPeerConnectionFactory()
             Log.i(TAG, "factory OK")
 
-            val iceServers = listOf(
+            val iceServers = mutableListOf(
                 PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer(),
                 PeerConnection.IceServer.builder("stun:stun1.l.google.com:19302").createIceServer(),
-                PeerConnection.IceServer.builder("stun:stun2.l.google.com:19302").createIceServer(),
-                PeerConnection.IceServer.builder("stun:stun3.l.google.com:19302").createIceServer(),
-                PeerConnection.IceServer.builder("stun:stun4.l.google.com:19302").createIceServer()
+                PeerConnection.IceServer.builder("stun:stun2.l.google.com:19302").createIceServer()
             )
+
+            val turnUrl = AppSettings.getTurnUrl(this)
+            val turnUser = AppSettings.getTurnUser(this)
+            val turnPass = AppSettings.getTurnPass(this)
+            if (turnUrl.isNotEmpty()) {
+                iceServers.add(
+                    PeerConnection.IceServer.builder(turnUrl)
+                        .setUsername(turnUser)
+                        .setPassword(turnPass)
+                        .createIceServer()
+                )
+                Log.i(TAG, "TURN sunucusu eklendi: $turnUrl")
+            }
+
             val config = PeerConnection.RTCConfiguration(iceServers)
             config.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
             config.continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY
@@ -361,6 +411,69 @@ class ScreenShareService : Service() {
         }
     }
 
+    fun startRecording(resultCode: Int, data: Intent?) {
+        if (isRecording) return
+        try {
+            val projectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+            @Suppress("DEPRECATION")
+            val mediaProjection = projectionManager.getMediaProjection(resultCode, data ?: return)
+
+            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(
+                android.os.Environment.DIRECTORY_MOVIES
+            )
+            val screenmirrorDir = File(picturesDir, "ScreenMirror")
+            if (!screenmirrorDir.exists()) screenmirrorDir.mkdirs()
+
+            recordingFile = File(screenmirrorDir, "screenmirror_$timestamp.mp4")
+
+            mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                MediaRecorder(this)
+            } else {
+                @Suppress("DEPRECATION")
+                MediaRecorder()
+            }
+
+            mediaRecorder?.apply {
+                setVideoSource(MediaRecorder.VideoSource.SURFACE)
+                setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                setVideoEncoder(MediaRecorder.VideoEncoder.H264)
+                setVideoSize(captureWidth, captureHeight)
+                setVideoFrameRate(captureFps)
+                setVideoEncodingBitRate(captureWidth * captureHeight * 3)
+                setOutputFile(recordingFile?.absolutePath)
+                prepare()
+                start()
+            }
+
+            isRecording = true
+            mainHandler.post { onRecordingStateChanged?.invoke(true) }
+            postState("Kayit baslatildi")
+            Log.i(TAG, "Kayit baslatildi: ${recordingFile?.absolutePath}")
+        } catch (e: Exception) {
+            Log.e(TAG, "Kayit baslatma hatasi", e)
+            postState("Kayit hatasi: ${e.message}")
+        }
+    }
+
+    fun stopRecording() {
+        if (!isRecording) return
+        try {
+            mediaRecorder?.stop()
+            mediaRecorder?.release()
+            mediaRecorder = null
+            isRecording = false
+            mainHandler.post { onRecordingStateChanged?.invoke(false) }
+            postState("Kayit durduruldu: ${recordingFile?.name}")
+            Log.i(TAG, "Kayit durduruldu: ${recordingFile?.absolutePath}")
+        } catch (e: Exception) {
+            Log.e(TAG, "Kayit durdurma hatasi", e)
+            postState("Kayit durdurma hatasi")
+        }
+    }
+
+    fun isRecording(): Boolean = isRecording
+
     private fun handleRemoteDescription(sdp: SessionDescription) {
         peerConnection?.setRemoteDescription(sdpObserver(
             onSetSuccess = {
@@ -421,11 +534,10 @@ class ScreenShareService : Service() {
     }
 
     private fun startStatsChecker() {
-        val statsRunnable = object : Runnable {
+        statsCheckerRunnable = object : Runnable {
             override fun run() {
                 if (!webRtcReady || peerConnection == null) return
                 peerConnection?.getStats { report ->
-                    var bitrate = 0L
                     var framesPerSecond = 0
                     var packetLoss = 0.0
                     var roundTripTime = 0.0
@@ -433,8 +545,6 @@ class ScreenShareService : Service() {
                     report.statsMap.forEach { (key, stats) ->
                         when (stats.type) {
                             "inbound-rtp" -> {
-                                val bytesReceived = stats.members["bytesReceived"] as? Long ?: 0
-                                val framesDecoded = stats.members["framesDecoded"] as? Long ?: 0
                                 framesPerSecond = stats.members["framesPerSecond"] as? Int ?: 0
                                 val packetsLost = stats.members["packetsLost"] as? Long ?: 0
                                 val packetsReceived = stats.members["packetsReceived"] as? Long ?: 1
@@ -457,6 +567,18 @@ class ScreenShareService : Service() {
                         else -> "IYI"
                     }
 
+                    if (quality == "KOTU" && captureWidth > 854) {
+                        captureWidth = 854
+                        captureHeight = 480
+                        capturer?.changeCaptureFormat(captureWidth, captureHeight, captureFps)
+                        Log.i(TAG, "Kalite dusuruldu: ${captureWidth}x${captureHeight}")
+                    } else if (quality == "IYI" && captureWidth < 1280) {
+                        captureWidth = 1280
+                        captureHeight = 720
+                        capturer?.changeCaptureFormat(captureWidth, captureHeight, captureFps)
+                        Log.i(TAG, "Kalite artirildi: ${captureWidth}x${captureHeight}")
+                    }
+
                     val statsText = String.format(
                         "RTT: %.0fms | Kayip: %.1f%% | FPS: %d",
                         roundTripTime * 1000, packetLoss, framesPerSecond
@@ -469,18 +591,30 @@ class ScreenShareService : Service() {
                 mainHandler.postDelayed(this, 2000)
             }
         }
-        mainHandler.postDelayed(statsRunnable, 3000)
+        mainHandler.postDelayed(statsCheckerRunnable!!, 3000)
     }
 
     override fun onDestroy() {
         Log.i(TAG, "onDestroy")
         super.onDestroy()
 
+        statsCheckerRunnable?.let { mainHandler.removeCallbacks(it) }
+
+        if (isRecording) {
+            try {
+                mediaRecorder?.stop()
+                mediaRecorder?.release()
+                mediaRecorder = null
+                isRecording = false
+            } catch (e: Exception) {
+                Log.e(TAG, "Kayit temizleme hatasi", e)
+            }
+        }
+
         if (startTime > 0 && roomId.isNotEmpty()) {
             val duration = System.currentTimeMillis() - startTime
             if (duration > 1000) {
                 try {
-                    val historyManager = RoomHistoryManager(applicationContext)
                     val room = RoomHistory(
                         roomName = roomId,
                         role = role,
@@ -489,7 +623,7 @@ class ScreenShareService : Service() {
                         startTime = startTime,
                         endTime = System.currentTimeMillis()
                     )
-                    historyManager.saveRoom(room)
+                    roomHistoryManager.saveRoom(room)
                     Log.i(TAG, "Room history kaydedildi: $roomId")
                 } catch (e: Exception) {
                     Log.e(TAG, "Room history kaydetme hatasi", e)
@@ -543,7 +677,7 @@ class ScreenShareService : Service() {
 
         try {
             val nm = getSystemService(NotificationManager::class.java)
-            nm.cancel(1)
+            nm.cancel(NotificationConstants.NOTIFICATION_ID_FOREGROUND)
         } catch (_: Exception) {}
 
         mainHandler.removeCallbacksAndMessages(null)

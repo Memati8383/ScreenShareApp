@@ -23,6 +23,8 @@ class CloudSignalingClient(
     private var connected = false
     private var peerCount = 0
     private var closed = false
+    private var reconnectAttempt = 0
+    private val maxReconnectDelay = 30000L
     private val reconnectHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
     fun connect() {
@@ -39,6 +41,7 @@ class CloudSignalingClient(
                 Log.i("CloudSig", "WS Baglandi, register gonderiliyor")
                 connected = true
                 registered = false
+                reconnectAttempt = 0
                 sendRegister()
             }
 
@@ -215,13 +218,15 @@ class CloudSignalingClient(
 
     private fun scheduleReconnect() {
         if (closed) return
-        Log.i("CloudSig", "3 saniye sonra yeniden baglanacak...")
+        val delay = minOf(1000L * (1 shl reconnectAttempt), maxReconnectDelay)
+        reconnectAttempt++
+        Log.i("CloudSig", "${delay}ms sonra yeniden baglanacak (deneme: $reconnectAttempt)")
         reconnectHandler.postDelayed({
             if (!closed && !connected) {
                 Log.i("CloudSig", "Yeniden baglaniyor...")
                 connect()
             }
-        }, 3000)
+        }, delay)
     }
 
     fun close() {

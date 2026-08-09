@@ -117,7 +117,8 @@
                 android:background="@drawable/bg_glass_card"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingHorizontal="16dp">
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="12dp">
 
                 <ImageView
                     android:layout_width="24dp"
@@ -153,6 +154,187 @@
                     android:layout_height="wrap_content"
                     android:thumbTint="@color/accent"
                     android:trackTint="@color/bg_input" />
+            </LinearLayout>
+
+            <!-- TURN Server Settings -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_turn_title"
+                android:textColor="@color/accent"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- TURN URL -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="12dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_link"
+                    android:layout_marginEnd="16dp" />
+
+                <EditText
+                    android:id="@+id/etTurnUrl"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/settings_turn_url_hint"
+                    android:textColor="@android:color/white"
+                    android:textColorHint="#99FFFFFF"
+                    android:textSize="14sp"
+                    android:inputType="textUri"
+                    android:singleLine="true"
+                    android:background="@android:color/transparent" />
+            </LinearLayout>
+
+            <!-- TURN Username -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="12dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_person"
+                    android:layout_marginEnd="16dp" />
+
+                <EditText
+                    android:id="@+id/etTurnUser"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/settings_turn_user_hint"
+                    android:textColor="@android:color/white"
+                    android:textColorHint="#99FFFFFF"
+                    android:textSize="14sp"
+                    android:inputType="text"
+                    android:singleLine="true"
+                    android:background="@android:color/transparent" />
+            </LinearLayout>
+
+            <!-- TURN Password -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="12dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_lock"
+                    android:layout_marginEnd="16dp" />
+
+                <EditText
+                    android:id="@+id/etTurnPass"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/settings_turn_pass_hint"
+                    android:textColor="@android:color/white"
+                    android:textColorHint="#99FFFFFF"
+                    android:textSize="14sp"
+                    android:inputType="textPassword"
+                    android:singleLine="true"
+                    android:background="@android:color/transparent" />
+            </LinearLayout>
+
+            <!-- Resolution Settings -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_resolution_title"
+                android:textColor="@color/accent"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Resolution Spinner -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="12dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_settings"
+                    android:layout_marginEnd="16dp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/settings_resolution"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/resolutionSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="140dp"
+                    android:popupBackground="@android:color/transparent"
+                    android:elevation="8dp"
+                    android:overlapAnchor="false"
+                    android:dropDownVerticalOffset="4dp" />
+            </LinearLayout>
+
+            <!-- FPS Spinner -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_speed"
+                    android:layout_marginEnd="16dp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/settings_fps"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/fpsSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="100dp"
+                    android:popupBackground="@android:color/transparent"
+                    android:elevation="8dp"
+                    android:overlapAnchor="false"
+                    android:dropDownVerticalOffset="4dp" />
             </LinearLayout>
 
         </LinearLayout>

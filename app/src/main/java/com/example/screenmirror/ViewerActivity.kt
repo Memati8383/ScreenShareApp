@@ -8,19 +8,23 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.MaterialToolbar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -32,14 +36,13 @@ class ViewerActivity : AppCompatActivity() {
     private lateinit var tvStats: TextView
     private lateinit var tvViewerCount: TextView
     private lateinit var tvConnectionQuality: TextView
+    private lateinit var ivConnectionDot: ImageView
     private lateinit var btnScreenshot: View
     private lateinit var btnDisconnect: Button
     private lateinit var controlPanel: View
 
     private var receiver: BroadcastReceiver? = null
     private var startTime = 0L
-    private val handler = Handler(Looper.getMainLooper())
-    private var statsCheckerRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +55,7 @@ class ViewerActivity : AppCompatActivity() {
         tvStats = findViewById(R.id.tvStats)
         tvViewerCount = findViewById(R.id.tvViewerCount)
         tvConnectionQuality = findViewById(R.id.tvConnectionQuality)
+        ivConnectionDot = findViewById(R.id.ivConnectionDot)
         btnScreenshot = findViewById(R.id.btnScreenshot)
         btnDisconnect = findViewById(R.id.btnDisconnect)
         controlPanel = findViewById(R.id.controlPanel)
@@ -71,8 +75,8 @@ class ViewerActivity : AppCompatActivity() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                "viewer_channel",
-                getString(R.string.viewer_channel_name),
+                NotificationConstants.CHANNEL_ID_VIEWER,
+                NotificationConstants.CHANNEL_NAME_VIEWER,
                 NotificationManager.IMPORTANCE_LOW
             )
             val manager = getSystemService(NotificationManager::class.java)
@@ -88,7 +92,10 @@ class ViewerActivity : AppCompatActivity() {
                         runOnUiThread {
                             tvViewerStatus.text = getString(R.string.status_disconnected)
                             Toast.makeText(context, getString(R.string.viewer_broadcast_ended), Toast.LENGTH_SHORT).show()
-                            handler.postDelayed({ finish() }, 2000)
+                            lifecycleScope.launch {
+                                delay(2000)
+                                finish()
+                            }
                         }
                     }
                     "com.example.screenmirror.VIEWER_COUNT_CHANGED" -> {
@@ -96,23 +103,28 @@ class ViewerActivity : AppCompatActivity() {
                         runOnUiThread { tvViewerCount.text = count.toString() }
                     }
                     "com.example.screenmirror.CONNECTION_QUALITY" -> {
+                        val quality = intent.getStringExtra("quality") ?: ""
                         val rtt = intent.getIntExtra("rtt", 0)
                         val fps = intent.getIntExtra("fps", 0)
                         val packetLoss = intent.getDoubleExtra("packet_loss", 0.0)
                         runOnUiThread {
                             if (!AppSettings.isQualityStatsEnabled(this@ViewerActivity)) {
                                 tvConnectionQuality.visibility = View.GONE
+                                ivConnectionDot.visibility = View.GONE
                                 return@runOnUiThread
                             }
                             tvConnectionQuality.visibility = View.VISIBLE
+                            ivConnectionDot.visibility = View.VISIBLE
                             tvConnectionQuality.text = getString(R.string.quality_stats_format, rtt, fps, packetLoss)
 
-                            val color = when {
-                                rtt < 100 && packetLoss < 1 -> ContextCompat.getColor(context, R.color.dark_status_good)
-                                rtt < 200 && packetLoss < 3 -> ContextCompat.getColor(context, R.color.dark_status_warning)
-                                else -> ContextCompat.getColor(context, R.color.dark_status_error)
+                            val colorRes = when (quality) {
+                                "IYI" -> R.color.dark_status_good
+                                "ORTA" -> R.color.dark_status_warning
+                                else -> R.color.dark_status_error
                             }
+                            val color = ContextCompat.getColor(context, colorRes)
                             tvConnectionQuality.setTextColor(color)
+                            ivConnectionDot.setColorFilter(color)
                         }
                     }
                 }
@@ -146,32 +158,30 @@ class ViewerActivity : AppCompatActivity() {
             setPackage(packageName)
         })
         try { receiver?.let { unregisterReceiver(it) } } catch (_: Exception) {}
-        statsCheckerRunnable?.let { handler.removeCallbacks(it) }
         finish()
     }
 
     private fun startStatsChecker() {
-        statsCheckerRunnable = object : Runnable {
-            override fun run() {
+        lifecycleScope.launch {
+            while (isActive) {
                 if (!AppSettings.isQualityStatsEnabled(this@ViewerActivity)) {
                     tvConnectionQuality.visibility = View.GONE
-                    handler.postDelayed(this, 2000)
-                    return
+                    delay(2000)
+                    continue
                 }
                 sendBroadcast(Intent("com.example.screenmirror.REQUEST_STATS").apply {
                     setPackage(packageName)
                 })
-                handler.postDelayed(this, 2000)
+                delay(2000)
             }
         }
-        handler.postDelayed(statsCheckerRunnable!!, 2000)
     }
 
     private fun takeScreenshot() {
         val screenView = window.decorView.rootView
-        screenView.isDrawingCacheEnabled = true
-        val bitmap = Bitmap.createBitmap(screenView.drawingCache)
-        screenView.isDrawingCacheEnabled = false
+        val bitmap = Bitmap.createBitmap(screenView.width, screenView.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        screenView.draw(canvas)
 
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val filename = "screenmirror_viewer_$timestamp.png"
@@ -192,6 +202,5 @@ class ViewerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         try { receiver?.let { unregisterReceiver(it) } } catch (_: Exception) {}
-        statsCheckerRunnable?.let { handler.removeCallbacks(it) }
     }
 }

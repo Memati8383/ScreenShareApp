@@ -12,19 +12,19 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import android.widget.EditText
-import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
 
-    private val REQ_PROJECTION = 1001
-    private val REQ_PERMISSIONS = 1002
     private lateinit var mpm: MediaProjectionManager
+    private lateinit var projectionLauncher: ActivityResultLauncher<Intent>
+    private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
 
     private lateinit var etRoom: EditText
     private lateinit var tvStatus: TextView
@@ -53,6 +53,23 @@ class MainActivity : AppCompatActivity() {
         btnHostMode = findViewById(R.id.btnHostMode)
         btnClientMode = findViewById(R.id.btnClientMode)
         tvSubtitle = findViewById(R.id.tvSubtitle)
+
+        projectionLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+                val intent = Intent(this, SenderActivity::class.java).apply {
+                    putExtra("room", etRoom.text.toString().trim())
+                    putExtra("resultCode", result.resultCode)
+                    putExtra("projectionData", result.data)
+                }
+                startActivity(intent)
+            }
+        }
+
+        permissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { /* permissions granted or denied */ }
 
         switchMode(true)
 
@@ -180,7 +197,7 @@ class MainActivity : AppCompatActivity() {
             perms.add(Manifest.permission.POST_NOTIFICATIONS)
         }
         if (perms.isNotEmpty()) {
-            ActivityCompat.requestPermissions(this, perms.toTypedArray(), REQ_PERMISSIONS)
+            permissionLauncher.launch(perms.toTypedArray())
         }
     }
 
@@ -195,7 +212,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startSender() {
         if (!validateInput()) return
-        startActivityForResult(mpm.createScreenCaptureIntent(), REQ_PROJECTION)
+        projectionLauncher.launch(mpm.createScreenCaptureIntent())
     }
 
     private fun goToViewer() {
@@ -204,18 +221,6 @@ class MainActivity : AppCompatActivity() {
             putExtra("room", etRoom.text.toString().trim())
         }
         startActivity(intent)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQ_PROJECTION && resultCode == Activity.RESULT_OK && data != null) {
-            val intent = Intent(this, SenderActivity::class.java).apply {
-                putExtra("room", etRoom.text.toString().trim())
-                putExtra("resultCode", resultCode)
-                putExtra("projectionData", data)
-            }
-            startActivity(intent)
-        }
     }
 
     private fun showStatus(msg: String) {

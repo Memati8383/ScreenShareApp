@@ -101,15 +101,31 @@
         </LinearLayout>
 
         <!-- Connection Quality Stats -->
-        <TextView
-            android:id="@+id/tvConnectionQuality"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="@color/text_secondary"
-            android:textSize="11sp"
-            android:fontFamily="monospace"
-            android:visibility="gone" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:id="@+id/connectionQualityRow">
+
+            <ImageView
+                android:id="@+id/ivConnectionDot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginEnd="4dp"
+                android:src="@drawable/bg_circle_gradient"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvConnectionQuality"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp"
+                android:fontFamily="monospace" />
+        </LinearLayout>
 
         <!-- Buttons row: Screenshot & Disconnect -->
         <LinearLayout

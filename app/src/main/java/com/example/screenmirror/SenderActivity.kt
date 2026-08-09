@@ -8,19 +8,26 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
-import android.view.WindowManager
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.MaterialToolbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -33,7 +40,6 @@ class SenderActivity : AppCompatActivity() {
         const val EXTRA_CAPTURE_WIDTH = "capture_width"
         const val EXTRA_CAPTURE_HEIGHT = "capture_height"
         const val EXTRA_CAPTURE_FPS = "capture_fps"
-        private const val NOTIFICATION_CHANNEL_ID = "screen_share_channel"
     }
 
     private lateinit var tvSenderStatus: TextView
@@ -42,6 +48,7 @@ class SenderActivity : AppCompatActivity() {
     private lateinit var tvViewerCount: TextView
     private lateinit var tvTimer: TextView
     private lateinit var tvConnectionQuality: TextView
+    private lateinit var ivConnectionDot: ImageView
     private lateinit var btnScreenshot: View
     private lateinit var btnRecord: View
     private lateinit var btnFreeze: View
@@ -49,14 +56,14 @@ class SenderActivity : AppCompatActivity() {
     private lateinit var btnStop: Button
     private lateinit var controlPanel: View
 
+    private lateinit var projectionLauncher: ActivityResultLauncher<Intent>
+    private lateinit var recordLauncher: ActivityResultLauncher<Intent>
+
     private var receiver: BroadcastReceiver? = null
     private var isSharing = false
     private var isRecording = false
     private var isFrozen = false
     private var startTime = 0L
-    private val handler = Handler(Looper.getMainLooper())
-    private var statsCheckerRunnable: Runnable? = null
-    private var recordRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +77,7 @@ class SenderActivity : AppCompatActivity() {
         tvViewerCount = findViewById(R.id.tvViewerCount)
         tvTimer = findViewById(R.id.tvTimer)
         tvConnectionQuality = findViewById(R.id.tvConnectionQuality)
+        ivConnectionDot = findViewById(R.id.ivConnectionDot)
         btnScreenshot = findViewById(R.id.btnScreenshot)
         btnRecord = findViewById(R.id.btnRecord)
         btnFreeze = findViewById(R.id.btnFreeze)
@@ -77,14 +85,44 @@ class SenderActivity : AppCompatActivity() {
         btnStop = findViewById(R.id.btnStop)
         controlPanel = findViewById(R.id.controlPanel)
 
-        val toolbar = findViewById<MaterialToolbar?>(R.id.toolbar)
+        projectionLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == RESULT_OK && result.data != null) {
+                val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
+                    putExtra("resultCode", result.resultCode)
+                    putExtra("data", result.data)
+                    putExtra(EXTRA_ROOM_CODE, intent.getStringExtra(EXTRA_ROOM_CODE))
+                }
+                startForegroundService(serviceIntent)
+            }
+        }
+
+        recordLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == RESULT_OK && result.data != null) {
+                val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
+                    action = "com.example.screenmirror.START_RECORDING"
+                    putExtra("resultCode", result.resultCode)
+                    putExtra("data", result.data)
+                }
+                startService(serviceIntent)
+                isRecording = true
+                val recordText = btnRecord.findViewById<TextView>(R.id.tvRecord)
+                recordText?.text = getString(R.string.sender_stop_record)
+                tvTimer.visibility = View.VISIBLE
+                startRecordTimer()
+                Toast.makeText(this, getString(R.string.sender_record_started), Toast.LENGTH_SHORT).show()
+            }
+        }
 
         val code = intent.getStringExtra(EXTRA_ROOM_CODE) ?: "000000"
         tvSenderRoom.text = getString(R.string.sender_room_prefix, code)
 
-        val captureWidth = intent.getIntExtra(EXTRA_CAPTURE_WIDTH, 1280)
-        val captureHeight = intent.getIntExtra(EXTRA_CAPTURE_HEIGHT, 720)
-        val captureFps = intent.getIntExtra(EXTRA_CAPTURE_FPS, 30)
+        val captureWidth = intent.getIntExtra(EXTRA_CAPTURE_WIDTH, AppSettings.getCaptureWidth(this))
+        val captureHeight = intent.getIntExtra(EXTRA_CAPTURE_HEIGHT, AppSettings.getCaptureHeight(this))
+        val captureFps = intent.getIntExtra(EXTRA_CAPTURE_FPS, AppSettings.getCaptureFps(this))
 
         ScreenShareService.captureWidth = captureWidth
         ScreenShareService.captureHeight = captureHeight
@@ -117,8 +155,8 @@ class SenderActivity : AppCompatActivity() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                getString(R.string.sender_channel_name),
+                NotificationConstants.CHANNEL_ID_SCREEN,
+                NotificationConstants.CHANNEL_NAME_SCREEN,
                 NotificationManager.IMPORTANCE_LOW
             )
             val manager = getSystemService(NotificationManager::class.java)
@@ -144,10 +182,11 @@ class SenderActivity : AppCompatActivity() {
                         updateViewerCount(count)
                     }
                     "com.example.screenmirror.CONNECTION_QUALITY" -> {
+                        val quality = intent.getStringExtra("quality") ?: ""
                         val rtt = intent.getIntExtra("rtt", 0)
                         val fps = intent.getIntExtra("fps", 0)
                         val packetLoss = intent.getDoubleExtra("packet_loss", 0.0)
-                        updateConnectionQuality(rtt, fps, packetLoss)
+                        updateConnectionQuality(quality, rtt, fps, packetLoss)
                     }
                 }
             }
@@ -166,7 +205,7 @@ class SenderActivity : AppCompatActivity() {
         }
 
         val projectionManager = getSystemService(MEDIA_PROJECTION_SERVICE) as android.media.projection.MediaProjectionManager
-        startActivityForResult(projectionManager.createScreenCaptureIntent(), 1001)
+        projectionLauncher.launch(projectionManager.createScreenCaptureIntent())
     }
 
     private fun showStopConfirmation() {
@@ -183,21 +222,20 @@ class SenderActivity : AppCompatActivity() {
     }
 
     private fun startStatsChecker() {
-        statsCheckerRunnable = object : Runnable {
-            override fun run() {
+        lifecycleScope.launch {
+            while (isActive) {
                 if (!AppSettings.isQualityStatsEnabled(this@SenderActivity)) {
                     tvConnectionQuality.visibility = View.GONE
-                    handler.postDelayed(this, 2000)
-                    return
+                    delay(2000)
+                    continue
                 }
                 val intent = Intent("com.example.screenmirror.REQUEST_STATS").apply {
                     setPackage(packageName)
                 }
                 sendBroadcast(intent)
-                handler.postDelayed(this, 2000)
+                delay(2000)
             }
         }
-        handler.postDelayed(statsCheckerRunnable!!, 2000)
     }
 
     private fun updateViewerCount(count: Int) {
@@ -206,30 +244,35 @@ class SenderActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateConnectionQuality(rtt: Int, fps: Int, packetLoss: Double) {
+    private fun updateConnectionQuality(quality: String, rtt: Int, fps: Int, packetLoss: Double) {
         runOnUiThread {
             if (!AppSettings.isQualityStatsEnabled(this)) {
                 tvConnectionQuality.visibility = View.GONE
+                ivConnectionDot.visibility = View.GONE
                 return@runOnUiThread
             }
 
             tvConnectionQuality.visibility = View.VISIBLE
+            ivConnectionDot.visibility = View.VISIBLE
             tvConnectionQuality.text = getString(R.string.quality_stats_format, rtt, fps, packetLoss)
 
-            val color = when {
-                rtt < 100 && packetLoss < 1 -> ContextCompat.getColor(this, R.color.dark_status_good)
-                rtt < 200 && packetLoss < 3 -> ContextCompat.getColor(this, R.color.dark_status_warning)
-                else -> ContextCompat.getColor(this, R.color.dark_status_error)
+            val (colorRes, iconRes) = when (quality) {
+                "IYI" -> R.color.dark_status_good to R.drawable.ic_signal
+                "ORTA" -> R.color.dark_status_warning to R.drawable.ic_signal
+                else -> R.color.dark_status_error to R.drawable.ic_signal
             }
+
+            val color = ContextCompat.getColor(this, colorRes)
             tvConnectionQuality.setTextColor(color)
+            ivConnectionDot.setColorFilter(color)
         }
     }
 
     private fun takeScreenshot() {
         val screenView = window.decorView.rootView
-        screenView.isDrawingCacheEnabled = true
-        val bitmap = Bitmap.createBitmap(screenView.drawingCache)
-        screenView.isDrawingCacheEnabled = false
+        val bitmap = Bitmap.createBitmap(screenView.width, screenView.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        screenView.draw(canvas)
 
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val filename = "screenmirror_$timestamp.png"
@@ -252,68 +295,36 @@ class SenderActivity : AppCompatActivity() {
 
     private fun startRecording() {
         val projectionManager = getSystemService(MEDIA_PROJECTION_SERVICE) as android.media.projection.MediaProjectionManager
-        startActivityForResult(projectionManager.createScreenCaptureIntent(), 1002)
+        recordLauncher.launch(projectionManager.createScreenCaptureIntent())
     }
 
     private fun stopRecording() {
-        sendBroadcast(Intent("com.example.screenmirror.STOP_RECORDING").apply {
-            setPackage(packageName)
-        })
+        val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
+            action = "com.example.screenmirror.STOP_RECORDING"
+        }
+        startService(serviceIntent)
         isRecording = false
         val recordText = btnRecord.findViewById<TextView>(R.id.tvRecord)
         recordText?.text = getString(R.string.sender_record)
         tvTimer.visibility = View.GONE
-        recordRunnable?.let { handler.removeCallbacks(it) }
         Toast.makeText(this, getString(R.string.sender_record_stopped), Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == 1001 && resultCode == RESULT_OK && data != null) {
-            val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
-                putExtra("resultCode", resultCode)
-                putExtra("data", data)
-                putExtra(EXTRA_ROOM_CODE, intent.getStringExtra(EXTRA_ROOM_CODE))
-            }
-            startForegroundService(serviceIntent)
-        }
-
-        if (requestCode == 1002 && resultCode == RESULT_OK && data != null) {
-            val recordIntent = Intent("com.example.screenmirror.START_RECORDING").apply {
-                putExtra("resultCode", resultCode)
-                putExtra("data", data)
-                setPackage(packageName)
-            }
-            sendBroadcast(recordIntent)
-            isRecording = true
-            val recordText = btnRecord.findViewById<TextView>(R.id.tvRecord)
-            recordText?.text = getString(R.string.sender_stop_record)
-            tvTimer.visibility = View.VISIBLE
-            startRecordTimer()
-            Toast.makeText(this, getString(R.string.sender_record_started), Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun startRecordTimer() {
         startTime = System.currentTimeMillis()
-        recordRunnable = object : Runnable {
-            override fun run() {
-                if (!isRecording) return
+        lifecycleScope.launch {
+            while (isActive && isRecording) {
                 val elapsed = System.currentTimeMillis() - startTime
                 val mins = elapsed / 60000
                 val secs = (elapsed % 60000) / 1000
                 tvTimer.text = String.format("%02d:%02d", mins, secs)
-                handler.postDelayed(this, 1000)
+                delay(1000)
             }
         }
-        handler.postDelayed(recordRunnable!!, 1000)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         receiver?.let { unregisterReceiver(it) }
-        statsCheckerRunnable?.let { handler.removeCallbacks(it) }
-        recordRunnable?.let { handler.removeCallbacks(it) }
     }
 }
