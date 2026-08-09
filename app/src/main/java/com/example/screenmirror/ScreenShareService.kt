@@ -327,6 +327,7 @@ class ScreenShareService : Service() {
             peerConnection = factory!!.createPeerConnection(config, object : PeerConnection.Observer {
                 override fun onSignalingChange(state: PeerConnection.SignalingState) {}
                 override fun onIceConnectionChange(state: PeerConnection.IceConnectionState) {
+                    OnScreenLog.add("WEBRTC", "ICE STATE: $state")
                     Log.i(TAG, "ICE: $state")
                     postState("ICE: $state")
                     when (state) {
@@ -359,10 +360,12 @@ class ScreenShareService : Service() {
                     }
                 }
                 override fun onIceCandidate(candidate: IceCandidate) {
+                    OnScreenLog.add("WEBRTC", "LOCAL ICE: ${candidate.sdp.take(50)}")
                     cloudSignaling?.sendIce(candidate)
                 }
                 override fun onAddTrack(receiver: RtpReceiver, mediaStreams: Array<out MediaStream>) {}
                 override fun onTrack(transceiver: RtpTransceiver) {
+                    OnScreenLog.add("WEBRTC", "onTrack: ${transceiver.receiver.track()?.id()}")
                     val track = transceiver.receiver.track()
                     if (track is VideoTrack) {
                         remoteTrack = track
@@ -565,6 +568,7 @@ class ScreenShareService : Service() {
     private fun handleRemoteDescription(sdp: SessionDescription) {
         try {
             val sdpTypeStr = if (sdp.type == SessionDescription.Type.OFFER) "offer" else "answer"
+            OnScreenLog.add("WEBRTC", "handleRemoteDesc: $sdpTypeStr")
             Log.i(TAG, "handleRemoteDescription: $sdpTypeStr alindi")
             if (sdp.type == SessionDescription.Type.OFFER) {
                 postState("Teklif alindi, yanit olusturuluyor...")
@@ -579,6 +583,7 @@ class ScreenShareService : Service() {
             peerConnection?.setRemoteDescription(sdpObserver(
                 onSetSuccess = {
                     remoteDescriptionSet = true
+                    OnScreenLog.add("WEBRTC", "setRemoteDesc OK ($sdpTypeStr) pending=${pendingCandidates.size}")
                     Log.i(TAG, "setRemoteDescription basarili ($sdpTypeStr)")
                     pendingCandidates.forEach { candidate ->
                         try {
@@ -592,9 +597,11 @@ class ScreenShareService : Service() {
                         Log.i(TAG, "Answer olusturuluyor...")
                         peerConnection?.createAnswer(sdpObserver(
                             onCreateSuccess = { ans ->
+                                OnScreenLog.add("WEBRTC", "Answer created, setLocalDesc")
                                 Log.i(TAG, "Answer olusturuldu, localDescription ayarlaniyor")
                                 peerConnection?.setLocalDescription(sdpObserver(
                                     onSetSuccess = {
+                                        OnScreenLog.add("WEBRTC", "Answer sent!")
                                         Log.i(TAG, "Answer localDescription ayarlandi, gonderiliyor")
                                         cloudSignaling?.sendAnswer(ans)
                                         postState("Yanit gonderildi, baglanti bekleniyor...")
@@ -613,6 +620,7 @@ class ScreenShareService : Service() {
                     }
                 },
                 onSetFailure = { error ->
+                    OnScreenLog.add("WEBRTC", "setRemoteDesc HATA: $error")
                     Log.e(TAG, "setRemoteDescription basarisiz: $error")
                     postState("HATA: SDP hatasi: $error")
                 }
@@ -628,6 +636,7 @@ class ScreenShareService : Service() {
 
     private fun handleRemoteIce(candidate: IceCandidate) {
         try {
+            OnScreenLog.add("WEBRTC", "remoteIce: descSet=$remoteDescriptionSet ${candidate.sdp.take(50)}")
             if (remoteDescriptionSet) {
                 peerConnection?.addIceCandidate(candidate)
             } else {
@@ -640,6 +649,7 @@ class ScreenShareService : Service() {
 
     private fun createOffer() {
         if (localTrack == null) {
+            OnScreenLog.add("WEBRTC", "createOffer: localTrack NULL!")
             Log.w(TAG, "createOffer: localTrack null, offer olusturulamadi")
             postState("HATA: Ekran verisi henuz hazir degil")
             return
@@ -653,6 +663,7 @@ class ScreenShareService : Service() {
         postState("Teklif olusturuluyor...")
         peerConnection?.createOffer(sdpObserver(
             onCreateSuccess = { offer ->
+                OnScreenLog.add("WEBRTC", "createOffer OK, setLocalDesc")
                 Log.i(TAG, "createOffer basarili, localDescription ayarlaniyor")
                 peerConnection?.setLocalDescription(sdpObserver(
                     onSetSuccess = {

@@ -297,4 +297,26 @@
             android:textSize="14sp"
             android:stateListAnimator="@null" />
     </LinearLayout>
+
+    <!-- Debug log overlay -->
+    <ScrollView
+        android:id="@+id/logOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="8dp"
+        android:background="#CC000000"
+        android:padding="6dp"
+        android:fadeScrollbars="false"
+        android:scrollbarThumbVertical="@android:color/darker_gray">
+
+        <TextView
+            android:id="@+id/tvLog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:textColor="#FF00FF00"
+            android:textSize="9sp"
+            android:lineSpacingExtra="1dp" />
+    </ScrollView>
 </FrameLayout>
