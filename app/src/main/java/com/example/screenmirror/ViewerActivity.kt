@@ -55,8 +55,6 @@ class ViewerActivity : AppCompatActivity() {
     private lateinit var skeletonStatus: View
     private lateinit var skeletonProgress: View
     private lateinit var skeletonHint: TextView
-    private lateinit var tvLog: TextView
-    private lateinit var logOverlay: View
     private lateinit var waitingOverlay: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,11 +87,7 @@ class ViewerActivity : AppCompatActivity() {
 
         tvStats.text = getString(R.string.viewer_stats)
 
-        logOverlay = findViewById(R.id.logOverlay)
-        tvLog = findViewById(R.id.tvLog)
         waitingOverlay = findViewById(R.id.waitingOverlay)
-        OnScreenLog.clear()
-        OnScreenLog.onUpdate = { text -> runOnUiThread { tvLog.text = text } }
 
         showSkeleton("Yayın bekleniyor...")
         startViewerService()

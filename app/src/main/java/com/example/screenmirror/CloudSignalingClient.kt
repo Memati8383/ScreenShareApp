@@ -67,7 +67,6 @@ class CloudSignalingClient(
         ws = client!!.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 Log.i("CloudSig", "WS onOpen - HTTP ${response.code}, protocol=${response.protocol}")
-                OnScreenLog.add("SIG", "WS onOpen HTTP=${response.code}")
                 connected = true
                 registered = false
                 reconnectAttempt = 0
@@ -129,8 +128,6 @@ class CloudSignalingClient(
     private fun handle(text: String) {
         try {
             val msg = JSONObject(text)
-            val short = text.take(200)
-            OnScreenLog.add("SIG", "RECV: $short")
             Log.d("CloudSig", "MSG parsed: keys=${msg.keys().asSequence().toList()}")
 
             if (msg.has("sys")) {
@@ -142,7 +139,6 @@ class CloudSignalingClient(
                         rosterTimeoutHandler.removeCallbacksAndMessages(null)
                         val roster = msg.getJSONArray("roster")
                         val newCount = roster.length()
-                        OnScreenLog.add("SIG", "ROSTER: $newCount peers")
                         Log.i("CloudSig", "ROSTER: $newCount peer var (onceki: $peerCount)")
                         val viewers = if (newCount > 1) newCount - 1 else 0
                         onViewerCountChanged(viewers)
@@ -232,7 +228,6 @@ class CloudSignalingClient(
             .put("payload", payload)
             .toString()
         Log.i("CloudSig", "OFFER gonderiliyor")
-        OnScreenLog.add("SIG", "SEND OFFER")
         val sent = send(msg)
         Log.i("CloudSig", "OFFER gonderildi: $sent")
     }
@@ -249,7 +244,6 @@ class CloudSignalingClient(
             .put("payload", payload)
             .toString()
         Log.i("CloudSig", "ANSWER gonderiliyor")
-        OnScreenLog.add("SIG", "SEND ANSWER")
         val sent = send(msg)
         Log.i("CloudSig", "ANSWER gonderildi: $sent")
     }
@@ -267,7 +261,6 @@ class CloudSignalingClient(
             .put("payload", payload)
             .toString()
         Log.i("CloudSig", "ICE gonderiliyor")
-        OnScreenLog.add("SIG", "SEND ICE ${candidate.sdp.take(60)}")
         send(msg)
     }
 
