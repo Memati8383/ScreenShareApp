@@ -121,6 +121,17 @@ class ScreenShareService : Service() {
                 roomId = intent.getStringExtra("room") ?: "oda1"
                 startTime = System.currentTimeMillis()
                 Log.i(TAG, "role=$role room=$roomId")
+
+                if (role == "sender") {
+                    val rc = intent.getIntExtra("resultCode", 0)
+                    @Suppress("DEPRECATION")
+                    val d = intent.getParcelableExtra<Intent>("data")
+                    if (rc != 0 && d != null) {
+                        pendingResultCode = rc
+                        pendingData = d
+                        Log.i(TAG, "sender: resultCode=$rc data mevcut")
+                    }
+                }
             }
 
             captureWidth = AppSettings.getCaptureWidth(this)
@@ -334,7 +345,7 @@ class ScreenShareService : Service() {
                     postState("Izleyici ayrildi")
                 },
                 onViewerCountChanged = { count ->
-                    mainHandler.post { onViewerCountChanged?.invoke(count) }
+                    postViewerCount(count)
                 }
             )
             Log.i(TAG, "cloud signaling objesi olusturuldu")
@@ -531,6 +542,18 @@ class ScreenShareService : Service() {
     private fun postState(s: String) {
         Log.i(TAG, s)
         mainHandler.post { onState?.invoke(s) }
+        sendBroadcast(Intent("com.example.screenmirror.STATE_CHANGED").apply {
+            putExtra("state", s)
+            setPackage(packageName)
+        })
+    }
+
+    private fun postViewerCount(count: Int) {
+        mainHandler.post { onViewerCountChanged?.invoke(count) }
+        sendBroadcast(Intent("com.example.screenmirror.VIEWER_COUNT_CHANGED").apply {
+            putExtra("viewer_count", count)
+            setPackage(packageName)
+        })
     }
 
     private fun startStatsChecker() {
@@ -587,6 +610,14 @@ class ScreenShareService : Service() {
                     mainHandler.post {
                         onConnectionQuality?.invoke("$quality|$statsText")
                     }
+
+                    sendBroadcast(Intent("com.example.screenmirror.CONNECTION_QUALITY").apply {
+                        putExtra("quality", quality)
+                        putExtra("rtt", (roundTripTime * 1000).toInt())
+                        putExtra("fps", framesPerSecond)
+                        putExtra("packet_loss", packetLoss)
+                        setPackage(packageName)
+                    })
                 }
                 mainHandler.postDelayed(this, 2000)
             }

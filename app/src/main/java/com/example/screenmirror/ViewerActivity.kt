@@ -43,6 +43,16 @@ class ViewerActivity : AppCompatActivity() {
 
     private var receiver: BroadcastReceiver? = null
     private var startTime = 0L
+    private var roomCode = ""
+
+    private lateinit var skeletonHelper: SkeletonAnimHelper
+    private lateinit var skeletonContainer: View
+    private lateinit var skeletonIcon: View
+    private lateinit var skeletonTitle: View
+    private lateinit var skeletonSubtitle: View
+    private lateinit var skeletonStatus: View
+    private lateinit var skeletonProgress: View
+    private lateinit var skeletonHint: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +60,7 @@ class ViewerActivity : AppCompatActivity() {
 
         createNotificationChannel()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        initSkeleton()
 
         tvViewerStatus = findViewById(R.id.tvViewerStatus)
         tvStats = findViewById(R.id.tvStats)
@@ -60,6 +71,8 @@ class ViewerActivity : AppCompatActivity() {
         btnDisconnect = findViewById(R.id.btnDisconnect)
         controlPanel = findViewById(R.id.controlPanel)
 
+        roomCode = intent.getStringExtra("room") ?: ""
+
         startTime = System.currentTimeMillis()
         registerReceiver()
         startStatsChecker()
@@ -68,8 +81,41 @@ class ViewerActivity : AppCompatActivity() {
 
         tvStats.text = getString(R.string.viewer_stats)
 
+        showSkeleton("Yayın bekleniyor...")
+        startViewerService()
         btnDisconnect.setOnClickListener { showDisconnectConfirmation() }
         btnScreenshot.setOnClickListener { takeScreenshot() }
+    }
+
+    private fun startViewerService() {
+        val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
+            putExtra("role", "viewer")
+            putExtra("room", roomCode)
+        }
+        startForegroundService(serviceIntent)
+    }
+
+    private fun initSkeleton() {
+        skeletonHelper = SkeletonAnimHelper()
+        skeletonContainer = findViewById(R.id.skeletonContainer)
+        skeletonIcon = findViewById(R.id.skeletonIcon)
+        skeletonTitle = findViewById(R.id.skeletonTitle)
+        skeletonSubtitle = findViewById(R.id.skeletonSubtitle)
+        skeletonStatus = findViewById(R.id.skeletonStatus)
+        skeletonProgress = findViewById(R.id.skeletonProgress)
+        skeletonHint = findViewById(R.id.skeletonHint)
+    }
+
+    private fun showSkeleton(hint: String) {
+        skeletonContainer.visibility = View.VISIBLE
+        skeletonHelper.updateHintText(skeletonHint, hint)
+        skeletonHelper.startSkeletonAnimation(
+            skeletonIcon, skeletonTitle, skeletonSubtitle, skeletonStatus
+        )
+    }
+
+    private fun hideSkeleton() {
+        skeletonHelper.hideSkeleton(skeletonContainer)
     }
 
     private fun createNotificationChannel() {
@@ -90,6 +136,7 @@ class ViewerActivity : AppCompatActivity() {
                 when (intent.action) {
                     "com.example.screenmirror.SENDER_DISCONNECTED" -> {
                         runOnUiThread {
+                            hideSkeleton()
                             tvViewerStatus.text = getString(R.string.status_disconnected)
                             Toast.makeText(context, getString(R.string.viewer_broadcast_ended), Toast.LENGTH_SHORT).show()
                             lifecycleScope.launch {
@@ -108,6 +155,7 @@ class ViewerActivity : AppCompatActivity() {
                         val fps = intent.getIntExtra("fps", 0)
                         val packetLoss = intent.getDoubleExtra("packet_loss", 0.0)
                         runOnUiThread {
+                            hideSkeleton()
                             if (!AppSettings.isQualityStatsEnabled(this@ViewerActivity)) {
                                 tvConnectionQuality.visibility = View.GONE
                                 ivConnectionDot.visibility = View.GONE
@@ -127,6 +175,15 @@ class ViewerActivity : AppCompatActivity() {
                             ivConnectionDot.setColorFilter(color)
                         }
                     }
+                    "com.example.screenmirror.STATE_CHANGED" -> {
+                        val state = intent.getStringExtra("state") ?: ""
+                        runOnUiThread {
+                            tvStats.text = state
+                            if (state.contains("goruntu") || state.contains("baglandi")) {
+                                hideSkeleton()
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -135,6 +192,7 @@ class ViewerActivity : AppCompatActivity() {
             addAction("com.example.screenmirror.SENDER_DISCONNECTED")
             addAction("com.example.screenmirror.VIEWER_COUNT_CHANGED")
             addAction("com.example.screenmirror.CONNECTION_QUALITY")
+            addAction("com.example.screenmirror.STATE_CHANGED")
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -154,9 +212,7 @@ class ViewerActivity : AppCompatActivity() {
     }
 
     private fun cleanupAndFinish() {
-        sendBroadcast(Intent("com.example.screenmirror.DISCONNECT_VIEWER").apply {
-            setPackage(packageName)
-        })
+        stopService(Intent(this, ScreenShareService::class.java))
         try { receiver?.let { unregisterReceiver(it) } } catch (_: Exception) {}
         finish()
     }
@@ -201,6 +257,7 @@ class ViewerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        skeletonHelper.stopAnimation()
         try { receiver?.let { unregisterReceiver(it) } } catch (_: Exception) {}
     }
 }

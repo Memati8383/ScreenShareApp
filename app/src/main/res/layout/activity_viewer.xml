@@ -10,6 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Skeleton loading overlay -->
+    <include layout="@layout/include_skeleton_loading" />
+
     <!-- Waiting overlay -->
     <LinearLayout
         android:id="@+id/waitingOverlay"

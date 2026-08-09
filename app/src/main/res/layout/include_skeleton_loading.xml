@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/skeletonContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark"
+    android:visibility="gone">
+
+    <!-- Main skeleton content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp">
+
+        <!-- Skeleton icon -->
+        <View
+            android:id="@+id/skeletonIcon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/bg_skeleton_circle" />
+
+        <!-- Skeleton title -->
+        <View
+            android:id="@+id/skeletonTitle"
+            android:layout_width="200dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_skeleton" />
+
+        <!-- Skeleton subtitle -->
+        <View
+            android:id="@+id/skeletonSubtitle"
+            android:layout_width="160dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_skeleton" />
+
+        <!-- Skeleton status text -->
+        <View
+            android:id="@+id/skeletonStatus"
+            android:layout_width="120dp"
+            android:layout_height="14dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_skeleton" />
+
+        <!-- Skeleton progress bar -->
+        <ProgressBar
+            android:id="@+id/skeletonProgress"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="32dp"
+            android:indeterminateTint="@color/accent" />
+
+        <!-- Skeleton hint text -->
+        <TextView
+            android:id="@+id/skeletonHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/status_connecting"
+            android:textColor="@color/text_hint"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <!-- Skeleton bottom cards -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <!-- Skeleton card 1 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@drawable/bg_card">
+
+            <View
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_skeleton_circle" />
+
+            <View
+                android:layout_width="60dp"
+                android:layout_height="12dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_skeleton" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="12dp"
+            android:layout_height="0dp" />
+
+        <!-- Skeleton card 2 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@drawable/bg_card">
+
+            <View
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_skeleton_circle" />
+
+            <View
+                android:layout_width="60dp"
+                android:layout_height="12dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_skeleton" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

@@ -14,7 +14,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -22,12 +21,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.appbar.MaterialToolbar
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -36,10 +32,9 @@ import java.util.*
 class SenderActivity : AppCompatActivity() {
 
     companion object {
-        const val EXTRA_ROOM_CODE = "room_code"
-        const val EXTRA_CAPTURE_WIDTH = "capture_width"
-        const val EXTRA_CAPTURE_HEIGHT = "capture_height"
-        const val EXTRA_CAPTURE_FPS = "capture_fps"
+        const val EXTRA_ROOM_CODE = "room"
+        const val EXTRA_RESULT_CODE = "resultCode"
+        const val EXTRA_PROJECTION_DATA = "projectionData"
     }
 
     private lateinit var tvSenderStatus: TextView
@@ -56,7 +51,6 @@ class SenderActivity : AppCompatActivity() {
     private lateinit var btnStop: Button
     private lateinit var controlPanel: View
 
-    private lateinit var projectionLauncher: ActivityResultLauncher<Intent>
     private lateinit var recordLauncher: ActivityResultLauncher<Intent>
 
     private var receiver: BroadcastReceiver? = null
@@ -64,12 +58,23 @@ class SenderActivity : AppCompatActivity() {
     private var isRecording = false
     private var isFrozen = false
     private var startTime = 0L
+    private var roomCode = ""
+
+    private lateinit var skeletonHelper: SkeletonAnimHelper
+    private lateinit var skeletonContainer: View
+    private lateinit var skeletonIcon: View
+    private lateinit var skeletonTitle: View
+    private lateinit var skeletonSubtitle: View
+    private lateinit var skeletonStatus: View
+    private lateinit var skeletonProgress: View
+    private lateinit var skeletonHint: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sender)
 
         createNotificationChannel()
+        initSkeleton()
 
         tvSenderStatus = findViewById(R.id.tvSenderStatus)
         tvSenderRoom = findViewById(R.id.tvSenderRoom)
@@ -84,19 +89,6 @@ class SenderActivity : AppCompatActivity() {
         btnQuality = findViewById(R.id.btnQuality)
         btnStop = findViewById(R.id.btnStop)
         controlPanel = findViewById(R.id.controlPanel)
-
-        projectionLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (result.resultCode == RESULT_OK && result.data != null) {
-                val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
-                    putExtra("resultCode", result.resultCode)
-                    putExtra("data", result.data)
-                    putExtra(EXTRA_ROOM_CODE, intent.getStringExtra(EXTRA_ROOM_CODE))
-                }
-                startForegroundService(serviceIntent)
-            }
-        }
 
         recordLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -117,16 +109,8 @@ class SenderActivity : AppCompatActivity() {
             }
         }
 
-        val code = intent.getStringExtra(EXTRA_ROOM_CODE) ?: "000000"
-        tvSenderRoom.text = getString(R.string.sender_room_prefix, code)
-
-        val captureWidth = intent.getIntExtra(EXTRA_CAPTURE_WIDTH, AppSettings.getCaptureWidth(this))
-        val captureHeight = intent.getIntExtra(EXTRA_CAPTURE_HEIGHT, AppSettings.getCaptureHeight(this))
-        val captureFps = intent.getIntExtra(EXTRA_CAPTURE_FPS, AppSettings.getCaptureFps(this))
-
-        ScreenShareService.captureWidth = captureWidth
-        ScreenShareService.captureHeight = captureHeight
-        ScreenShareService.captureFps = captureFps
+        roomCode = intent.getStringExtra(EXTRA_ROOM_CODE) ?: "000000"
+        tvSenderRoom.text = getString(R.string.sender_room_prefix, roomCode)
 
         btnFreeze.setOnClickListener {
             ScreenShareService.isFrozen = !ScreenShareService.isFrozen
@@ -148,8 +132,33 @@ class SenderActivity : AppCompatActivity() {
 
         tvConnectionQuality.visibility = if (AppSettings.isQualityStatsEnabled(this)) View.VISIBLE else View.GONE
 
-        startSharing()
+        showSkeleton("Ekran paylaşımı başlatılıyor...")
+        startService()
+        registerBroadcastReceiver()
         startStatsChecker()
+    }
+
+    private fun initSkeleton() {
+        skeletonHelper = SkeletonAnimHelper()
+        skeletonContainer = findViewById(R.id.skeletonContainer)
+        skeletonIcon = findViewById(R.id.skeletonIcon)
+        skeletonTitle = findViewById(R.id.skeletonTitle)
+        skeletonSubtitle = findViewById(R.id.skeletonSubtitle)
+        skeletonStatus = findViewById(R.id.skeletonStatus)
+        skeletonProgress = findViewById(R.id.skeletonProgress)
+        skeletonHint = findViewById(R.id.skeletonHint)
+    }
+
+    private fun showSkeleton(hint: String) {
+        skeletonContainer.visibility = View.VISIBLE
+        skeletonHelper.updateHintText(skeletonHint, hint)
+        skeletonHelper.startSkeletonAnimation(
+            skeletonIcon, skeletonTitle, skeletonSubtitle, skeletonStatus
+        )
+    }
+
+    private fun hideSkeleton() {
+        skeletonHelper.hideSkeleton(skeletonContainer)
     }
 
     private fun createNotificationChannel() {
@@ -164,16 +173,34 @@ class SenderActivity : AppCompatActivity() {
         }
     }
 
-    private fun startSharing() {
+    private fun startService() {
+        val resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, 0)
+        val projectionData = intent.getParcelableExtra<Intent>(EXTRA_PROJECTION_DATA)
+
+        if (resultCode == 0 || projectionData == null) {
+            showSkeleton("HATA: Ekran paylaşımı izni alınamadı")
+            return
+        }
+
+        val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
+            putExtra("role", "sender")
+            putExtra("room", roomCode)
+            putExtra(EXTRA_RESULT_CODE, resultCode)
+            putExtra("data", projectionData)
+        }
+        startForegroundService(serviceIntent)
+
         isSharing = true
         startTime = System.currentTimeMillis()
         tvSenderStatus.text = getString(R.string.status_live)
+        hideSkeleton()
+    }
 
+    private fun registerBroadcastReceiver() {
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 when (intent.action) {
                     "com.example.screenmirror.PEER_LEFT" -> {
-                        Toast.makeText(context, getString(R.string.sender_peer_left), Toast.LENGTH_SHORT).show()
                         val count = intent.getIntExtra("viewer_count", 0)
                         updateViewerCount(count)
                     }
@@ -188,6 +215,10 @@ class SenderActivity : AppCompatActivity() {
                         val packetLoss = intent.getDoubleExtra("packet_loss", 0.0)
                         updateConnectionQuality(quality, rtt, fps, packetLoss)
                     }
+                    "com.example.screenmirror.STATE_CHANGED" -> {
+                        val state = intent.getStringExtra("state") ?: ""
+                        tvSenderStats.text = state
+                    }
                 }
             }
         }
@@ -196,6 +227,7 @@ class SenderActivity : AppCompatActivity() {
             addAction("com.example.screenmirror.PEER_LEFT")
             addAction("com.example.screenmirror.VIEWER_COUNT_CHANGED")
             addAction("com.example.screenmirror.CONNECTION_QUALITY")
+            addAction("com.example.screenmirror.STATE_CHANGED")
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -203,9 +235,6 @@ class SenderActivity : AppCompatActivity() {
         } else {
             registerReceiver(receiver, filter)
         }
-
-        val projectionManager = getSystemService(MEDIA_PROJECTION_SERVICE) as android.media.projection.MediaProjectionManager
-        projectionLauncher.launch(projectionManager.createScreenCaptureIntent())
     }
 
     private fun showStopConfirmation() {
@@ -325,6 +354,7 @@ class SenderActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        skeletonHelper.stopAnimation()
         receiver?.let { unregisterReceiver(it) }
     }
 }
