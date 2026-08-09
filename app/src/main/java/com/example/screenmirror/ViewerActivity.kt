@@ -182,9 +182,7 @@ class ViewerActivity : AppCompatActivity() {
                         val state = intent.getStringExtra("state") ?: ""
                         runOnUiThread {
                             tvStats.text = state
-                            if (state.contains("goruntu") || state.contains("baglandi")) {
-                                hideSkeleton()
-                            }
+                            hideSkeleton()
                         }
                     }
                 }

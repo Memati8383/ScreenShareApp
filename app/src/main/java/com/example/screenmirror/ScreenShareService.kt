@@ -146,8 +146,18 @@ class ScreenShareService : Service() {
 
             val r = renderer
             if (r == null) {
-                Log.e(TAG, "renderer NULL")
-                postState("HATA: SurfaceView bulunamadi")
+                Log.e(TAG, "renderer NULL, 2sn sonra tekrar denenecek")
+                postState("Surface bekleniyor...")
+                mainHandler.postDelayed({
+                    val retry = renderer
+                    if (retry == null) {
+                        Log.e(TAG, "renderer hala NULL")
+                        postState("HATA: SurfaceView bulunamadi")
+                    } else {
+                        Log.i(TAG, "renderer bulundu, WebRTC baslatiliyor")
+                        startWebRtc(retry)
+                    }
+                }, 2000)
                 return START_STICKY
             }
 

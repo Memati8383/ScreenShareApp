@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.util.Log
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Build
@@ -114,6 +115,7 @@ class SenderActivity : AppCompatActivity() {
 
         val senderSurface = findViewById<org.webrtc.SurfaceViewRenderer>(R.id.senderSurface)
         ScreenShareService.renderer = senderSurface
+        Log.i("SenderActivity", "renderer atandi: ${senderSurface != null}")
 
         btnFreeze.setOnClickListener {
             ScreenShareService.isFrozen = !ScreenShareService.isFrozen
