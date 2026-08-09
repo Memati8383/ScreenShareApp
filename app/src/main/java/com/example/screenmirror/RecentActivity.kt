@@ -109,7 +109,23 @@ class RecentActivity : AppCompatActivity() {
             finish()
             return true
         }
+        if (item.itemId == R.id.action_delete_all) {
+            showDeleteAllDialog()
+            return true
+        }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun showDeleteAllDialog() {
+        AlertDialog.Builder(this, R.style.Theme_ScreenShare_Dialog)
+            .setTitle(getString(R.string.recent_delete_title))
+            .setMessage("Tum oda gecmisini silmek istediginize emin misiniz?")
+            .setPositiveButton(getString(R.string.recent_delete_confirm)) { _, _ ->
+                viewModel.deleteAll()
+                Snackbar.make(recyclerView, "Gecmis temizlendi", Snackbar.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(getString(R.string.btn_cancel), null)
+            .show()
     }
 
     inner class RoomAdapter(

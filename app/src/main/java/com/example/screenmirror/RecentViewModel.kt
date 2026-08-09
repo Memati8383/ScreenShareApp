@@ -35,4 +35,11 @@ class RecentViewModel(
             loadRooms()
         }
     }
+
+    fun deleteAll() {
+        viewModelScope.launch(Dispatchers.IO) {
+            manager.deleteAll()
+            loadRooms()
+        }
+    }
 }
