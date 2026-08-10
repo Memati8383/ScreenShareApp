@@ -19,21 +19,31 @@ class CloudSignalingClient(
 ) {
     private var client: OkHttpClient? = null
     private var ws: WebSocket? = null
-    private val peerId = "${role}_${System.currentTimeMillis()}"
+    private val peerId = "${role}_${java.util.UUID.randomUUID()}"
     private var registered = false
     @Volatile private var connected = false
     private var peerCount = 0
     private var closed = false
     private var reconnectAttempt = 0
     private val maxReconnectDelay = 30000L
+    private val maxReconnectAttempts = 20
     private val reconnectHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private val heartbeatHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    @Volatile private var lastPongTime = 0L
     private val heartbeatRunnable = object : Runnable {
         override fun run() {
             if (!connected || closed) return
+            val now = System.currentTimeMillis()
+            if (lastPongTime > 0 && now - lastPongTime > 60000) {
+                Log.e("CloudSig", "PONG alinmadi, yeniden baglaniliyor")
+                onDisconnect?.invoke("Sunucu yanit vermiyor, yeniden baglaniliyor...")
+                try { ws?.close(1000, "pong timeout") } catch (_: Exception) {}
+                return
+            }
             val ping = JSONObject().put("kind", "ping").toString()
             Log.d("CloudSig", "HEARTBEAT ping gonderiliyor")
             send(ping)
+            lastPongTime = now
             heartbeatHandler.postDelayed(this, 25000L)
         }
     }
@@ -150,6 +160,10 @@ class CloudSignalingClient(
                             onPeerLeft()
                         }
                         peerCount = newCount
+                    }
+                    "pong" -> {
+                        lastPongTime = System.currentTimeMillis()
+                        Log.d("CloudSig", "PONG alindi")
                     }
                     "error" -> {
                         val code = msg.optString("code", "unknown")
@@ -280,7 +294,12 @@ class CloudSignalingClient(
 
     private fun scheduleReconnect() {
         if (closed) return
-        val delay = minOf(1000L * (1 shl reconnectAttempt), maxReconnectDelay)
+        if (reconnectAttempt >= maxReconnectAttempts) {
+            Log.e("CloudSig", "Maksimum reconnect denemesine ulasildi ($maxReconnectAttempts)")
+            onDisconnect?.invoke("Yeniden baglanma limiti asildi")
+            return
+        }
+        val delay = minOf(1000L * (1L shl minOf(reconnectAttempt, 30)), maxReconnectDelay)
         reconnectAttempt++
         Log.i("CloudSig", "${delay}ms sonra yeniden baglanacak (deneme: $reconnectAttempt)")
         onDisconnect?.invoke("Yeniden baglaniliyor... (deneme: $reconnectAttempt)")

@@ -43,6 +43,7 @@ class ScreenShareService : Service() {
 
     companion object {
         private const val TAG = "ScreenShareSvc"
+        @Volatile private var globalFactoryInitialized = false
     }
 
     inner class LocalBinder : Binder() {
@@ -64,7 +65,7 @@ class ScreenShareService : Service() {
     private var videoSource: VideoSource? = null
     private var capturer: ScreenCapturerAndroid? = null
     private var localTrack: VideoTrack? = null
-    private var remoteTrack: VideoTrack? = null
+    @Volatile private var remoteTrack: VideoTrack? = null
 
     private var mediaRecorder: MediaRecorder? = null
     private val isRecording = AtomicBoolean(false)
@@ -84,7 +85,6 @@ class ScreenShareService : Service() {
     private var pendingResultCode: Int = 0
     private var pendingData: Intent? = null
     private var renderer: SurfaceViewRenderer? = null
-    private var factoryInitialized = false
     private var captureWidth = 1280
     private var captureHeight = 720
     private var captureFps = 30
@@ -93,6 +93,7 @@ class ScreenShareService : Service() {
 
     @Volatile private var remoteDescriptionSet = false
     private val pendingCandidates = CopyOnWriteArrayList<IceCandidate>()
+    private val MAX_PENDING_CANDIDATES = 50
 
     fun getStateManager(): ServiceStateManager = stateManager
 
@@ -145,22 +146,22 @@ class ScreenShareService : Service() {
                         val resultCode = intent.getIntExtra("resultCode", 0)
                         val data = getParcelableExtraCompat(intent, "data")
                         executor.execute { startRecording(resultCode, data) }
-                        return START_STICKY
+                        return START_NOT_STICKY
                     }
                     "com.example.screenmirror.STOP_RECORDING" -> {
                         executor.execute { stopRecording() }
-                        return START_STICKY
+                        return START_NOT_STICKY
                     }
                     "com.example.screenmirror.TOGGLE_FREEZE" -> {
                         executor.execute { toggleFreeze() }
-                        return START_STICKY
+                        return START_NOT_STICKY
                     }
                     "com.example.screenmirror.CHANGE_QUALITY" -> {
                         val w = intent.getIntExtra("width", 1280)
                         val h = intent.getIntExtra("height", 720)
                         val fps = intent.getIntExtra("fps", 30)
                         executor.execute { changeQuality(w, h, fps) }
-                        return START_STICKY
+                        return START_NOT_STICKY
                     }
                 }
 
@@ -199,7 +200,7 @@ class ScreenShareService : Service() {
                 Log.e(TAG, "renderer NULL, 5 kez 1sn aralikla denenecek")
                 stateManager.emitEvent(ServiceEvent.SurfaceWaiting)
                 retryRenderer(1, 5)
-                return START_STICKY
+                return START_NOT_STICKY
             }
 
             if (webRtcReady.get()) {
@@ -209,7 +210,7 @@ class ScreenShareService : Service() {
                     pendingResultCode = 0; pendingData = null
                     executor.execute { startCapture(code, data) }
                 }
-                return START_STICKY
+                return START_NOT_STICKY
             }
 
             val sv = r as? SurfaceView
@@ -247,7 +248,7 @@ class ScreenShareService : Service() {
             Log.e(TAG, "onStartCommand hatasi", e)
             stateManager.emitEvent(ServiceEvent.Error(ErrorType.UNKNOWN, e.message ?: "Unknown"))
         }
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     @Suppress("DEPRECATION")
@@ -284,7 +285,8 @@ class ScreenShareService : Service() {
                 startForeground(NotificationConstants.NOTIFICATION_ID_FOREGROUND, notif)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "foreground hatasi", e)
+            Log.e(TAG, "foreground hatasi, servis durduruluyor", e)
+            stopSelf()
         }
     }
 
@@ -353,13 +355,13 @@ class ScreenShareService : Service() {
             r.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
             r.setZOrderMediaOverlay(true)
 
-            if (!factoryInitialized) {
+            if (!globalFactoryInitialized) {
                 PeerConnectionFactory.initialize(
                     PeerConnectionFactory.InitializationOptions.builder(this)
                         .setFieldTrials("WebRTC-Network-DisableNetworkMonitor/Enabled/")
                         .createInitializationOptions()
                 )
-                factoryInitialized = true
+                globalFactoryInitialized = true
                 Log.i(TAG, "PeerConnectionFactory initialize OK")
             }
 
@@ -500,7 +502,7 @@ class ScreenShareService : Service() {
         }
         override fun onAddTrack(receiver: RtpReceiver, mediaStreams: Array<out MediaStream>) {
             val track = receiver.track()
-            if (track is VideoTrack) {
+            if (track is VideoTrack && remoteTrack == null) {
                 remoteTrack = track
                 mainHandler.post {
                     renderer?.let { r -> remoteTrack?.addSink(r) }
@@ -510,7 +512,7 @@ class ScreenShareService : Service() {
         }
         override fun onTrack(transceiver: RtpTransceiver) {
             val track = transceiver.receiver.track()
-            if (track is VideoTrack) {
+            if (track is VideoTrack && remoteTrack == null) {
                 remoteTrack = track
                 mainHandler.post {
                     renderer?.let { r -> remoteTrack?.addSink(r) }
@@ -525,6 +527,10 @@ class ScreenShareService : Service() {
         if (data == null) {
             Log.e(TAG, "startCapture: data NULL!")
             stateManager.emitEvent(ServiceEvent.Error(ErrorType.SCREEN_CAPTURE, "Projection data is null"))
+            return
+        }
+        if (capturer != null) {
+            Log.w(TAG, "startCapture: capturer zaten mevcut, atlandi")
             return
         }
         try {
@@ -572,7 +578,8 @@ class ScreenShareService : Service() {
     }
 
     fun toggleFreeze() {
-        isFrozen.set(!isFrozen.get())
+        val wasFrozen = isFrozen.get()
+        isFrozen.compareAndSet(wasFrozen, !wasFrozen)
         try {
             localTrack?.setEnabled(!isFrozen.get())
             if (isFrozen.get()) {
@@ -589,9 +596,11 @@ class ScreenShareService : Service() {
     }
 
     fun changeQuality(newWidth: Int, newHeight: Int, newFps: Int) {
-        captureWidth = newWidth
-        captureHeight = newHeight
-        captureFps = newFps
+        synchronized(lock) {
+            captureWidth = newWidth
+            captureHeight = newHeight
+            captureFps = newFps
+        }
         Log.i(TAG, "Kalite degistirildi: ${newWidth}x${newHeight} @ ${newFps}fps")
         try {
             capturer?.changeCaptureFormat(newWidth, newHeight, newFps)
@@ -660,19 +669,19 @@ class ScreenShareService : Service() {
 
     fun stopRecording() {
         if (!isRecording.get()) return
+        isRecording.set(false)
         try {
             recordingVirtualDisplay?.release()
             recordingVirtualDisplay = null
             mediaRecorder?.stop()
-            mediaRecorder?.release()
+        } catch (e: Exception) {
+            Log.e(TAG, "Kayit durdurma hatasi", e)
+        } finally {
+            try { mediaRecorder?.release() } catch (_: Exception) {}
             mediaRecorder = null
-            isRecording.set(false)
             stateManager.emitEvent(ServiceEvent.RecordingStopped)
             stateManager.emitEvent(ServiceEvent.RecordingProgress(recordingFile?.name ?: ""))
             Log.i(TAG, "Kayit durduruldu: ${recordingFile?.absolutePath}")
-        } catch (e: Exception) {
-            Log.e(TAG, "Kayit durdurma hatasi", e)
-            stateManager.emitEvent(ServiceEvent.RecordingError(e.message ?: "Unknown"))
         }
     }
 
@@ -744,7 +753,11 @@ class ScreenShareService : Service() {
             if (remoteDescriptionSet) {
                 peerConnection?.addIceCandidate(candidate)
             } else {
-                pendingCandidates.add(candidate)
+                if (pendingCandidates.size < MAX_PENDING_CANDIDATES) {
+                    pendingCandidates.add(candidate)
+                } else {
+                    Log.w(TAG, "pendingCandidates limiti asildi, candidate atlandi")
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "ICE candidate ekleme hatasi", e)
@@ -933,17 +946,13 @@ class ScreenShareService : Service() {
 
         try { factory?.dispose() } catch (_: Exception) {}
         factory = null
-        factoryInitialized = false
+        globalFactoryInitialized = false
 
         try { eglBase?.release() } catch (_: Exception) {}
         eglBase = null
 
-        try {
-            mainHandler.post {
-                try { renderer?.release() } catch (_: Exception) {}
-                renderer = null
-            }
-        } catch (_: Exception) {}
+        try { renderer?.release() } catch (_: Exception) {}
+        renderer = null
 
         try { executor.shutdownNow() } catch (_: Exception) {}
 

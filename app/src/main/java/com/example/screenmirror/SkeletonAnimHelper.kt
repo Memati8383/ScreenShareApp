@@ -12,7 +12,7 @@ import com.airbnb.lottie.LottieDrawable
 class SkeletonAnimHelper {
 
     private var animatorSet: AnimatorSet? = null
-    private val animatedViews = mutableListOf<View>()
+    private val animatedViews = java.util.concurrent.CopyOnWriteArrayList<View>()
 
     var container: View? = null
         private set

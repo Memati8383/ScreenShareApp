@@ -232,4 +232,22 @@
     <!-- Delete All History -->
     <string name="recent_delete_all_msg">Are you sure you want to delete all room history?</string>
     <string name="recent_cleared">History cleared</string>
+
+    <!-- Error Types -->
+    <string name="error_webrtc_init">WebRTC initialization error</string>
+    <string name="error_sdp_negotiation">SDP negotiation error</string>
+    <string name="error_ice_connection">ICE connection error</string>
+    <string name="error_signaling_connection">Signaling connection error</string>
+    <string name="error_signaling_timeout">Signaling timeout</string>
+    <string name="error_screen_capture">Screen capture error</string>
+    <string name="error_recording">Recording error</string>
+    <string name="error_permission_denied">Permission denied</string>
+    <string name="error_surface_not_ready">Surface not ready yet</string>
+    <string name="error_peer_connection_null">Peer connection could not be established</string>
+    <string name="error_unknown">Unknown error</string>
+
+    <!-- Connection Quality -->
+    <string name="quality_good">GOOD</string>
+    <string name="quality_medium">MEDIUM</string>
+    <string name="quality_bad">BAD</string>
 </resources>

@@ -51,15 +51,17 @@ class SplashActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             delay(2200)
-            HapticHelper.lightTap(this@SplashActivity)
-            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
-            if (android.os.Build.VERSION.SDK_INT >= 34) {
-                overrideActivityTransition(android.app.Activity.OVERRIDE_TRANSITION_OPEN, R.anim.fade_in, R.anim.fade_out)
-            } else {
-                @Suppress("DEPRECATION")
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            if (!isFinishing && !isDestroyed) {
+                HapticHelper.lightTap(this@SplashActivity)
+                startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    overrideActivityTransition(android.app.Activity.OVERRIDE_TRANSITION_OPEN, R.anim.fade_in, R.anim.fade_out)
+                } else {
+                    @Suppress("DEPRECATION")
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+                }
+                finish()
             }
-            finish()
         }
     }
 }

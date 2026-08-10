@@ -1,9 +1,12 @@
 package com.example.screenmirror.model
 
-enum class ConnectionQuality {
-    GOOD,
-    MEDIUM,
-    BAD;
+import androidx.annotation.StringRes
+import com.example.screenmirror.R
+
+enum class ConnectionQuality(@StringRes val labelRes: Int) {
+    GOOD(R.string.quality_good),
+    MEDIUM(R.string.quality_medium),
+    BAD(R.string.quality_bad);
 
     val label: String
         get() = when (this) {

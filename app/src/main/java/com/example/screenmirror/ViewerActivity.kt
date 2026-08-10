@@ -98,7 +98,6 @@ class ViewerActivity : AppCompatActivity() {
         window.navigationBarColor = android.graphics.Color.TRANSPARENT
 
         NotificationHelper.createViewerChannel(this)
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         initSkeleton()
 
         tvStats = findViewById(R.id.tvStats)
@@ -229,6 +228,9 @@ class ViewerActivity : AppCompatActivity() {
             } catch (_: Exception) {}
             topBar.visibility = View.GONE
             bottomBar.visibility = View.GONE
+            notificationOverlay.setOnClickListener {
+                hideNotification()
+            }
         }
     }
 
@@ -255,6 +257,7 @@ class ViewerActivity : AppCompatActivity() {
                         tvStats.text = getString(R.string.state_live_received)
                         hideSkeleton()
                         waitingOverlay.visibility = View.GONE
+                        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                         showBars()
                     }
                     is ServiceEvent.OfferSent -> {
@@ -275,7 +278,12 @@ class ViewerActivity : AppCompatActivity() {
                         )
                         lifecycleScope.launch {
                             delay(3000)
-                            cleanupAndFinish()
+                            if (!isDisconnecting && service != null) {
+                                hideNotification()
+                                showSkeleton(getString(R.string.state_reconnecting, 1))
+                            } else {
+                                cleanupAndFinish()
+                            }
                         }
                     }
                     is ServiceEvent.ViewerCountChanged -> {
@@ -403,7 +411,6 @@ class ViewerActivity : AppCompatActivity() {
             try { unbindService(serviceConnection) } catch (_: Exception) {}
             isBound = false
         }
-        stopService(Intent(this, ScreenShareService::class.java))
         finish()
     }
 

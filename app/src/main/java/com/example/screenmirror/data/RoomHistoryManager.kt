@@ -9,37 +9,47 @@ class RoomHistoryManager(context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences("room_history", Context.MODE_PRIVATE)
     private val gson = Gson()
+    @Volatile private var cachedRooms: List<RoomHistory>? = null
 
-    fun saveRoom(room: RoomHistory) {
-        val rooms = getAll().toMutableList()
-        rooms.add(0, room)
-        if (rooms.size > 50) {
-            rooms.removeAt(rooms.lastIndex)
-        }
-        prefs.edit().putString("rooms", gson.toJson(rooms)).apply()
-    }
-
-    fun getAll(): List<RoomHistory> {
+    private fun getCache(): List<RoomHistory> {
+        cachedRooms?.let { return it }
         val json = prefs.getString("rooms", "[]")
         val type = object : TypeToken<List<RoomHistory>>() {}.type
-        return try {
+        val rooms: List<RoomHistory> = try {
             gson.fromJson(json, type) ?: emptyList()
         } catch (e: Exception) {
             emptyList()
         }
+        cachedRooms = rooms
+        return rooms
     }
 
-    fun deleteRoom(roomId: Long) {
-        val rooms = getAll().toMutableList()
-        rooms.removeAll { it.id == roomId }
+    private fun saveToPrefs(rooms: List<RoomHistory>) {
+        cachedRooms = rooms
         prefs.edit().putString("rooms", gson.toJson(rooms)).apply()
     }
 
+    fun saveRoom(room: RoomHistory) {
+        val rooms = getCache().toMutableList()
+        rooms.add(0, room)
+        if (rooms.size > 50) {
+            rooms.removeAt(rooms.lastIndex)
+        }
+        saveToPrefs(rooms)
+    }
+
+    fun getAll(): List<RoomHistory> = getCache()
+
+    fun deleteRoom(roomId: Long) {
+        val rooms = getCache().toMutableList()
+        rooms.removeAll { it.id == roomId }
+        saveToPrefs(rooms)
+    }
+
     fun deleteAll() {
+        cachedRooms = emptyList()
         prefs.edit().remove("rooms").apply()
     }
 
-    fun getCount(): Int {
-        return getAll().size
-    }
+    fun getCount(): Int = getCache().size
 }

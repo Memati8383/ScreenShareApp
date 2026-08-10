@@ -1,17 +1,20 @@
 package com.example.screenmirror.model
 
-enum class ErrorType {
-    WEBRTC_INIT,
-    SDP_NEGOTIATION,
-    ICE_CONNECTION,
-    SIGNALING_CONNECTION,
-    SIGNALING_TIMEOUT,
-    SCREEN_CAPTURE,
-    RECORDING,
-    PERMISSION_DENIED,
-    SURFACE_NOT_READY,
-    PEER_CONNECTION_NULL,
-    UNKNOWN;
+import androidx.annotation.StringRes
+import com.example.screenmirror.R
+
+enum class ErrorType(@StringRes val messageRes: Int) {
+    WEBRTC_INIT(R.string.error_webrtc_init),
+    SDP_NEGOTIATION(R.string.error_sdp_negotiation),
+    ICE_CONNECTION(R.string.error_ice_connection),
+    SIGNALING_CONNECTION(R.string.error_signaling_connection),
+    SIGNALING_TIMEOUT(R.string.error_signaling_timeout),
+    SCREEN_CAPTURE(R.string.error_screen_capture),
+    RECORDING(R.string.error_recording),
+    PERMISSION_DENIED(R.string.error_permission_denied),
+    SURFACE_NOT_READY(R.string.error_surface_not_ready),
+    PEER_CONNECTION_NULL(R.string.error_peer_connection_null),
+    UNKNOWN(R.string.error_unknown);
 
     val displayMessage: String
         get() = when (this) {

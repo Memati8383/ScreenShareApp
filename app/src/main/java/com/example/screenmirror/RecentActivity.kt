@@ -66,7 +66,7 @@ class RecentActivity : AppCompatActivity() {
             ): Boolean = false
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
+                val position = viewHolder.layoutPosition
                 val room = adapter.getItemAt(position)
                 deleteRoom(room)
             }

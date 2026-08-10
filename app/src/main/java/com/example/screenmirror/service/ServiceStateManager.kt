@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class ServiceStateManager {
 
-    private val _event = MutableSharedFlow<ServiceEvent>(extraBufferCapacity = 64)
+    private val _event = MutableSharedFlow<ServiceEvent>(extraBufferCapacity = 128)
     val event: SharedFlow<ServiceEvent> = _event.asSharedFlow()
 
     private val _state = MutableStateFlow<ServiceState>(ServiceState.Idle)

@@ -29,14 +29,14 @@ object ScreenshotHelper {
             val scale = MAX_SCREENSHOT_WIDTH.toFloat() / width
             val scaledWidth = MAX_SCREENSHOT_WIDTH
             val scaledHeight = (height * scale).toInt()
-            val raw = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+            val raw = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(raw)
             screenView.draw(canvas)
             Bitmap.createScaledBitmap(raw, scaledWidth, scaledHeight, true).also {
                 if (it !== raw) raw.recycle()
             }
         } else {
-            Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565).also { bmp ->
+            Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).also { bmp ->
                 Canvas(bmp).also { screenView.draw(it) }
             }
         }

@@ -65,6 +65,7 @@ class SenderActivity : AppCompatActivity() {
     private var isFrozen = false
     private var isDisconnecting = false
     private var startTime = 0L
+    private var recordStartTime = 0L
     private var roomCode = ""
 
     private lateinit var skeletonHelper: SkeletonAnimHelper
@@ -132,6 +133,13 @@ class SenderActivity : AppCompatActivity() {
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             if (result.resultCode == RESULT_OK && result.data != null) {
+                val projectionManager = getSystemService(MEDIA_PROJECTION_SERVICE) as android.media.projection.MediaProjectionManager
+                val projection = projectionManager.getMediaProjection(result.resultCode, result.data!!)
+                if (projection == null) {
+                    Toast.makeText(this, getString(R.string.state_screen_permission_error), Toast.LENGTH_SHORT).show()
+                    return@registerForActivityResult
+                }
+                projection.stop()
                 val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
                     action = "com.example.screenmirror.START_RECORDING"
                     putExtra("resultCode", result.resultCode)
@@ -476,7 +484,8 @@ class SenderActivity : AppCompatActivity() {
             while (isActive) {
                 if (!AppSettings.isQualityStatsEnabled(this@SenderActivity)) {
                     tvConnectionQuality.visibility = View.GONE
-                    delay(2000)
+                    ivConnectionDot.visibility = View.GONE
+                    delay(30000)
                     continue
                 }
                 delay(2000)
@@ -534,10 +543,10 @@ class SenderActivity : AppCompatActivity() {
     }
 
     private fun startRecordTimer() {
-        startTime = System.currentTimeMillis()
+        recordStartTime = System.currentTimeMillis()
         lifecycleScope.launch {
             while (isActive && isRecording) {
-                val elapsed = System.currentTimeMillis() - startTime
+                val elapsed = System.currentTimeMillis() - recordStartTime
                 val mins = elapsed / 60000
                 val secs = (elapsed % 60000) / 1000
                 tvTimer.text = String.format("%02d:%02d", mins, secs)

@@ -244,4 +244,22 @@
     <!-- Tüm Oda Geçmişi Silme -->
     <string name="recent_delete_all_msg">Tüm oda geçmişini silmek istediğinize emin misiniz?</string>
     <string name="recent_cleared">Geçmiş temizlendi</string>
+
+    <!-- Hata Türleri -->
+    <string name="error_webrtc_init">WebRTC başlatma hatası</string>
+    <string name="error_sdp_negotiation">SDP müzakere hatası</string>
+    <string name="error_ice_connection">ICE baglanti hatasi</string>
+    <string name="error_signaling_connection">Sinyalleme baglanti hatasi</string>
+    <string name="error_signaling_timeout">Sinyalleme zaman asimi</string>
+    <string name="error_screen_capture">Ekran yakalama hatasi</string>
+    <string name="error_recording">Kayit hatasi</string>
+    <string name="error_permission_denied">Izin reddedildi</string>
+    <string name="error_surface_not_ready">Yuzey henuz hazir degil</string>
+    <string name="error_peer_connection_null">Es baglantisi kurulamadi</string>
+    <string name="error_unknown">Bilinmeyen hata</string>
+
+    <!-- Baglanti Kalitesi -->
+    <string name="quality_good">IYI</string>
+    <string name="quality_medium">ORTA</string>
+    <string name="quality_bad">KOTU</string>
 </resources>

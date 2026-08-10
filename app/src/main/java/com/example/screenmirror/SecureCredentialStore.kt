@@ -3,6 +3,7 @@ package com.example.screenmirror
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import android.util.Log
 import android.util.Base64
 import java.security.KeyStore
 import javax.crypto.Cipher
@@ -64,6 +65,7 @@ object SecureCredentialStore {
             val decrypted = cipher.doFinal(Base64.decode(encrypted, Base64.NO_WRAP))
             String(decrypted, Charsets.UTF_8)
         } catch (e: Exception) {
+            Log.e("SecureCredentialStore", "Decryption hatasi: ${e.message}")
             defaultValue
         }
     }
