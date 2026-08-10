@@ -75,33 +75,46 @@
                     android:text="@string/profile_create_desc"
                     android:textColor="#99FFFFFF"
                     android:textSize="14sp"
-                    android:layout_marginBottom="32dp" />
+                    android:layout_marginBottom="24dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginBottom="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/profile_device_label"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="11sp"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="6dp" />
+
+                    <TextView
+                        android:id="@+id/deviceName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
                 <EditText
-                    android:id="@+id/nameInput"
+                    android:id="@+id/nicknameInput"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:background="@drawable/bg_input"
-                    android:hint="@string/profile_name_hint"
+                    android:hint="@string/profile_nickname_hint"
                     android:textColorHint="#4DFFFFFF"
                     android:textColor="@android:color/white"
                     android:textSize="15sp"
                     android:paddingHorizontal="16dp"
                     android:inputType="textPersonName"
-                    android:singleLine="true"
-                    android:layout_marginBottom="12dp" />
-
-                <EditText
-                    android:id="@+id/emailInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:background="@drawable/bg_input"
-                    android:hint="@string/profile_email_hint"
-                    android:textColorHint="#4DFFFFFF"
-                    android:textColor="@android:color/white"
-                    android:textSize="15sp"
-                    android:paddingHorizontal="16dp"
-                    android:inputType="textEmailAddress"
                     android:singleLine="true"
                     android:layout_marginBottom="24dp" />
 
@@ -135,6 +148,7 @@
                 android:paddingHorizontal="24dp"
                 android:paddingBottom="32dp">
 
+                <!-- Avatar + İsim + Cihaz -->
                 <LinearLayout
                     android:id="@+id/profileHeader"
                     android:layout_width="match_parent"
@@ -144,33 +158,112 @@
                     android:padding="24dp"
                     android:gravity="center"
                     android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="8dp">
 
                     <FrameLayout
+                        android:id="@+id/avatarContainer"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
-                        android:layout_marginBottom="16dp">
-                        <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_avatar_glass" />
-                        <ImageView android:layout_width="60dp" android:layout_height="60dp" android:layout_gravity="center" android:src="@drawable/ic_person" />
+                        android:layout_marginBottom="16dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <View
+                            android:id="@+id/avatarBg"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_avatar_color1" />
+
+                        <TextView
+                            android:id="@+id/avatarLetter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:textColor="@android:color/white"
+                            android:textSize="36sp"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/profilePhoto"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:visibility="gone"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circle" />
                     </FrameLayout>
 
                     <TextView
-                        android:id="@+id/profileName"
+                        android:id="@+id/profileDevice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/profile_user"
-                        android:textColor="@android:color/white"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/profileEmail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="email@email.com"
                         android:textColor="#99FFFFFF"
                         android:textSize="13sp"
-                        android:layout_marginTop="4dp" />
+                        android:layout_marginBottom="4dp" />
+
+                    <LinearLayout
+                        android:id="@+id/nicknameDisplay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="@drawable/bg_nickname_edit"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="8dp">
+
+                        <TextView
+                            android:id="@+id/profileName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_user"
+                            android:textColor="@android:color/white"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_edit"
+                            android:layout_marginStart="8dp"
+                            android:alpha="0.5" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/nicknameEditContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:visibility="gone"
+                        android:layout_marginTop="8dp">
+
+                        <EditText
+                            android:id="@+id/nicknameEditInput"
+                            android:layout_width="0dp"
+                            android:layout_height="42dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_input"
+                            android:textColor="@android:color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:paddingHorizontal="14dp"
+                            android:inputType="textPersonName"
+                            android:singleLine="true"
+                            android:imeOptions="actionDone" />
+
+                        <TextView
+                            android:id="@+id/nicknameDoneBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="42dp"
+                            android:gravity="center"
+                            android:text="@string/profile_nickname_done"
+                            android:textColor="@color/accent"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:paddingHorizontal="12dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+                    </LinearLayout>
 
                     <View
                         android:layout_width="60dp"
@@ -179,40 +272,361 @@
                         android:layout_marginTop="16dp" />
                 </LinearLayout>
 
+                <!-- Karşılama Mesajı -->
+                <TextView
+                    android:id="@+id/greetingText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="italic"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone" />
+
+                <!-- İstatistikler (2x2 grid) -->
                 <LinearLayout
                     android:id="@+id/statsCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:layout_marginBottom="16dp">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_glass_card"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:gravity="center"
-                        android:layout_marginEnd="8dp">
-                        <TextView android:id="@+id/statRooms" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#00B4FF" android:textSize="28sp" android:textStyle="bold" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"                          android:text="@string/profile_sessions" android:textColor="#99FFFFFF" android:textSize="11sp" android:layout_marginTop="4dp" />
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_glass_card"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:gravity="center"
+                            android:layout_marginEnd="4dp">
+                            <TextView android:id="@+id/statRooms" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#00B4FF" android:textSize="28sp" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/profile_sessions" android:textColor="#99FFFFFF" android:textSize="11sp" android:layout_marginTop="4dp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_glass_card"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:gravity="center"
+                            android:layout_marginStart="4dp">
+                            <TextView android:id="@+id/statHours" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#00B4FF" android:textSize="28sp" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/profile_total_time" android:textColor="#99FFFFFF" android:textSize="11sp" android:layout_marginTop="4dp" />
+                        </LinearLayout>
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_glass_card"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:gravity="center"
-                        android:layout_marginStart="8dp">
-                        <TextView android:id="@+id/statHours" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#00B4FF" android:textSize="28sp" android:textStyle="bold" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"                          android:text="@string/profile_total_time" android:textColor="#99FFFFFF" android:textSize="11sp" android:layout_marginTop="4dp" />
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_glass_card"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:gravity="center"
+                            android:layout_marginEnd="4dp">
+                            <TextView android:id="@+id/statViewHours" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#00E676" android:textSize="28sp" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/profile_stat_viewing" android:textColor="#99FFFFFF" android:textSize="11sp" android:layout_marginTop="4dp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_glass_card"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:gravity="center"
+                            android:layout_marginStart="4dp">
+                            <TextView android:id="@+id/statSuccess" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0%" android:textColor="#FFD600" android:textSize="28sp" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/profile_stat_success" android:textColor="#99FFFFFF" android:textSize="11sp" android:layout_marginTop="4dp" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- Rozetler -->
+                <LinearLayout
+                    android:id="@+id/badgesCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/badges_title"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="11sp"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout
+                        android:id="@+id/badgesContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:scrollbars="horizontal"
+                        android:overScrollMode="never" />
+                </LinearLayout>
+
+                <!-- Haftalık Aktivite -->
+                <LinearLayout
+                    android:id="@+id/weeklyCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/activity_title"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="11sp"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.example.screenmirror.WeeklyActivityView
+                        android:id="@+id/weeklyActivityView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/activityTotalText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="12sp"
+                        android:layout_marginTop="8dp"
+                        android:layout_gravity="end" />
+                </LinearLayout>
+
+                <!-- Bağlantı Zaman Çizelgesi -->
+                <LinearLayout
+                    android:id="@+id/timelineCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/timeline_title"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="11sp"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.example.screenmirror.ConnectionTimelineView
+                        android:id="@+id/connectionTimelineView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginTop="8dp">
+
+                        <View
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:background="@drawable/bg_circle_accent" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/timeline_legend_host"
+                            android:textColor="#99FFFFFF"
+                            android:textSize="11sp"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginEnd="16dp" />
+
+                        <View
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:background="@drawable/bg_circle_green" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/timeline_legend_viewer"
+                            android:textColor="#99FFFFFF"
+                            android:textSize="11sp"
+                            android:layout_marginStart="6dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Son Bağlantı + En Sık Oda -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/profile_stat_last_active"
+                            android:textColor="#99FFFFFF"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/statLastActive"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#1AFFFFFF" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/profile_stat_top_room"
+                            android:textColor="#99FFFFFF"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/statTopRoom"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Hızlı Başlangıç -->
+                <LinearLayout
+                    android:id="@+id/quickStartCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_quick_start"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/quick_start_title"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="11sp"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="12dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/quick_start_resolution" android:textColor="@android:color/white" android:textSize="14sp" />
+                        <Spinner android:id="@+id/quickResSpinner" android:layout_width="120dp" android:layout_height="40dp" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="12dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/quick_start_fps" android:textColor="@android:color/white" android:textSize="14sp" />
+                        <Spinner android:id="@+id/quickFpsSpinner" android:layout_width="120dp" android:layout_height="40dp" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/quick_start_auto_reconnect" android:textColor="@android:color/white" android:textSize="14sp" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/quick_start_auto_reconnect_desc" android:textColor="#66FFFFFF" android:textSize="11sp" />
+                        </LinearLayout>
+                        <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/quickAutoReconnect" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Cihaz Bilgisi -->
+                <LinearLayout
+                    android:id="@+id/deviceInfoCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/profile_device_info"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="11sp"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/profile_device_android" android:textColor="#99FFFFFF" android:textSize="13sp" />
+                        <TextView android:id="@+id/infoAndroid" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@android:color/white" android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/profile_device_resolution" android:textColor="#99FFFFFF" android:textSize="13sp" />
+                        <TextView android:id="@+id/infoResolution" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@android:color/white" android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/profile_device_network" android:textColor="#99FFFFFF" android:textSize="13sp" />
+                        <TextView android:id="@+id/infoNetwork" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@android:color/white" android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/profile_device_battery" android:textColor="#99FFFFFF" android:textSize="13sp" />
+                        <TextView android:id="@+id/infoBattery" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@android:color/white" android:textSize="13sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Menü -->
                 <LinearLayout
                     android:id="@+id/menuCard"
                     android:layout_width="match_parent"
@@ -244,6 +658,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- Verileri Temizle -->
                 <LinearLayout
                     android:id="@+id/btnLogout"
                     android:layout_width="match_parent"
@@ -253,7 +668,7 @@
                     android:gravity="center"
                     android:clickable="true"
                     android:focusable="true"
-                    android:layout_marginTop="16dp">
+                    android:layout_marginTop="12dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/profile_delete" android:textColor="@color/status_bad" android:textSize="15sp" android:textStyle="bold" />
                 </LinearLayout>
 

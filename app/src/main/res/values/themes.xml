@@ -26,6 +26,10 @@
         <item name="android:windowLightNavigationBar">false</item>
     </style>
 
+    <style name="ShapeAppearanceOverlay.Circle" parent="">
+        <item name="cornerSize">50%</item>
+    </style>
+
     <style name="Theme.ScreenShare.Dialog" parent="Theme.MaterialComponents.Dialog.Alert">
         <item name="android:background">@color/dark_bg_card</item>
         <item name="android:textColorPrimary">@color/dark_text_primary</item>

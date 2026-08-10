@@ -56,10 +56,10 @@
 
     <!-- Profile -->
     <string name="profile_title">Profile</string>
-    <string name="profile_create">Create Profile</string>
-    <string name="profile_create_desc">Enter your details to get started</string>
-    <string name="profile_name_hint">Your Name</string>
-    <string name="profile_email_hint">Your email address</string>
+    <string name="profile_create">Create Nickname</string>
+    <string name="profile_create_desc">Your device was detected automatically. Choose a nickname.</string>
+    <string name="profile_device_label">DEVICE</string>
+    <string name="profile_nickname_hint">Your nickname</string>
     <string name="profile_save">SAVE</string>
     <string name="profile_user">User</string>
     <string name="profile_sessions">Sessions</string>
@@ -67,12 +67,90 @@
     <string name="profile_menu_settings">Settings</string>
     <string name="profile_menu_help">Help</string>
     <string name="profile_menu_about">About</string>
-    <string name="profile_delete">Delete Profile</string>
+    <string name="profile_delete">Clear Data</string>
     <string name="profile_version">Screen Mirror v1.0.0</string>
-    <string name="profile_error_name">Name is required</string>
+    <string name="profile_error_nickname">Nickname is required</string>
     <string name="profile_saved">Profile saved</string>
     <string name="profile_updated">Profile updated</string>
     <string name="profile_deleted">Profile deleted</string>
+    <string name="profile_nickname_edit">Tap to edit</string>
+    <string name="profile_nickname_done">Done</string>
+    <string name="profile_avatar_title">Choose Avatar</string>
+    <string name="profile_stat_viewing">Watch Time</string>
+    <string name="profile_stat_last_active">Last Active</string>
+    <string name="profile_stat_top_room">Top Room</string>
+    <string name="profile_stat_success">Success</string>
+    <string name="profile_stat_hours_format">%d hrs</string>
+    <string name="profile_stat_never">Never</string>
+    <string name="profile_device_info">Device Info</string>
+    <string name="profile_device_android">Android</string>
+    <string name="profile_device_resolution">Resolution</string>
+    <string name="profile_device_network">Network</string>
+    <string name="profile_device_battery">Battery</string>
+    <string name="profile_share_title">Share Profile</string>
+    <string name="profile_share_text" formatted="false">%s • %s • %d sessions</string>
+    <string name="profile_network_wifi">WiFi</string>
+    <string name="profile_network_mobile">Mobile</string>
+    <string name="profile_network_none">None</string>
+    <string name="profile_battery_format">%%%d</string>
+
+    <!-- Greeting -->
+    <string name="greeting_morning">Good morning, %s</string>
+    <string name="greeting_afternoon">Good afternoon, %s</string>
+    <string name="greeting_evening">Good evening, %s</string>
+    <string name="greeting_night">Good night, %s</string>
+
+    <!-- Badges -->
+    <string name="badges_title">BADGES</string>
+    <string name="badge_first_session">First Step</string>
+    <string name="badge_first_session_desc">Completed your first session</string>
+    <string name="badge_broadcaster_10">Broadcaster</string>
+    <string name="badge_broadcaster_10_desc">Broadcasted 10 rooms</string>
+    <string name="badge_viewer_20">Observer</string>
+    <string name="badge_viewer_20_desc">Watched 20 rooms</string>
+    <string name="badge_night_owl">Night Owl</string>
+    <string name="badge_night_owl_desc">Connected after midnight</string>
+    <string name="badge_week_streak">Weekly Master</string>
+    <string name="badge_week_streak_desc">Used 7 days in a row</string>
+    <string name="badge_master_50">Master Broadcaster</string>
+    <string name="badge_master_50_desc">Broadcasted 50 rooms</string>
+    <string name="badge_hours_100">Time Master</string>
+    <string name="badge_hours_100_desc">Surpassed 100 hours</string>
+    <string name="badge_unlocked">Unlocked!</string>
+    <string name="badge_locked">Locked</string>
+
+    <!-- Weekly Activity -->
+    <string name="activity_title">Weekly Activity</string>
+    <string name="activity_min_format">%d min</string>
+    <string name="activity_total_format">Total: %d minutes</string>
+    <string name="activity_no_data">No data yet</string>
+
+    <!-- Quick Start (Room Preferences) -->
+    <string name="quick_start_title">Quick Start</string>
+    <string name="quick_start_resolution">Default Resolution</string>
+    <string name="quick_start_fps">Default FPS</string>
+    <string name="quick_start_auto_reconnect">Auto Reconnect</string>
+    <string name="quick_start_auto_reconnect_desc">Automatically retry when connection drops</string>
+    <string name="quick_start_saved">Preferences saved</string>
+
+    <!-- Connection Timeline -->
+    <string name="timeline_title">Connection Map</string>
+    <string name="timeline_legend_host">Host</string>
+    <string name="timeline_legend_viewer">Viewer</string>
+    <string name="timeline_no_data">No connections yet</string>
+    <string name="timeline_detail_format">%s • %d min • %s</string>
+    <string name="timeline_last_30">Last 30 Days</string>
+
+    <!-- Progress Bars -->
+    <string name="progress_title">Achievement Progress</string>
+    <string name="progress_format">%d/%d</string>
+
+    <!-- Profile Photo -->
+    <string name="profile_photo_title">Choose Photo</string>
+    <string name="profile_photo_gallery">Choose from Gallery</string>
+    <string name="profile_photo_camera">Take Photo</string>
+    <string name="profile_photo_remove">Remove Photo</string>
+    <string name="profile_photo_cropped">Photo updated</string>
 
     <!-- Recent Rooms -->
     <string name="recent_empty">No room history yet</string>

@@ -63,10 +63,10 @@
 
     <!-- Profil -->
     <string name="profile_title">Profil</string>
-    <string name="profile_create">Profil Oluştur</string>
-    <string name="profile_create_desc">Kişisel bilgilerinizi girerek başlayın</string>
-    <string name="profile_name_hint">Adınız Soyadınız</string>
-    <string name="profile_email_hint">E-posta adresiniz</string>
+    <string name="profile_create">Takma Ad Oluştur</string>
+    <string name="profile_create_desc">Cihazınız otomatik olarak algılandı. Bir takma ad seçin.</string>
+    <string name="profile_device_label">CİHAZ</string>
+    <string name="profile_nickname_hint">Takma adınız</string>
     <string name="profile_save">KAYDET</string>
     <string name="profile_user">Kullanıcı</string>
     <string name="profile_sessions">Oturum</string>
@@ -74,12 +74,90 @@
     <string name="profile_menu_settings">Ayarlar</string>
     <string name="profile_menu_help">Yardım</string>
     <string name="profile_menu_about">Hakkında</string>
-    <string name="profile_delete">Profili Sil</string>
+    <string name="profile_delete">Verileri Temizle</string>
     <string name="profile_version">Screen Mirror v1.0.0</string>
-    <string name="profile_error_name">İsim gerekli</string>
+    <string name="profile_error_nickname">Takma ad gerekli</string>
     <string name="profile_saved">Profil kaydedildi</string>
     <string name="profile_updated">Profil güncellendi</string>
     <string name="profile_deleted">Profil silindi</string>
+    <string name="profile_nickname_edit">Düzenlemek için dokunun</string>
+    <string name="profile_nickname_done">Bitti</string>
+    <string name="profile_avatar_title">Avatar Seç</string>
+    <string name="profile_stat_viewing">İzlenen Süre</string>
+    <string name="profile_stat_last_active">Son Bağlantı</string>
+    <string name="profile_stat_top_room">En Sık Oda</string>
+    <string name="profile_stat_success">Başarı</string>
+    <string name="profile_stat_hours_format">%d saat</string>
+    <string name="profile_stat_never">Hiç</string>
+    <string name="profile_device_info">Cihaz Bilgisi</string>
+    <string name="profile_device_android">Android</string>
+    <string name="profile_device_resolution">Çözünürlük</string>
+    <string name="profile_device_network">Ağ</string>
+    <string name="profile_device_battery">Pil</string>
+    <string name="profile_share_title">Profili Paylaş</string>
+    <string name="profile_share_text" formatted="false">%s • %s • %d oturum</string>
+    <string name="profile_network_wifi">WiFi</string>
+    <string name="profile_network_mobile">Mobil</string>
+    <string name="profile_network_none">Yok</string>
+    <string name="profile_battery_format">%%%d</string>
+
+    <!-- Karşılama -->
+    <string name="greeting_morning">Günaydın, %s</string>
+    <string name="greeting_afternoon">İyi günler, %s</string>
+    <string name="greeting_evening">İyi akşamlar, %s</string>
+    <string name="greeting_night">İyi geceler, %s</string>
+
+    <!-- Rozetler -->
+    <string name="badges_title">Rozetler</string>
+    <string name="badge_first_session">İlk Adım</string>
+    <string name="badge_first_session_desc">İlk oturumunu tamamladın</string>
+    <string name="badge_broadcaster_10">Yayıncı</string>
+    <string name="badge_broadcaster_10_desc">10 oda yayınladın</string>
+    <string name="badge_viewer_20">Gözlemci</string>
+    <string name="badge_viewer_20_desc">20 oda izledin</string>
+    <string name="badge_night_owl">Gece Kuşu</string>
+    <string name="badge_night_owl_desc">Gece yarısından sonra bağlandın</string>
+    <string name="badge_week_streak">Haftanın Ustası</string>
+    <string name="badge_week_streak_desc">7 gün üst üste kullandın</string>
+    <string name="badge_master_50">Usta Yayıncı</string>
+    <string name="badge_master_50_desc">50 oda yayınladın</string>
+    <string name="badge_hours_100">Zaman ustası</string>
+    <string name="badge_hours_100_desc">100 saati aştın</string>
+    <string name="badge_unlocked">Açıldı!</string>
+    <string name="badge_locked">Kilitli</string>
+
+    <!-- Haftalık Aktivite -->
+    <string name="activity_title">Haftalık Aktivite</string>
+    <string name="activity_min_format">%d dk</string>
+    <string name="activity_total_format">Toplam: %d dakika</string>
+    <string name="activity_no_data">Henüz veri yok</string>
+
+    <!-- Hızlı Başlangıç (Oda Tercihleri) -->
+    <string name="quick_start_title">Hızlı Başlangıç</string>
+    <string name="quick_start_resolution">Varsayılan Çözünürlük</string>
+    <string name="quick_start_fps">Varsayılan FPS</string>
+    <string name="quick_start_auto_reconnect">Otomatik Yeniden Bağlan</string>
+    <string name="quick_start_auto_reconnect_desc">Bağlantı koptuğunda otomatik olarak yeniden dene</string>
+    <string name="quick_start_saved">Tercihler kaydedildi</string>
+
+    <!-- Bağlantı Haritası -->
+    <string name="timeline_title">Bağlantı Haritası</string>
+    <string name="timeline_legend_host">Yayıncı</string>
+    <string name="timeline_legend_viewer">İzleyici</string>
+    <string name="timeline_no_data">Henüz bağlantı yok</string>
+    <string name="timeline_detail_format">%s • %d dk • %s</string>
+    <string name="timeline_last_30">Son 30 Gün</string>
+
+    <!-- İlerleme Çubukları -->
+    <string name="progress_title">Başarı İlerlemesi</string>
+    <string name="progress_format">%d/%d</string>
+
+    <!-- Profil Fotoğrafı -->
+    <string name="profile_photo_title">Fotoğraf Seç</string>
+    <string name="profile_photo_gallery">Galeriden Seç</string>
+    <string name="profile_photo_camera">Fotoğraf Çek</string>
+    <string name="profile_photo_remove">Fotoğrafı Kaldır</string>
+    <string name="profile_photo_cropped">Fotoğraf güncellendi</string>
 
     <!-- Son Odalar -->
     <string name="recent_empty">Henüz oda geçmişi yok</string>
