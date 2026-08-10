@@ -4,10 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieDrawable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -20,7 +21,7 @@ class SplashActivity : AppCompatActivity() {
         val icon = findViewById<ImageView>(R.id.splash_icon)
         val title = findViewById<TextView>(R.id.splash_title)
         val subtitle = findViewById<TextView>(R.id.splash_subtitle)
-        val progress = findViewById<ProgressBar>(R.id.splash_progress)
+        val lottie = findViewById<LottieAnimationView>(R.id.splash_lottie)
 
         val fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in).apply {
             duration = 600
@@ -41,12 +42,16 @@ class SplashActivity : AppCompatActivity() {
             subtitle.alpha = 1f
         }, 700)
 
-        progress.postDelayed({
-            progress.alpha = 1f
+        lottie.setAnimation("spinner.json")
+        lottie.repeatCount = LottieDrawable.INFINITE
+        lottie.playAnimation()
+        lottie.postDelayed({
+            lottie.alpha = 1f
         }, 900)
 
         lifecycleScope.launch {
             delay(2200)
+            HapticHelper.lightTap(this@SplashActivity)
             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
             if (android.os.Build.VERSION.SDK_INT >= 34) {
                 overrideActivityTransition(android.app.Activity.OVERRIDE_TRANSITION_OPEN, R.anim.fade_in, R.anim.fade_out)

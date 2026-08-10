@@ -25,6 +25,7 @@ class HelpActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.nav_help)
 
         toolbar.setNavigationOnClickListener {
+            HapticHelper.lightTap(this)
             finish()
         }
 
@@ -46,6 +47,7 @@ class HelpActivity : AppCompatActivity() {
             val arrow = findViewById<ImageView>(arrowId)
 
             header.setOnClickListener {
+                HapticHelper.lightTap(this)
                 if (expandedSection == content) {
                     collapseSection(content, arrow)
                     expandedSection = null

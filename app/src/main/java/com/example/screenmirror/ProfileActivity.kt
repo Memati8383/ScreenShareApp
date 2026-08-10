@@ -39,7 +39,10 @@ class ProfileActivity : AppCompatActivity() {
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.title = getString(R.string.profile_title)
 
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener {
+            HapticHelper.lightTap(this)
+            finish()
+        }
 
         profileView = findViewById(R.id.profileView)
         createForm = findViewById(R.id.createForm)
@@ -54,6 +57,7 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         saveBtn.setOnClickListener {
+            HapticHelper.mediumTap(this)
             val name = nameInput.text.toString().trim()
             val email = emailInput.text.toString().trim()
             if (name.isEmpty()) {
@@ -61,25 +65,30 @@ class ProfileActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             saveProfile(name, email)
+            HapticHelper.successTap(this)
             Toast.makeText(this, if (profileView.visibility == View.VISIBLE) getString(R.string.profile_updated) else getString(R.string.profile_saved), Toast.LENGTH_SHORT).show()
             showProfile()
         }
 
         findViewById<LinearLayout>(R.id.btnLogout).setOnClickListener {
+            HapticHelper.heavyTap(this)
             clearProfile()
             Toast.makeText(this, getString(R.string.profile_deleted), Toast.LENGTH_SHORT).show()
             showCreateForm()
         }
 
         findViewById<LinearLayout>(R.id.menuSettings).setOnClickListener {
+            HapticHelper.lightTap(this)
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
         findViewById<LinearLayout>(R.id.menuHelp).setOnClickListener {
+            HapticHelper.lightTap(this)
             startActivity(Intent(this, HelpActivity::class.java))
         }
 
         findViewById<LinearLayout>(R.id.menuAbout).setOnClickListener {
+            HapticHelper.lightTap(this)
             startActivity(Intent(this, AboutActivity::class.java))
         }
 

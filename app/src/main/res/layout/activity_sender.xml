@@ -13,76 +13,71 @@
     <!-- Skeleton loading overlay -->
     <include layout="@layout/include_skeleton_loading" />
 
-    <!-- Floating control panel -->
+    <!-- Top status bar - glass effect -->
     <LinearLayout
-        android:id="@+id/controlPanel"
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
-        android:orientation="vertical"
-        android:background="@drawable/bg_overlay_panel"
-        android:padding="16dp"
-        android:layout_margin="16dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_glass_panel"
+        android:elevation="4dp">
 
-        <!-- Header -->
+        <!-- Live indicator -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
             <View
                 android:layout_width="8dp"
                 android:layout_height="8dp"
-                android:background="@drawable/bg_circle_gradient" />
+                android:background="@drawable/bg_live_dot" />
 
             <TextView
                 android:id="@+id/tvSenderStatus"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginStart="8dp"
                 android:text="@string/status_live"
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="#FFFFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1" />
+        </LinearLayout>
+
+        <!-- Room info -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/tvSenderRoom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <!-- Stats + Viewer count row -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:src="@drawable/ic_signal" />
-
-            <TextView
-                android:id="@+id/tvSenderStats"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                android:text="@string/status_connecting"
-                android:textColor="@color/text_secondary"
+                android:textColor="#B3FFFFFF"
                 android:textSize="12sp" />
 
-            <!-- Viewer count -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="12dp"
+                android:layout_marginHorizontal="8dp"
+                android:background="#33FFFFFF" />
+
             <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:src="@drawable/ic_viewer" />
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_viewer"
+                android:alpha="0.5" />
 
             <TextView
                 android:id="@+id/tvViewerCount"
@@ -90,72 +85,77 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:text="0"
-                android:textColor="@color/text_primary"
+                android:textColor="#FFFFFFFF"
                 android:textSize="12sp"
                 android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvViewerLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="@string/sender_viewer_label"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp" />
-
-            <View
-                android:id="@+id/senderStatusDot"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:background="@drawable/bg_circle_gradient" />
         </LinearLayout>
+    </LinearLayout>
 
-        <!-- Connection Quality Stats -->
+    <!-- Bottom control panel - glass effect -->
+    <LinearLayout
+        android:id="@+id/controlPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:background="@drawable/bg_glass_panel_bottom"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="28dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="12dp"
+        android:elevation="8dp">
+
+        <!-- Status row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:visibility="gone"
-            android:id="@+id/connectionQualityRow">
+            android:gravity="center_vertical">
 
             <ImageView
                 android:id="@+id/ivConnectionDot"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:layout_marginEnd="4dp"
-                android:src="@drawable/bg_circle_gradient"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/bg_live_dot"
                 android:visibility="gone" />
 
             <TextView
-                android:id="@+id/tvConnectionQuality"
-                android:layout_width="match_parent"
+                android:id="@+id/tvSenderStats"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
+                android:layout_weight="1"
+                android:text="@string/status_connecting"
+                android:textColor="#B3FFFFFF"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvConnectionQuality"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#80FFFFFF"
                 android:textSize="11sp"
-                android:fontFamily="monospace" />
+                android:fontFamily="monospace"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textColor="#FFFF1744"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:visibility="gone" />
         </LinearLayout>
 
-        <!-- Timer row (visible when recording) -->
-        <TextView
-            android:id="@+id/tvTimer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:text="00:00"
-            android:textColor="@color/status_bad"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:fontFamily="monospace"
-            android:visibility="gone" />
-
-        <!-- Control buttons row 1: Screenshot & Record -->
+        <!-- Action buttons row 1 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             android:orientation="horizontal"
             android:gravity="center">
 
@@ -166,28 +166,26 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="12dp"
-                android:background="@drawable/bg_card"
+                android:paddingVertical="14dp"
+                android:background="@drawable/bg_glass_button"
                 android:clickable="true"
-                android:focusable="true">
+                android:focusable="true"
+                android:layout_marginEnd="6dp">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_camera" />
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_camera"
+                    android:tint="#FFFFFFFF" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="6dp"
                     android:text="@string/sender_screenshot"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#B3FFFFFF"
                     android:textSize="11sp" />
             </LinearLayout>
-
-            <View
-                android:layout_width="12dp"
-                android:layout_height="0dp" />
 
             <LinearLayout
                 android:id="@+id/btnRecord"
@@ -196,29 +194,31 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="12dp"
-                android:background="@drawable/bg_card"
+                android:paddingVertical="14dp"
+                android:background="@drawable/bg_glass_button"
                 android:clickable="true"
-                android:focusable="true">
+                android:focusable="true"
+                android:layout_marginStart="6dp">
 
                 <ImageView
                     android:id="@+id/ivRecord"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_record" />
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_record"
+                    android:tint="#FFFFFFFF" />
 
                 <TextView
                     android:id="@+id/tvRecord"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="6dp"
                     android:text="@string/sender_record"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#B3FFFFFF"
                     android:textSize="11sp" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Control buttons row 2: Freeze & Quality -->
+        <!-- Action buttons row 2 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -233,30 +233,28 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="12dp"
-                android:background="@drawable/bg_card"
+                android:paddingVertical="14dp"
+                android:background="@drawable/bg_glass_button"
                 android:clickable="true"
-                android:focusable="true">
+                android:focusable="true"
+                android:layout_marginEnd="6dp">
 
                 <ImageView
                     android:id="@+id/ivFreeze"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_frozen" />
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_frozen"
+                    android:tint="#FFFFFFFF" />
 
                 <TextView
                     android:id="@+id/tvFreeze"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="6dp"
                     android:text="@string/sender_freeze"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#B3FFFFFF"
                     android:textSize="11sp" />
             </LinearLayout>
-
-            <View
-                android:layout_width="12dp"
-                android:layout_height="0dp" />
 
             <LinearLayout
                 android:id="@+id/btnQuality"
@@ -265,36 +263,40 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="12dp"
-                android:background="@drawable/bg_card"
+                android:paddingVertical="14dp"
+                android:background="@drawable/bg_glass_button"
                 android:clickable="true"
-                android:focusable="true">
+                android:focusable="true"
+                android:layout_marginStart="6dp">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_settings" />
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_settings"
+                    android:tint="#FFFFFFFF" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="6dp"
                     android:text="@string/sender_quality"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#B3FFFFFF"
                     android:textSize="11sp" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Stop button -->
+        <!-- Stop button - glowing red glass -->
         <Button
             android:id="@+id/btnStop"
             android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_button_outline"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_glass_stop"
             android:text="@string/sender_stop_broadcast"
-            android:textColor="@color/status_bad"
+            android:textColor="#FFFFFFFF"
             android:textSize="14sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
             android:stateListAnimator="@null" />
     </LinearLayout>
 </FrameLayout>

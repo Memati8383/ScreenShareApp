@@ -47,6 +47,7 @@ class RecentActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.nav_recent)
 
         toolbar.setNavigationOnClickListener {
+            HapticHelper.lightTap(this)
             finish()
         }
 
@@ -96,6 +97,7 @@ class RecentActivity : AppCompatActivity() {
     }
 
     private fun showDeleteDialog(room: RoomHistory) {
+        HapticHelper.mediumTap(this)
         AlertDialog.Builder(this, R.style.Theme_ScreenShare_Dialog)
             .setTitle(getString(R.string.recent_delete_title))
             .setMessage(getString(R.string.recent_delete_msg, room.roomName))

@@ -6,6 +6,8 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.TextView
+import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieDrawable
 
 class SkeletonAnimHelper {
 
@@ -24,6 +26,8 @@ class SkeletonAnimHelper {
         private set
     var hintView: TextView? = null
         private set
+    var lottieView: LottieAnimationView? = null
+        private set
 
     fun init(
         container: View,
@@ -31,7 +35,8 @@ class SkeletonAnimHelper {
         title: View,
         subtitle: View,
         status: View,
-        hint: TextView
+        hint: TextView,
+        lottie: LottieAnimationView? = null
     ) {
         this.container = container
         this.iconView = icon
@@ -39,18 +44,51 @@ class SkeletonAnimHelper {
         this.subtitleView = subtitle
         this.statusView = status
         this.hintView = hint
+        this.lottieView = lottie
     }
 
     fun show(hint: String) {
         val c = container ?: return
         c.visibility = View.VISIBLE
         hintView?.text = hint
+
+        lottieView?.let { lottie ->
+            lottie.setAnimation("loading_hand.json")
+            lottie.repeatCount = LottieDrawable.INFINITE
+            lottie.playAnimation()
+        }
+
         startSkeletonAnimation(
             iconView ?: return,
             titleView ?: return,
             subtitleView ?: return,
             statusView ?: return
         )
+    }
+
+    fun showWithAnimation(hint: String, animationName: String) {
+        val c = container ?: return
+        c.visibility = View.VISIBLE
+        hintView?.text = hint
+
+        lottieView?.let { lottie ->
+            lottie.setAnimation(animationName)
+            lottie.repeatCount = if (animationName == "loading_hand.json" || animationName == "connecting.json") {
+                LottieDrawable.INFINITE
+            } else {
+                0
+            }
+            lottie.playAnimation()
+        }
+
+        if (animationName == "loading_hand.json" || animationName == "connecting.json") {
+            startSkeletonAnimation(
+                iconView ?: return,
+                titleView ?: return,
+                subtitleView ?: return,
+                statusView ?: return
+            )
+        }
     }
 
     fun hide() {
@@ -113,6 +151,7 @@ class SkeletonAnimHelper {
     }
 
     fun hideSkeleton(container: View) {
+        lottieView?.cancelAnimation()
         container.animate()
             .alpha(0f)
             .setDuration(300)

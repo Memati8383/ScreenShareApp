@@ -74,15 +74,29 @@ class MainActivity : AppCompatActivity() {
         switchMode(true)
 
         findViewById<ImageView>(R.id.btnMenuDrawer).setOnClickListener {
+            HapticHelper.lightTap(this)
             drawerLayout.open()
         }
 
-        btnHostMode.setOnClickListener { switchMode(true) }
-        btnClientMode.setOnClickListener { switchMode(false) }
-        btnShare.setOnClickListener { startSender() }
-        btnWatch.setOnClickListener { goToViewer() }
+        btnHostMode.setOnClickListener {
+            HapticHelper.lightTap(this)
+            switchMode(true)
+        }
+        btnClientMode.setOnClickListener {
+            HapticHelper.lightTap(this)
+            switchMode(false)
+        }
+        btnShare.setOnClickListener {
+            HapticHelper.mediumTap(this)
+            startSender()
+        }
+        btnWatch.setOnClickListener {
+            HapticHelper.mediumTap(this)
+            goToViewer()
+        }
 
         findViewById<ImageView>(R.id.btnCopyRoom).setOnClickListener {
+            HapticHelper.lightTap(this)
             val room = etRoom.text.toString().trim()
             if (room.isNotEmpty()) {
                 val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
@@ -93,6 +107,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         bottomNav.setOnItemSelectedListener { item ->
+            HapticHelper.lightTap(this)
             when (item.itemId) {
                 R.id.nav_home -> true
                 R.id.nav_recent -> {
@@ -107,7 +122,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
+
         navigationView.setNavigationItemSelectedListener { item ->
+            HapticHelper.lightTap(this)
             drawerLayout.closeDrawers()
             when (item.itemId) {
                 R.id.drawer_home -> true

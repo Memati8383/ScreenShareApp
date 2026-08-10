@@ -5,19 +5,25 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
+import android.view.KeyEvent
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.WindowManager
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
+import com.airbnb.lottie.LottieAnimationView
 import com.example.screenmirror.model.ConnectionQuality
 import com.example.screenmirror.model.ServiceEvent
 import kotlinx.coroutines.delay
@@ -29,14 +35,25 @@ import java.util.*
 
 class ViewerActivity : AppCompatActivity() {
 
-    private lateinit var tvViewerStatus: TextView
     private lateinit var tvStats: TextView
     private lateinit var tvViewerCount: TextView
     private lateinit var tvConnectionQuality: TextView
+    private lateinit var tvRoomName: TextView
     private lateinit var ivConnectionDot: ImageView
     private lateinit var btnScreenshot: View
-    private lateinit var btnDisconnect: Button
-    private lateinit var controlPanel: View
+    private lateinit var btnDisconnect: View
+    private lateinit var topBar: View
+    private lateinit var bottomBar: View
+    private lateinit var waitingOverlay: View
+    private lateinit var notificationOverlay: View
+    private lateinit var lottieNotification: LottieAnimationView
+    private lateinit var tvNotificationTitle: TextView
+    private lateinit var tvNotificationSubtitle: TextView
+    private lateinit var viewerSurface: org.webrtc.SurfaceViewRenderer
+
+    private var isScaling = false
+    private var currentScale = 1f
+    private lateinit var scaleDetector: ScaleGestureDetector
 
     private var service: ScreenShareService? = null
     private var isBound = false
@@ -46,13 +63,16 @@ class ViewerActivity : AppCompatActivity() {
     private var skeletonTimeoutJob: kotlinx.coroutines.Job? = null
 
     private lateinit var skeletonHelper: SkeletonAnimHelper
-    private lateinit var waitingOverlay: View
+
+    private val autoHideHandler = Handler(Looper.getMainLooper())
+    private val autoHideRunnable = Runnable { hideBars() }
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
             val localBinder = binder as ScreenShareService.LocalBinder
             service = localBinder.getService()
             isBound = true
+            service?.setRenderer(viewerSurface)
             observeServiceEvents()
             Log.i("ViewerActivity", getString(R.string.state_service_connected))
         }
@@ -68,32 +88,153 @@ class ViewerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_viewer)
 
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.decorView.systemUiVisibility = (
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        )
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT
+
         NotificationHelper.createViewerChannel(this)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         initSkeleton()
 
-        tvViewerStatus = findViewById(R.id.tvViewerStatus)
         tvStats = findViewById(R.id.tvStats)
         tvViewerCount = findViewById(R.id.tvViewerCount)
         tvConnectionQuality = findViewById(R.id.tvConnectionQuality)
+        tvRoomName = findViewById(R.id.tvRoomName)
         ivConnectionDot = findViewById(R.id.ivConnectionDot)
         btnScreenshot = findViewById(R.id.btnScreenshot)
         btnDisconnect = findViewById(R.id.btnDisconnect)
-        controlPanel = findViewById(R.id.controlPanel)
+        topBar = findViewById(R.id.topBar)
+        bottomBar = findViewById(R.id.bottomBar)
+        waitingOverlay = findViewById(R.id.waitingOverlay)
+        notificationOverlay = findViewById(R.id.notificationOverlay)
+        lottieNotification = findViewById(R.id.lottieNotification)
+        tvNotificationTitle = findViewById(R.id.tvNotificationTitle)
+        tvNotificationSubtitle = findViewById(R.id.tvNotificationSubtitle)
+        viewerSurface = findViewById(R.id.viewerSurface)
 
         roomCode = intent.getStringExtra("room") ?: ""
+        tvRoomName.text = getString(R.string.sender_room_prefix, roomCode)
 
         startTime = System.currentTimeMillis()
-
-        tvConnectionQuality.visibility = if (AppSettings.isQualityStatsEnabled(this)) View.VISIBLE else View.GONE
         tvStats.text = getString(R.string.viewer_stats)
-
-        waitingOverlay = findViewById(R.id.waitingOverlay)
 
         showSkeleton(getString(R.string.viewer_waiting))
         startViewerService()
-        btnDisconnect.setOnClickListener { showDisconnectConfirmation() }
-        btnScreenshot.setOnClickListener { takeScreenshot() }
+
+        tvConnectionQuality.visibility = if (AppSettings.isQualityStatsEnabled(this)) View.VISIBLE else View.GONE
+
+        btnDisconnect.setOnClickListener {
+            HapticHelper.mediumTap(this)
+            showDisconnectConfirmation()
+        }
+        btnScreenshot.setOnClickListener {
+            HapticHelper.lightTap(this)
+            takeScreenshot()
+        }
+
+        setupAutoHide()
+        showBars()
+
+        scaleDetector = ScaleGestureDetector(this, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+                isScaling = true
+                return true
+            }
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                currentScale *= detector.scaleFactor
+                currentScale = currentScale.coerceIn(0.5f, 5f)
+                viewerSurface.pivotX = detector.focusX
+                viewerSurface.pivotY = detector.focusY
+                viewerSurface.scaleX = currentScale
+                viewerSurface.scaleY = currentScale
+                return true
+            }
+            override fun onScaleEnd(detector: ScaleGestureDetector) {
+                isScaling = false
+                if (currentScale < 1f) {
+                    currentScale = 1f
+                    viewerSurface.scaleX = 1f
+                    viewerSurface.scaleY = 1f
+                    viewerSurface.pivotX = viewerSurface.width / 2f
+                    viewerSurface.pivotY = viewerSurface.height / 2f
+                }
+            }
+        })
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                showDisconnectConfirmation()
+            }
+        })
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.keyCode == KeyEvent.KEYCODE_VOLUME_UP || event.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            if (event.action == KeyEvent.ACTION_DOWN) {
+                if (topBar.visibility == View.VISIBLE) {
+                    hideBars()
+                } else {
+                    showBars()
+                }
+            }
+            return true
+        }
+        return super.dispatchKeyEvent(event)
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        scaleDetector.onTouchEvent(ev)
+        return super.dispatchTouchEvent(ev)
+    }
+
+    private fun setupAutoHide() {
+        // Touch handled in dispatchTouchEvent
+    }
+
+    private fun showBars() {
+        topBar.alpha = 1f
+        topBar.translationY = 0f
+        topBar.visibility = View.VISIBLE
+        bottomBar.alpha = 1f
+        bottomBar.translationY = 0f
+        bottomBar.visibility = View.VISIBLE
+        autoHideHandler.removeCallbacks(autoHideRunnable)
+        autoHideHandler.postDelayed(autoHideRunnable, 3000)
+    }
+
+    private fun hideBars() {
+        if (waitingOverlay.visibility == View.VISIBLE) return
+        if (notificationOverlay.visibility == View.VISIBLE) return
+        topBar.animate().alpha(0f).translationY(-topBar.height.toFloat()).setDuration(200).withEndAction {
+            topBar.visibility = View.GONE
+        }
+        bottomBar.animate().alpha(0f).translationY(bottomBar.height.toFloat()).setDuration(200).withEndAction {
+            bottomBar.visibility = View.GONE
+        }
+    }
+
+    private fun showNotification(title: String, subtitle: String, animation: String) {
+        runOnUiThread {
+            notificationOverlay.visibility = View.VISIBLE
+            tvNotificationTitle.text = title
+            tvNotificationSubtitle.text = subtitle
+            try {
+                lottieNotification.setAnimation(animation)
+                lottieNotification.playAnimation()
+            } catch (_: Exception) {}
+            topBar.visibility = View.GONE
+            bottomBar.visibility = View.GONE
+        }
+    }
+
+    private fun hideNotification() {
+        notificationOverlay.visibility = View.GONE
+        showBars()
     }
 
     private fun observeServiceEvents() {
@@ -103,32 +244,39 @@ class ViewerActivity : AppCompatActivity() {
                 when (event) {
                     is ServiceEvent.WebRtcReady -> {
                         tvStats.text = getString(R.string.state_webrtc_ready)
-                        hideSkeleton()
-                        waitingOverlay.visibility = View.GONE
+                        skeletonHelper.showWithAnimation(getString(R.string.state_webrtc_ready), "connecting.json")
                     }
                     is ServiceEvent.PeerConnected -> {
                         tvStats.text = getString(R.string.state_peer_connected)
-                        hideSkeleton()
-                        waitingOverlay.visibility = View.GONE
+                        HapticHelper.successTap(this@ViewerActivity)
+                        skeletonHelper.showWithAnimation(getString(R.string.state_peer_connected), "success_check.json")
                     }
                     is ServiceEvent.LiveReceived -> {
                         tvStats.text = getString(R.string.state_live_received)
                         hideSkeleton()
                         waitingOverlay.visibility = View.GONE
+                        showBars()
                     }
                     is ServiceEvent.OfferSent -> {
                         tvStats.text = getString(R.string.state_offer_sent)
-                        hideSkeleton()
-                        waitingOverlay.visibility = View.GONE
+                        skeletonHelper.showWithAnimation(getString(R.string.state_offer_sent), "connecting.json")
                     }
                     is ServiceEvent.AnswerSent -> {
                         tvStats.text = getString(R.string.state_answer_sent)
-                        hideSkeleton()
-                        waitingOverlay.visibility = View.GONE
+                        skeletonHelper.showWithAnimation(getString(R.string.state_answer_sent), "connecting.json")
                     }
                     is ServiceEvent.ConnectionBroken -> {
                         tvStats.text = getString(R.string.state_connection_broken)
-                        hideSkeleton()
+                        HapticHelper.errorTap(this@ViewerActivity)
+                        showNotification(
+                            getString(R.string.state_connection_broken),
+                            getString(R.string.state_reconnecting, 1),
+                            "disconnect.json"
+                        )
+                        lifecycleScope.launch {
+                            delay(3000)
+                            cleanupAndFinish()
+                        }
                     }
                     is ServiceEvent.ViewerCountChanged -> {
                         tvViewerCount.text = event.count.toString()
@@ -140,37 +288,43 @@ class ViewerActivity : AppCompatActivity() {
                     is ServiceEvent.SenderDisconnected -> {
                         if (!isDisconnecting) {
                             isDisconnecting = true
-                            hideSkeleton()
-                            tvViewerStatus.text = getString(R.string.status_disconnected)
-                            Toast.makeText(this@ViewerActivity, getString(R.string.viewer_broadcast_ended), Toast.LENGTH_SHORT).show()
+                            HapticHelper.errorTap(this@ViewerActivity)
+                            showNotification(
+                                getString(R.string.viewer_broadcast_ended),
+                                getString(R.string.state_yayinci_ayrildi),
+                                "disconnect.json"
+                            )
                             lifecycleScope.launch {
-                                delay(2000)
+                                delay(3000)
                                 finish()
                             }
                         }
                     }
                     is ServiceEvent.Error -> {
                         tvStats.text = event.type.displayMessage
-                        hideSkeleton()
+                        HapticHelper.errorTap(this@ViewerActivity)
+                        skeletonHelper.showWithAnimation(event.type.displayMessage, "error_cross.json")
                     }
                     is ServiceEvent.SdpError -> {
                         tvStats.text = getString(R.string.state_sdp_error, event.detail)
-                        hideSkeleton()
+                        HapticHelper.errorTap(this@ViewerActivity)
+                        skeletonHelper.showWithAnimation(getString(R.string.state_sdp_error, event.detail), "error_cross.json")
                     }
                     is ServiceEvent.WebRtcError -> {
                         tvStats.text = getString(R.string.state_webrtc_error, event.detail)
-                        hideSkeleton()
+                        HapticHelper.errorTap(this@ViewerActivity)
+                        skeletonHelper.showWithAnimation(getString(R.string.state_webrtc_error, event.detail), "error_cross.json")
                     }
                     is ServiceEvent.SignalingStatus -> {
                         tvStats.text = event.message
-                        tvViewerStatus.text = event.message
                     }
                     is ServiceEvent.SurfaceWaiting -> {
                         tvStats.text = getString(R.string.state_surface_waiting)
                     }
                     is ServiceEvent.SurfaceNotFound -> {
                         tvStats.text = getString(R.string.state_surface_not_found)
-                        hideSkeleton()
+                        HapticHelper.errorTap(this@ViewerActivity)
+                        skeletonHelper.showWithAnimation(getString(R.string.state_surface_not_found), "error_cross.json")
                     }
                     else -> {}
                 }
@@ -201,7 +355,8 @@ class ViewerActivity : AppCompatActivity() {
             title = findViewById(R.id.skeletonTitle),
             subtitle = findViewById(R.id.skeletonSubtitle),
             status = findViewById(R.id.skeletonStatus),
-            hint = findViewById(R.id.skeletonHint)
+            hint = findViewById(R.id.skeletonHint),
+            lottie = findViewById(R.id.lottieLoading)
         )
     }
 
@@ -217,8 +372,11 @@ class ViewerActivity : AppCompatActivity() {
             val c = skeletonHelper.container
             if (!isDisconnecting && c != null && c.visibility == View.VISIBLE) {
                 hideSkeleton()
-                tvViewerStatus.text = getString(R.string.state_connection_timeout)
-                Toast.makeText(this@ViewerActivity, getString(R.string.state_broadcast_not_found), Toast.LENGTH_LONG).show()
+                showNotification(
+                    getString(R.string.state_connection_timeout),
+                    getString(R.string.state_broadcast_not_found),
+                    "error_cross.json"
+                )
             }
         }
     }
@@ -238,11 +396,14 @@ class ViewerActivity : AppCompatActivity() {
     }
 
     private fun cleanupAndFinish() {
-        stopService(Intent(this, ScreenShareService::class.java))
+        if (isDisconnecting) return
+        isDisconnecting = true
+        autoHideHandler.removeCallbacks(autoHideRunnable)
         if (isBound) {
-            unbindService(serviceConnection)
+            try { unbindService(serviceConnection) } catch (_: Exception) {}
             isBound = false
         }
+        stopService(Intent(this, ScreenShareService::class.java))
         finish()
     }
 
@@ -268,6 +429,13 @@ class ViewerActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (isBound) {
+            service?.reattachSink(viewerSurface)
+        }
+    }
+
     private fun takeScreenshot() {
         val screenView = window.decorView.rootView
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
@@ -278,10 +446,11 @@ class ViewerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        autoHideHandler.removeCallbacks(autoHideRunnable)
         skeletonTimeoutJob?.cancel()
         skeletonHelper.stopAnimation()
         if (isBound) {
-            unbindService(serviceConnection)
+            try { unbindService(serviceConnection) } catch (_: Exception) {}
             isBound = false
         }
     }

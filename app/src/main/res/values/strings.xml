@@ -99,6 +99,10 @@
     <string name="sender_freeze">Dondur</string>
     <string name="sender_unfreeze">Devam</string>
     <string name="sender_quality">Kalite</string>
+    <string name="sender_quality_resolution">Çözünürlük</string>
+    <string name="sender_quality_fps">Kare Hızı (FPS)</string>
+    <string name="sender_quality_apply">Uygula</string>
+    <string name="sender_quality_changed">Kalite değiştirildi: %1$s %2$s</string>
     <string name="sender_stop_broadcast">Yayını Durdur</string>
     <string name="sender_viewer_label"> izleyici</string>
     <string name="sender_channel_name">Ekran Paylaşımı</string>
@@ -121,6 +125,7 @@
     <string name="viewer_disconnect_msg">Yayından ayrılmak istediğinize emin misiniz?</string>
     <string name="viewer_disconnect_confirm">Ayrıl</string>
     <string name="viewer_screenshot_saved">Ekran görüntüsü kaydedildi: %s</string>
+    <string name="viewer_fullscreen">Tam Ekran</string>
 
     <!-- Ortak -->
     <string name="btn_cancel">İptal</string>

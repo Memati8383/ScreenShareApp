@@ -13,6 +13,7 @@ object AppSettings {
     private const val KEY_LANGUAGE = "language"
     private const val KEY_NOTIFICATIONS = "notifications_enabled"
     private const val KEY_QUALITY_STATS = "quality_stats_enabled"
+    private const val KEY_HAPTIC_ENABLED = "haptic_enabled"
     private const val KEY_CAPTURE_WIDTH = "capture_width"
     private const val KEY_CAPTURE_HEIGHT = "capture_height"
     private const val KEY_CAPTURE_FPS = "capture_fps"
@@ -55,6 +56,14 @@ object AppSettings {
 
     fun setQualityStatsEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit().putBoolean(KEY_QUALITY_STATS, enabled).apply()
+    }
+
+    fun isHapticEnabled(context: Context): Boolean {
+        return prefs(context).getBoolean(KEY_HAPTIC_ENABLED, true)
+    }
+
+    fun setHapticEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit().putBoolean(KEY_HAPTIC_ENABLED, enabled).apply()
     }
 
     // TURN credentials — encrypted via SecureCredentialStore

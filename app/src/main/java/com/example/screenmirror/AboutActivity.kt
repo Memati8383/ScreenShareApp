@@ -28,6 +28,7 @@ class AboutActivity : AppCompatActivity() {
         supportActionBar?.title = ""
 
         toolbar.setNavigationOnClickListener {
+            HapticHelper.lightTap(this)
             finish()
         }
 
@@ -37,14 +38,17 @@ class AboutActivity : AppCompatActivity() {
 
     private fun setupSocialButtons() {
         findViewById<LinearLayout>(R.id.btnInstagram).setOnClickListener {
+            HapticHelper.lightTap(this)
             openUrl(INSTAGRAM_URL)
         }
 
         findViewById<LinearLayout>(R.id.btnGithub).setOnClickListener {
+            HapticHelper.lightTap(this)
             openUrl(GITHUB_PROFILE)
         }
 
         findViewById<LinearLayout>(R.id.btnSource).setOnClickListener {
+            HapticHelper.lightTap(this)
             openUrl(SOURCE_CODE)
         }
     }

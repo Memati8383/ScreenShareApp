@@ -44,6 +44,9 @@ dependencies {
     implementation(libs.material)
     implementation(libs.gson)
 
+    // Lottie
+    implementation(libs.lottie)
+
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)

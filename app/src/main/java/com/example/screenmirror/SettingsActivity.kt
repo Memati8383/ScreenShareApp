@@ -32,7 +32,10 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.title = getString(R.string.settings_title)
 
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener {
+            HapticHelper.lightTap(this)
+            finish()
+        }
 
         languageSpinner = findViewById(R.id.languageSpinner)
         notificationSwitch = findViewById(R.id.switchNotifications)
@@ -78,11 +81,13 @@ class SettingsActivity : AppCompatActivity() {
 
         notificationSwitch.isChecked = AppSettings.isNotificationsEnabled(this)
         notificationSwitch.setOnCheckedChangeListener { _, isChecked ->
+            HapticHelper.lightTap(this)
             AppSettings.setNotificationsEnabled(this, isChecked)
         }
 
         qualityStatsSwitch.isChecked = AppSettings.isQualityStatsEnabled(this)
         qualityStatsSwitch.setOnCheckedChangeListener { _, isChecked ->
+            HapticHelper.lightTap(this)
             AppSettings.setQualityStatsEnabled(this, isChecked)
         }
 

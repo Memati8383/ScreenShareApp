@@ -29,7 +29,10 @@ class FeedbackActivity : AppCompatActivity() {
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.title = getString(R.string.feedback_title)
 
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener {
+            HapticHelper.lightTap(this)
+            finish()
+        }
 
         nameInput = findViewById(R.id.etName)
         emailInput = findViewById(R.id.etEmail)
@@ -44,6 +47,7 @@ class FeedbackActivity : AppCompatActivity() {
 
         subjectButtons.forEachIndexed { index, button ->
             button.setOnClickListener {
+                HapticHelper.lightTap(this)
                 selectSubject(index)
                 selectedSubject = when (index) {
                     0 -> getString(R.string.feedback_subject_suggestion)
@@ -55,15 +59,18 @@ class FeedbackActivity : AppCompatActivity() {
         }
 
         sendBtn.setOnClickListener {
+            HapticHelper.mediumTap(this)
             val name = nameInput.text.toString().trim()
             val email = emailInput.text.toString().trim()
             val message = messageInput.text.toString().trim()
 
             if (selectedSubject.isEmpty()) {
+                HapticHelper.errorTap(this)
                 Toast.makeText(this, getString(R.string.feedback_error_subject), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (message.isEmpty()) {
+                HapticHelper.errorTap(this)
                 messageInput.error = getString(R.string.feedback_error_message)
                 return@setOnClickListener
             }

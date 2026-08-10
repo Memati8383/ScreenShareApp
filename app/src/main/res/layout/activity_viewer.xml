@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_dark">
@@ -37,45 +38,106 @@
             android:textSize="16sp" />
     </LinearLayout>
 
-    <!-- Floating control panel (tap to toggle) -->
+    <!-- Notification overlay -->
+    <FrameLayout
+        android:id="@+id/notificationOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#990A0E27"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottieNotification"
+                android:layout_width="140dp"
+                android:layout_height="140dp" />
+
+            <TextView
+                android:id="@+id/tvNotificationTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvNotificationSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:gravity="center" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Top stats bar -->
     <LinearLayout
-        android:id="@+id/controlPanel"
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:orientation="vertical"
-        android:background="@drawable/bg_overlay_panel"
-        android:padding="16dp"
-        android:layout_margin="16dp"
-        android:visibility="gone">
+        android:background="@drawable/bg_glass_panel"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp"
+        android:elevation="4dp">
 
-        <!-- Connection stats + viewer count -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_signal" />
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/bg_live_dot" />
 
             <TextView
-                android:id="@+id/tvStats"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:text="@string/status_connecting"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
+                android:text="@string/status_live"
+                android:textColor="#FFFFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1" />
 
-            <!-- Viewer count -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/tvRoomName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#B3FFFFFF"
+                android:textSize="12sp" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="12dp"
+                android:layout_marginHorizontal="8dp"
+                android:background="#33FFFFFF" />
+
             <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:src="@drawable/ic_viewer" />
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_viewer"
+                android:alpha="0.5" />
 
             <TextView
                 android:id="@+id/tvViewerCount"
@@ -83,99 +145,115 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:text="0"
-                android:textColor="@color/text_primary"
+                android:textColor="#FFFFFFFF"
                 android:textSize="12sp"
                 android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvViewerLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="@string/sender_viewer_label"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp" />
-
-            <View
-                android:id="@+id/statusDot"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:background="@drawable/bg_circle_gradient" />
         </LinearLayout>
 
-        <!-- Connection Quality Stats -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:visibility="gone"
-            android:id="@+id/connectionQualityRow">
+            android:gravity="center_vertical">
 
             <ImageView
                 android:id="@+id/ivConnectionDot"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:layout_marginEnd="4dp"
-                android:src="@drawable/bg_circle_gradient"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/bg_live_dot"
                 android:visibility="gone" />
 
             <TextView
-                android:id="@+id/tvConnectionQuality"
-                android:layout_width="match_parent"
+                android:id="@+id/tvStats"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
+                android:layout_weight="1"
+                android:text="@string/status_connecting"
+                android:textColor="#B3FFFFFF"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvConnectionQuality"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#80FFFFFF"
                 android:textSize="11sp"
-                android:fontFamily="monospace" />
+                android:fontFamily="monospace"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Bottom control bar -->
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/bg_glass_panel_bottom"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="12dp"
+        android:elevation="4dp">
+
+        <LinearLayout
+            android:id="@+id/btnScreenshot"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="10dp"
+            android:background="@drawable/bg_glass_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginEnd="6dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_camera"
+                android:tint="#FFFFFFFF" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/sender_screenshot"
+                android:textColor="#B3FFFFFF"
+                android:textSize="10sp" />
         </LinearLayout>
 
-        <!-- Buttons row: Screenshot & Disconnect -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/btnDisconnect"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="10dp"
+            android:background="@drawable/bg_glass_disconnect"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginStart="6dp">
 
-            <LinearLayout
-                android:id="@+id/btnScreenshot"
-                android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:background="@drawable/bg_card"
-                android:clickable="true"
-                android:focusable="true">
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_stop"
+                android:tint="#FFFF1744" />
 
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:src="@drawable/ic_camera" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:text="@string/sender_screenshot"
-                    android:textColor="@color/text_primary"
-                    android:textSize="13sp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="12dp"
-                android:layout_height="0dp" />
-
-            <Button
-                android:id="@+id/btnDisconnect"
-                android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_button_outline"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="@string/viewer_disconnect_title"
-                android:textColor="@color/status_bad"
-                android:textSize="13sp"
-                android:stateListAnimator="@null" />
+                android:textColor="#FFFF1744"
+                android:textSize="10sp" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>
