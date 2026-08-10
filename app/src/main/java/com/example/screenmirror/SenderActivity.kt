@@ -133,13 +133,6 @@ class SenderActivity : AppCompatActivity() {
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             if (result.resultCode == RESULT_OK && result.data != null) {
-                val projectionManager = getSystemService(MEDIA_PROJECTION_SERVICE) as android.media.projection.MediaProjectionManager
-                val projection = projectionManager.getMediaProjection(result.resultCode, result.data!!)
-                if (projection == null) {
-                    Toast.makeText(this, getString(R.string.state_screen_permission_error), Toast.LENGTH_SHORT).show()
-                    return@registerForActivityResult
-                }
-                projection.stop()
                 val serviceIntent = Intent(this, ScreenShareService::class.java).apply {
                     action = "com.example.screenmirror.START_RECORDING"
                     putExtra("resultCode", result.resultCode)

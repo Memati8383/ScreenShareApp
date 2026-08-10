@@ -15,8 +15,12 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -106,19 +110,25 @@ class ProfileActivity : AppCompatActivity() {
         val name = prefs.getString("name", "") ?: ""
         val email = prefs.getString("email", "") ?: ""
 
-        val roomHistoryManager = (application as ScreenMirrorApp).roomHistoryManager
-        val allRooms = roomHistoryManager.getAll()
-        val roomsHosted = allRooms.count { it.role == "sender" }
-        val totalDurationMs = allRooms.sumOf { it.duration }
-        val hoursShared = (totalDurationMs / 3600000).toInt()
-
         findViewById<TextView>(R.id.profileName).text = name
         findViewById<TextView>(R.id.profileEmail).text = email
-        findViewById<TextView>(R.id.statRooms).text = roomsHosted.toString()
-        findViewById<TextView>(R.id.statHours).text = hoursShared.toString()
 
         nameInput.setText(name)
         emailInput.setText(email)
+
+        val roomHistoryManager = (application as ScreenMirrorApp).roomHistoryManager
+        lifecycleScope.launch {
+            val roomsHosted: Int
+            val hoursShared: Int
+            withContext(Dispatchers.IO) {
+                val allRooms = roomHistoryManager.getAll()
+                roomsHosted = allRooms.count { it.role == "sender" }
+                val totalDurationMs = allRooms.sumOf { it.duration }
+                hoursShared = (totalDurationMs / 3600000).toInt()
+            }
+            findViewById<TextView>(R.id.statRooms).text = roomsHosted.toString()
+            findViewById<TextView>(R.id.statHours).text = hoursShared.toString()
+        }
     }
 
     private fun showCreateForm() {

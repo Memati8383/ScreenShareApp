@@ -25,6 +25,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import com.example.screenmirror.data.RoomHistory
+import com.example.screenmirror.capture.VideoCaptureManager
 import com.example.screenmirror.model.ConnectionQuality
 import com.example.screenmirror.model.ErrorType
 import com.example.screenmirror.model.ServiceEvent
@@ -61,11 +62,8 @@ class ScreenShareService : Service() {
     private var factory: PeerConnectionFactory? = null
     private var peerConnection: PeerConnection? = null
     private var cloudSignaling: CloudSignalingClient? = null
-    private var surfaceTextureHelper: SurfaceTextureHelper? = null
-    private var videoSource: VideoSource? = null
-    private var capturer: ScreenCapturerAndroid? = null
-    private var localTrack: VideoTrack? = null
     @Volatile private var remoteTrack: VideoTrack? = null
+    private var captureManager: VideoCaptureManager? = null
 
     private var mediaRecorder: MediaRecorder? = null
     private val isRecording = AtomicBoolean(false)
@@ -85,9 +83,6 @@ class ScreenShareService : Service() {
     private var pendingResultCode: Int = 0
     private var pendingData: Intent? = null
     private var renderer: SurfaceViewRenderer? = null
-    private var captureWidth = 1280
-    private var captureHeight = 720
-    private var captureFps = 30
     private val isFrozen = AtomicBoolean(false)
     private val rendererInitialized = AtomicBoolean(false)
 
@@ -180,10 +175,6 @@ class ScreenShareService : Service() {
                     }
                 }
             }
-
-            captureWidth = AppSettings.getCaptureWidth(this)
-            captureHeight = AppSettings.getCaptureHeight(this)
-            captureFps = AppSettings.getCaptureFps(this)
 
             val notificationText = if (role == "sender")
                 getString(R.string.notif_broadcast_active)
@@ -410,7 +401,7 @@ class ScreenShareService : Service() {
                     participantCount.set(2)
                     showJoinNotification()
                     if (role == "sender") {
-                        if (localTrack != null) {
+                        if (captureManager?.getLocalTrack() != null) {
                             executor.execute { createOffer() }
                         } else {
                             Log.i(TAG, "sender: localTrack henuz hazir degil, offer bekleniyor")
@@ -418,7 +409,7 @@ class ScreenShareService : Service() {
                             mainHandler.postDelayed({
                                 if (offerPending.get() && role == "sender") {
                                     Log.w(TAG, "sender: offer hala bekleniyor, yeniden deneniyor")
-                                    if (localTrack != null) {
+                                    if (captureManager?.getLocalTrack() != null) {
                                         offerPending.set(false)
                                         executor.execute { createOffer() }
                                     }
@@ -529,59 +520,50 @@ class ScreenShareService : Service() {
             stateManager.emitEvent(ServiceEvent.Error(ErrorType.SCREEN_CAPTURE, "Projection data is null"))
             return
         }
-        if (capturer != null) {
-            Log.w(TAG, "startCapture: capturer zaten mevcut, atlandi")
+        if (captureManager?.isCapturing() == true) {
+            Log.w(TAG, "startCapture: zaten yakalaniyor, atlandi")
             return
         }
-        try {
-            val eb = eglBase
-            if (eb == null) {
-                Log.e(TAG, "startCapture: eglBase NULL!")
-                stateManager.emitEvent(ServiceEvent.Error(ErrorType.SCREEN_CAPTURE, "EGL base not initialized"))
-                return
-            }
-            val f = factory
-            if (f == null) {
-                Log.e(TAG, "startCapture: factory NULL!")
-                stateManager.emitEvent(ServiceEvent.Error(ErrorType.SCREEN_CAPTURE, "PeerConnectionFactory not initialized"))
-                return
-            }
-
-            val w = captureWidth
-            val h = captureHeight
-            Log.i(TAG, "startCapture: screen: ${w}x${h} @ ${captureFps}fps")
-
-            surfaceTextureHelper = SurfaceTextureHelper.create("CaptureThread", eb.eglBaseContext)
-            videoSource = f.createVideoSource(true)
-            capturer = ScreenCapturerAndroid(data, object : MediaProjection.Callback() {
-                override fun onStop() {
-                    Log.w(TAG, "startCapture: MediaProjection durduruldu")
-                    stopSelf()
-                }
-            })
-            capturer?.initialize(surfaceTextureHelper, this, videoSource?.capturerObserver)
-            capturer?.startCapture(w, h, captureFps)
-            localTrack = f.createVideoTrack("screen0", videoSource)
-            peerConnection?.addTrack(localTrack, listOf("stream0"))
-            Log.i(TAG, "startCapture: basarili! localTrack eklenmis, izleyici bekleniyor")
-            stateManager.emitEvent(ServiceEvent.ScreenBroadcasting)
-
-            if (offerPending.get() && role == "sender") {
-                offerPending.set(false)
-                Log.i(TAG, "sender: localTrack hazir, beklenen offer olusturuluyor")
-                createOffer()
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "startCapture HATA", e)
-            stateManager.emitEvent(ServiceEvent.Error(ErrorType.SCREEN_CAPTURE, e.message ?: ""))
+        val eb = eglBase
+        if (eb == null) {
+            Log.e(TAG, "startCapture: eglBase NULL!")
+            stateManager.emitEvent(ServiceEvent.Error(ErrorType.SCREEN_CAPTURE, "EGL base not initialized"))
+            return
         }
+        val f = factory
+        if (f == null) {
+            Log.e(TAG, "startCapture: factory NULL!")
+            stateManager.emitEvent(ServiceEvent.Error(ErrorType.SCREEN_CAPTURE, "PeerConnectionFactory not initialized"))
+            return
+        }
+
+        captureManager = VideoCaptureManager(
+            context = this,
+            eglBase = eb,
+            factory = f,
+            onCapturerReady = { track ->
+                stateManager.emitEvent(ServiceEvent.ScreenBroadcasting)
+                if (offerPending.get() && role == "sender") {
+                    offerPending.set(false)
+                    Log.i(TAG, "sender: localTrack hazir, beklenen offer olusturuluyor")
+                    executor.execute { createOffer() }
+                }
+            },
+            onCapturerError = { error ->
+                stateManager.emitEvent(ServiceEvent.Error(ErrorType.SCREEN_CAPTURE, error))
+            }
+        )
+        captureManager?.captureWidth = AppSettings.getCaptureWidth(this)
+        captureManager?.captureHeight = AppSettings.getCaptureHeight(this)
+        captureManager?.captureFps = AppSettings.getCaptureFps(this)
+        captureManager?.startCapture(resultCode, data, peerConnection)
     }
 
     fun toggleFreeze() {
         val wasFrozen = isFrozen.get()
         isFrozen.compareAndSet(wasFrozen, !wasFrozen)
-        try {
-            localTrack?.setEnabled(!isFrozen.get())
+        val success = captureManager?.toggleFreeze(isFrozen.get()) ?: false
+        if (success) {
             if (isFrozen.get()) {
                 stateManager.emitEvent(ServiceEvent.BroadcastPaused)
                 Log.i(TAG, "Yayin donduruldu (track disabled)")
@@ -589,24 +571,14 @@ class ScreenShareService : Service() {
                 stateManager.emitEvent(ServiceEvent.BroadcastResumed)
                 Log.i(TAG, "Yayin devam ediyor (track enabled)")
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Dondurme hatasi", e)
-            stateManager.emitEvent(ServiceEvent.WebRtcError(e.message ?: "Unknown"))
+        } else {
+            stateManager.emitEvent(ServiceEvent.WebRtcError("Freeze basarisiz"))
         }
     }
 
     fun changeQuality(newWidth: Int, newHeight: Int, newFps: Int) {
-        synchronized(lock) {
-            captureWidth = newWidth
-            captureHeight = newHeight
-            captureFps = newFps
-        }
+        captureManager?.changeQuality(newWidth, newHeight, newFps)
         Log.i(TAG, "Kalite degistirildi: ${newWidth}x${newHeight} @ ${newFps}fps")
-        try {
-            capturer?.changeCaptureFormat(newWidth, newHeight, newFps)
-        } catch (e: Exception) {
-            Log.e(TAG, "Kalite degisikligi hatasi", e)
-        }
     }
 
     fun startRecording(resultCode: Int, data: Intent?) {
@@ -633,12 +605,15 @@ class ScreenShareService : Service() {
             }
 
             mediaRecorder?.apply {
+                val cw = captureManager?.captureWidth ?: AppSettings.getCaptureWidth(this@ScreenShareService)
+                val ch = captureManager?.captureHeight ?: AppSettings.getCaptureHeight(this@ScreenShareService)
+                val cf = captureManager?.captureFps ?: AppSettings.getCaptureFps(this@ScreenShareService)
                 setVideoSource(MediaRecorder.VideoSource.SURFACE)
                 setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
                 setVideoEncoder(MediaRecorder.VideoEncoder.H264)
-                setVideoSize(captureWidth, captureHeight)
-                setVideoFrameRate(captureFps)
-                setVideoEncodingBitRate(captureWidth * captureHeight * 3)
+                setVideoSize(cw, ch)
+                setVideoFrameRate(cf)
+                setVideoEncodingBitRate(cw * ch * 3)
                 setOutputFile(recordingFile?.absolutePath)
                 prepare()
             }
@@ -649,9 +624,11 @@ class ScreenShareService : Service() {
                 return
             }
 
+            val cw = captureManager?.captureWidth ?: AppSettings.getCaptureWidth(this)
+            val ch = captureManager?.captureHeight ?: AppSettings.getCaptureHeight(this)
             recordingVirtualDisplay = mediaProjection?.createVirtualDisplay(
                 "ScreenMirrorRecording",
-                captureWidth, captureHeight, resources.displayMetrics.densityDpi,
+                cw, ch, resources.displayMetrics.densityDpi,
                 android.hardware.display.DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                 recorderSurface,
                 null, null
@@ -765,7 +742,7 @@ class ScreenShareService : Service() {
     }
 
     private fun createOffer() {
-        if (localTrack == null) {
+        if (captureManager?.getLocalTrack() == null) {
             Log.w(TAG, "createOffer: localTrack null, offer olusturulamadi")
             stateManager.emitEvent(ServiceEvent.ScreenBroadcasting)
             return
@@ -841,17 +818,15 @@ class ScreenShareService : Service() {
 
                     val quality = ConnectionQuality.fromStats(packetLoss, roundTripTime)
 
-                    synchronized(lock) {
-                        if (quality == ConnectionQuality.BAD && captureWidth > 854) {
-                            captureWidth = 854
-                            captureHeight = 480
-                            capturer?.changeCaptureFormat(captureWidth, captureHeight, captureFps)
-                            Log.i(TAG, "Kalite dusuruldu: ${captureWidth}x${captureHeight}")
-                        } else if (quality == ConnectionQuality.GOOD && captureWidth < 1280) {
-                            captureWidth = 1280
-                            captureHeight = 720
-                            capturer?.changeCaptureFormat(captureWidth, captureHeight, captureFps)
-                            Log.i(TAG, "Kalite artirildi: ${captureWidth}x${captureHeight}")
+                    captureManager?.let { mgr ->
+                        synchronized(lock) {
+                            if (quality == ConnectionQuality.BAD && mgr.captureWidth > 854) {
+                                mgr.changeQuality(854, 480, mgr.captureFps)
+                                Log.i(TAG, "Kalite dusuruldu: 854x480")
+                            } else if (quality == ConnectionQuality.GOOD && mgr.captureWidth < 1280) {
+                                mgr.changeQuality(1280, 720, mgr.captureFps)
+                                Log.i(TAG, "Kalite artirildi: 1280x720")
+                            }
                         }
                     }
 
@@ -923,17 +898,8 @@ class ScreenShareService : Service() {
         try { cloudSignaling?.close() } catch (_: Exception) {}
         cloudSignaling = null
 
-        try { capturer?.stopCapture() } catch (_: Exception) {}
-        try { capturer?.dispose() } catch (_: Exception) {}
-        capturer = null
-
-        try { videoSource?.dispose() } catch (_: Exception) {}
-        videoSource = null
-
-        try { surfaceTextureHelper?.dispose() } catch (_: Exception) {}
-        surfaceTextureHelper = null
-
-        localTrack = null
+        try { captureManager?.stopCapture() } catch (_: Exception) {}
+        captureManager = null
 
         try {
             val r = renderer

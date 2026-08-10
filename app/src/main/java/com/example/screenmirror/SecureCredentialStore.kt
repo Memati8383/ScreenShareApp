@@ -72,17 +72,14 @@ object SecureCredentialStore {
 
     fun migrateFromPlainText(context: Context) {
         val legacyPrefs = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-        val keys = mapOf(
-            "turn_url_enc" to legacyPrefs.getString("turn_url", null),
-            "turn_user_enc" to legacyPrefs.getString("turn_user", null),
-            "turn_pass_enc" to legacyPrefs.getString("turn_pass", null)
-        )
         val securePrefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
-        keys.forEach { (encKey, plainValue) ->
-            if (plainValue != null && !securePrefs.contains(encKey)) {
-                val rawKey = encKey.removeSuffix("_enc")
-                encrypt(context, rawKey, plainValue)
+        val mappings = listOf("turn_url", "turn_user", "turn_pass")
+
+        mappings.forEach { key ->
+            val plainValue = legacyPrefs.getString(key, null)
+            if (plainValue != null && !securePrefs.contains(key)) {
+                encrypt(context, key, plainValue)
             }
         }
     }

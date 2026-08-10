@@ -9,6 +9,7 @@ class RoomHistoryManager(context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences("room_history", Context.MODE_PRIVATE)
     private val gson = Gson()
+    private val lock = Any()
     @Volatile private var cachedRooms: List<RoomHistory>? = null
 
     private fun getCache(): List<RoomHistory> {
@@ -30,26 +31,40 @@ class RoomHistoryManager(context: Context) {
     }
 
     fun saveRoom(room: RoomHistory) {
-        val rooms = getCache().toMutableList()
-        rooms.add(0, room)
-        if (rooms.size > 50) {
-            rooms.removeAt(rooms.lastIndex)
+        synchronized(lock) {
+            val rooms = getCache().toMutableList()
+            rooms.add(0, room)
+            if (rooms.size > 50) {
+                rooms.removeAt(rooms.lastIndex)
+            }
+            saveToPrefs(rooms)
         }
-        saveToPrefs(rooms)
     }
 
-    fun getAll(): List<RoomHistory> = getCache()
+    fun getAll(): List<RoomHistory> {
+        synchronized(lock) {
+            return getCache()
+        }
+    }
 
     fun deleteRoom(roomId: Long) {
-        val rooms = getCache().toMutableList()
-        rooms.removeAll { it.id == roomId }
-        saveToPrefs(rooms)
+        synchronized(lock) {
+            val rooms = getCache().toMutableList()
+            rooms.removeAll { it.id == roomId }
+            saveToPrefs(rooms)
+        }
     }
 
     fun deleteAll() {
-        cachedRooms = emptyList()
-        prefs.edit().remove("rooms").apply()
+        synchronized(lock) {
+            cachedRooms = emptyList()
+            prefs.edit().remove("rooms").apply()
+        }
     }
 
-    fun getCount(): Int = getCache().size
+    fun getCount(): Int {
+        synchronized(lock) {
+            return getCache().size
+        }
+    }
 }
