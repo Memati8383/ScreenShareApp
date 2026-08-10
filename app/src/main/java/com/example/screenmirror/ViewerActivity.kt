@@ -35,6 +35,16 @@ import java.util.*
 
 class ViewerActivity : AppCompatActivity() {
 
+    private companion object {
+        const val AUTO_HIDE_DELAY_MS = 3000L
+        const val ANIMATION_DURATION_MS = 200L
+        const val RECONNECT_DELAY_MS = 3000L
+        const val SKELETON_TIMEOUT_MS = 15_000L
+        const val MIN_SCALE = 0.5f
+        const val MAX_SCALE = 5f
+        const val DEFAULT_SCALE = 1f
+    }
+
     private lateinit var tvStats: TextView
     private lateinit var tvViewerCount: TextView
     private lateinit var tvConnectionQuality: TextView
@@ -146,7 +156,7 @@ class ViewerActivity : AppCompatActivity() {
             }
             override fun onScale(detector: ScaleGestureDetector): Boolean {
                 currentScale *= detector.scaleFactor
-                currentScale = currentScale.coerceIn(0.5f, 5f)
+                currentScale = currentScale.coerceIn(MIN_SCALE, MAX_SCALE)
                 viewerSurface.pivotX = detector.focusX
                 viewerSurface.pivotY = detector.focusY
                 viewerSurface.scaleX = currentScale
@@ -155,10 +165,10 @@ class ViewerActivity : AppCompatActivity() {
             }
             override fun onScaleEnd(detector: ScaleGestureDetector) {
                 isScaling = false
-                if (currentScale < 1f) {
-                    currentScale = 1f
-                    viewerSurface.scaleX = 1f
-                    viewerSurface.scaleY = 1f
+                if (currentScale < DEFAULT_SCALE) {
+                    currentScale = DEFAULT_SCALE
+                    viewerSurface.scaleX = DEFAULT_SCALE
+                    viewerSurface.scaleY = DEFAULT_SCALE
                     viewerSurface.pivotX = viewerSurface.width / 2f
                     viewerSurface.pivotY = viewerSurface.height / 2f
                 }
@@ -203,16 +213,16 @@ class ViewerActivity : AppCompatActivity() {
         bottomBar.translationY = 0f
         bottomBar.visibility = View.VISIBLE
         autoHideHandler.removeCallbacks(autoHideRunnable)
-        autoHideHandler.postDelayed(autoHideRunnable, 3000)
+        autoHideHandler.postDelayed(autoHideRunnable, AUTO_HIDE_DELAY_MS)
     }
 
     private fun hideBars() {
         if (waitingOverlay.visibility == View.VISIBLE) return
         if (notificationOverlay.visibility == View.VISIBLE) return
-        topBar.animate().alpha(0f).translationY(-topBar.height.toFloat()).setDuration(200).withEndAction {
+        topBar.animate().alpha(0f).translationY(-topBar.height.toFloat()).setDuration(ANIMATION_DURATION_MS).withEndAction {
             topBar.visibility = View.GONE
         }
-        bottomBar.animate().alpha(0f).translationY(bottomBar.height.toFloat()).setDuration(200).withEndAction {
+        bottomBar.animate().alpha(0f).translationY(bottomBar.height.toFloat()).setDuration(ANIMATION_DURATION_MS).withEndAction {
             bottomBar.visibility = View.GONE
         }
     }
@@ -277,7 +287,7 @@ class ViewerActivity : AppCompatActivity() {
                             "disconnect.json"
                         )
                         lifecycleScope.launch {
-                            delay(3000)
+                            delay(RECONNECT_DELAY_MS)
                             if (!isDisconnecting && service != null) {
                                 hideNotification()
                                 showSkeleton(getString(R.string.state_reconnecting, 1))
@@ -303,7 +313,7 @@ class ViewerActivity : AppCompatActivity() {
                                 "disconnect.json"
                             )
                             lifecycleScope.launch {
-                                delay(3000)
+                                delay(RECONNECT_DELAY_MS)
                                 finish()
                             }
                         }
@@ -376,7 +386,7 @@ class ViewerActivity : AppCompatActivity() {
     private fun startSkeletonTimeout() {
         skeletonTimeoutJob?.cancel()
         skeletonTimeoutJob = lifecycleScope.launch {
-            delay(15_000)
+            delay(SKELETON_TIMEOUT_MS)
             val c = skeletonHelper.container
             if (!isDisconnecting && c != null && c.visibility == View.VISIBLE) {
                 hideSkeleton()

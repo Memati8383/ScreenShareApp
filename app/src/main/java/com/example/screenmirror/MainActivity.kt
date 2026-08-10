@@ -22,6 +22,10 @@ import android.widget.EditText
 
 class MainActivity : AppCompatActivity() {
 
+    private companion object {
+        const val STATUS_DISMISS_DELAY_MS = 5000L
+    }
+
     private lateinit var mpm: MediaProjectionManager
     private lateinit var projectionLauncher: ActivityResultLauncher<Intent>
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
@@ -244,7 +248,7 @@ class MainActivity : AppCompatActivity() {
     private fun showStatus(msg: String) {
         tvStatus.text = msg
         tvStatus.visibility = View.VISIBLE
-        tvStatus.postDelayed({ tvStatus.visibility = View.GONE }, 5000)
+        tvStatus.postDelayed({ tvStatus.visibility = View.GONE }, STATUS_DISMISS_DELAY_MS)
     }
 
     private fun shareApp() {

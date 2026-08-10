@@ -17,6 +17,19 @@ class CloudSignalingClient(
     private val onViewerCountChanged: (Int) -> Unit = {},
     private val onDisconnect: ((String) -> Unit)? = null
 ) {
+    private companion object {
+        const val TAG = "CloudSig"
+        const val WS_URL = "wss://wss.getlost.ovh"
+        const val PONG_TIMEOUT_MS = 60000L
+        const val HEARTBEAT_INTERVAL_MS = 25000L
+        const val ROSTER_TIMEOUT_MS = 10000L
+        const val CLOSE_CODE_NORMAL = 1000
+        const val INITIAL_RECONNECT_DELAY_MS = 1000L
+        const val MAX_RECONNECT_DELAY_MS = 30000L
+        const val MAX_RECONNECT_ATTEMPTS = 20
+        const val MAX_RECONNECT_SHIFT = 30
+    }
+
     private var client: OkHttpClient? = null
     private var ws: WebSocket? = null
     private val peerId = "${role}_${java.util.UUID.randomUUID()}"
@@ -25,98 +38,114 @@ class CloudSignalingClient(
     private var peerCount = 0
     private var closed = false
     private var reconnectAttempt = 0
-    private val maxReconnectDelay = 30000L
-    private val maxReconnectAttempts = 20
     private val reconnectHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private val heartbeatHandler = android.os.Handler(android.os.Looper.getMainLooper())
     @Volatile private var lastPongTime = 0L
+    private var rosterReceived = false
+    private val rosterTimeoutHandler = android.os.Handler(android.os.Looper.getMainLooper())
+
     private val heartbeatRunnable = object : Runnable {
         override fun run() {
             if (!connected || closed) return
             val now = System.currentTimeMillis()
-            if (lastPongTime > 0 && now - lastPongTime > 60000) {
-                Log.e("CloudSig", "PONG alinmadi, yeniden baglaniliyor")
+            if (lastPongTime > 0 && now - lastPongTime > PONG_TIMEOUT_MS) {
+                Log.e(TAG, "PONG alinmadi, yeniden baglaniliyor")
                 onDisconnect?.invoke("Sunucu yanit vermiyor, yeniden baglaniliyor...")
-                try { ws?.close(1000, "pong timeout") } catch (_: Exception) {}
+                try { ws?.close(CLOSE_CODE_NORMAL, "pong timeout") } catch (_: Exception) {}
                 return
             }
-            val ping = JSONObject().put("kind", "ping").toString()
-            Log.d("CloudSig", "HEARTBEAT ping gonderiliyor")
-            send(ping)
+            sendPing()
             lastPongTime = now
-            heartbeatHandler.postDelayed(this, 25000L)
+            heartbeatHandler.postDelayed(this, HEARTBEAT_INTERVAL_MS)
         }
     }
-    private var rosterReceived = false
-    private val rosterTimeoutHandler = android.os.Handler(android.os.Looper.getMainLooper())
+
     private val rosterTimeoutRunnable = Runnable {
         if (!rosterReceived && connected && !closed) {
-            Log.e("CloudSig", "ROSTER TIMEOUT: 10 sn icinde roster alinamadi!")
+            Log.e(TAG, "ROSTER TIMEOUT: 10 sn icinde roster alinamadi!")
             onDisconnect?.invoke("Sunucu yanit vermiyor, yeniden baglaniliyor...")
-            try { ws?.close(1000, "roster timeout") } catch (_: Exception) {}
+            try { ws?.close(CLOSE_CODE_NORMAL, "roster timeout") } catch (_: Exception) {}
         }
     }
 
     fun connect() {
-        val url = "wss://wss.getlost.ovh"
-        Log.i("CloudSig", "Baglaniliyor: $url, peer: $peerId")
+        Log.i(TAG, "Baglaniliyor: $WS_URL, peer: $peerId")
+        closeExistingConnection()
+        initHttpClient()
+        onDisconnect?.invoke("Signaling sunucusuna baglaniliyor...")
+        createWebSocket()
+    }
 
+    private fun closeExistingConnection() {
         try {
-            ws?.close(1000, "yeniden baglaniliyor")
+            ws?.close(CLOSE_CODE_NORMAL, "yeniden baglaniliyor")
             ws = null
         } catch (_: Exception) {}
+    }
 
+    private fun initHttpClient() {
         if (client == null) {
             client = OkHttpClient.Builder()
                 .readTimeout(0, TimeUnit.MILLISECONDS)
                 .build()
         }
+    }
 
-        onDisconnect?.invoke("Signaling sunucusuna baglaniliyor...")
-        val request = Request.Builder().url(url).build()
-        ws = client!!.newWebSocket(request, object : WebSocketListener() {
-            override fun onOpen(webSocket: WebSocket, response: Response) {
-                Log.i("CloudSig", "WS onOpen - HTTP ${response.code}, protocol=${response.protocol}")
-                connected = true
-                registered = false
-                reconnectAttempt = 0
-                onDisconnect?.invoke("Signaling baglandi, odaya katiliyor...")
-                sendRegister()
-                heartbeatHandler.postDelayed(heartbeatRunnable, 25000L)
-            }
+    private fun createWebSocket() {
+        val request = Request.Builder().url(WS_URL).build()
+        ws = client!!.newWebSocket(request, createWebSocketListener())
+    }
 
-            override fun onMessage(webSocket: WebSocket, text: String) {
-                Log.d("CloudSig", "MESAJ alindi (${text.length} bytes)")
-                handle(text)
-            }
+    private fun createWebSocketListener() = object : WebSocketListener() {
+        override fun onOpen(webSocket: WebSocket, response: Response) {
+            Log.i(TAG, "WS onOpen - HTTP ${response.code}, protocol=${response.protocol}")
+            connected = true
+            registered = false
+            reconnectAttempt = 0
+            onDisconnect?.invoke("Signaling baglandi, odaya katiliyor...")
+            sendRegister()
+            heartbeatHandler.postDelayed(heartbeatRunnable, HEARTBEAT_INTERVAL_MS)
+        }
 
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                Log.e("CloudSig", "WS onFailure: ${t.message}", t)
-                connected = false
-                registered = false
-                heartbeatHandler.removeCallbacksAndMessages(null)
-                rosterTimeoutHandler.removeCallbacksAndMessages(null)
-                onDisconnect?.invoke("Baglanti hatasi: ${t.message}")
-                scheduleReconnect()
-            }
+        override fun onMessage(webSocket: WebSocket, text: String) {
+            Log.d(TAG, "MESAJ alindi (${text.length} bytes)")
+            handle(text)
+        }
 
-            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                Log.i("CloudSig", "WS onClosed: code=$code, reason=$reason")
-                connected = false
-                registered = false
-                heartbeatHandler.removeCallbacksAndMessages(null)
-                rosterTimeoutHandler.removeCallbacksAndMessages(null)
-                if (!closed) {
-                    onDisconnect?.invoke("Baglanti kesildi ($code)")
-                    scheduleReconnect()
-                }
-            }
+        override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            Log.e(TAG, "WS onFailure: ${t.message}", t)
+            handleConnectionFailure(t.message)
+        }
 
-            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                Log.i("CloudSig", "WS onClosing: code=$code, reason=$reason")
-                webSocket.close(code, reason)
-            }
-        })
+        override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+            Log.i(TAG, "WS onClosed: code=$code, reason=$reason")
+            handleConnectionClosed(code, reason)
+        }
+
+        override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+            Log.i(TAG, "WS onClosing: code=$code, reason=$reason")
+            webSocket.close(code, reason)
+        }
+    }
+
+    private fun handleConnectionFailure(message: String?) {
+        connected = false
+        registered = false
+        heartbeatHandler.removeCallbacksAndMessages(null)
+        rosterTimeoutHandler.removeCallbacksAndMessages(null)
+        onDisconnect?.invoke("Baglanti hatasi: $message")
+        scheduleReconnect()
+    }
+
+    private fun handleConnectionClosed(code: Int, reason: String) {
+        connected = false
+        registered = false
+        heartbeatHandler.removeCallbacksAndMessages(null)
+        rosterTimeoutHandler.removeCallbacksAndMessages(null)
+        if (!closed) {
+            onDisconnect?.invoke("Baglanti kesildi ($code)")
+            scheduleReconnect()
+        }
     }
 
     private fun sendRegister() {
@@ -126,140 +155,158 @@ class CloudSignalingClient(
             .put("from", peerId)
             .put("announce", true)
             .toString()
-        Log.i("CloudSig", "REGISTER gonderiliyor: roomId=$room")
+        Log.i(TAG, "REGISTER gonderiliyor: roomId=$room")
         val sent = send(msg)
-        Log.i("CloudSig", "REGISTER gonderildi: sent=$sent, ws=${ws != null}, connected=$connected")
+        Log.i(TAG, "REGISTER gonderildi: sent=$sent, ws=${ws != null}, connected=$connected")
         onDisconnect?.invoke("Odaya katiliyor: $room")
+        startRosterTimeout()
+    }
+
+    private fun startRosterTimeout() {
         rosterReceived = false
         rosterTimeoutHandler.removeCallbacksAndMessages(null)
-        rosterTimeoutHandler.postDelayed(rosterTimeoutRunnable, 10000L)
+        rosterTimeoutHandler.postDelayed(rosterTimeoutRunnable, ROSTER_TIMEOUT_MS)
     }
 
     private fun handle(text: String) {
         try {
             val msg = JSONObject(text)
-            Log.d("CloudSig", "MSG parsed: keys=${msg.keys().asSequence().toList()}")
+            Log.d(TAG, "MSG parsed: keys=${msg.keys().asSequence().toList()}")
 
-            if (msg.has("sys")) {
-                val sys = msg.getString("sys")
-                Log.i("CloudSig", "SYS mesaji: $sys")
-                when (sys) {
-                    "roster" -> {
-                        rosterReceived = true
-                        rosterTimeoutHandler.removeCallbacksAndMessages(null)
-                        val roster = msg.getJSONArray("roster")
-                        val newCount = roster.length()
-                    Log.i("CloudSig", "ROSTER: $newCount peer var (onceki: $peerCount)")
-                        val viewers = if (newCount > 1) newCount - 1 else 0
-                        onViewerCountChanged(viewers)
-                        if (newCount > peerCount && newCount > 1) {
-                            Log.i("CloudSig", "Baska peer katildi! onPeerJoined cagiriliyor")
-                            onPeerJoined()
-                        } else if (newCount < peerCount && peerCount > 1) {
-                            Log.i("CloudSig", "Peer ayrildi! onPeerLeft cagiriliyor")
-                            onPeerLeft()
-                        }
-                        peerCount = newCount
-                    }
-                    "pong" -> {
-                        lastPongTime = System.currentTimeMillis()
-                        Log.d("CloudSig", "PONG alindi")
-                    }
-                    "error" -> {
-                        val code = msg.optString("code", "unknown")
-                        Log.e("CloudSig", "SUNUCU HATASI: sys=error, code=$code")
-                        onDisconnect?.invoke("Sunucu hatasi: $code")
-                    }
-                    else -> {
-                        Log.w("CloudSig", "Bilinmeyen sys mesaji: $sys")
-                    }
-                }
-                return
-            }
-
-            if (msg.has("error")) {
-                Log.e("CloudSig", "SUNUCU HATASI: ${msg.getString("error")}")
-                return
-            }
+            if (handleSystemMessage(msg)) return
+            if (handleErrorMessage(msg)) return
 
             val kind = msg.optString("kind", "")
             val from = msg.optString("from", "")
 
             if (from == peerId) {
-                Log.d("CloudSig", "Kendinden gelen, atlandi")
+                Log.d(TAG, "Kendinden gelen, atlandi")
                 return
             }
 
-            when (kind) {
-                "desc" -> {
-                    val payload = msg.getJSONObject("payload")
-                    val sdpType = payload.getString("type")
-                    val sdpStr = payload.getString("sdp")
-                    Log.i("CloudSig", "DESC alindi: $sdpType from $from")
-
-                    when (sdpType) {
-                        "offer" -> {
-                            onRemoteDescription(
-                                SessionDescription(SessionDescription.Type.OFFER, sdpStr)
-                            )
-                        }
-                        "answer" -> {
-                            onRemoteDescription(
-                                SessionDescription(SessionDescription.Type.ANSWER, sdpStr)
-                            )
-                        }
-                    }
-                }
-                "ice" -> {
-                    val payload = msg.getJSONObject("payload")
-                    Log.i("CloudSig", "ICE alindi from $from")
-                    onRemoteIce(
-                        IceCandidate(
-                            payload.optString("sdpMid", ""),
-                            payload.optInt("sdpMLineIndex", 0),
-                            payload.getString("candidate")
-                        )
-                    )
-                }
-                else -> {
-                    Log.d("CloudSig", "Bilinmeyen kind: $kind")
-                }
-            }
+            handlePeerMessage(kind, from, msg)
         } catch (e: Exception) {
-            Log.e("CloudSig", "Mesaj isleme hatasi: ${e.message}", e)
+            Log.e(TAG, "Mesaj isleme hatasi: ${e.message}", e)
         }
     }
 
-    fun sendOffer(sdp: SessionDescription) {
-        val payload = JSONObject()
-            .put("type", "offer")
-            .put("sdp", sdp.description)
+    private fun handleSystemMessage(msg: JSONObject): Boolean {
+        if (!msg.has("sys")) return false
 
-        val msg = JSONObject()
-            .put("kind", "desc")
-            .put("roomId", room)
-            .put("from", peerId)
-            .put("payload", payload)
-            .toString()
-        Log.i("CloudSig", "OFFER gonderiliyor")
+        val sys = msg.getString("sys")
+        Log.i(TAG, "SYS mesaji: $sys")
+
+        when (sys) {
+            "roster" -> handleRoster(msg)
+            "pong" -> handlePong()
+            "error" -> handleServerError(msg)
+            else -> Log.w(TAG, "Bilinmeyen sys mesaji: $sys")
+        }
+        return true
+    }
+
+    private fun handleRoster(msg: JSONObject) {
+        rosterReceived = true
+        rosterTimeoutHandler.removeCallbacksAndMessages(null)
+        val roster = msg.getJSONArray("roster")
+        val newCount = roster.length()
+        Log.i(TAG, "ROSTER: $newCount peer var (onceki: $peerCount)")
+
+        val viewers = if (newCount > 1) newCount - 1 else 0
+        onViewerCountChanged(viewers)
+
+        if (newCount > peerCount && newCount > 1) {
+            Log.i(TAG, "Baska peer katildi! onPeerJoined cagiriliyor")
+            onPeerJoined()
+        } else if (newCount < peerCount && peerCount > 1) {
+            Log.i(TAG, "Peer ayrildi! onPeerLeft cagiriliyor")
+            onPeerLeft()
+        }
+        peerCount = newCount
+    }
+
+    private fun handlePong() {
+        lastPongTime = System.currentTimeMillis()
+        Log.d(TAG, "PONG alindi")
+    }
+
+    private fun handleServerError(msg: JSONObject) {
+        val code = msg.optString("code", "unknown")
+        Log.e(TAG, "SUNUCU HATASI: sys=error, code=$code")
+        onDisconnect?.invoke("Sunucu hatasi: $code")
+    }
+
+    private fun handleErrorMessage(msg: JSONObject): Boolean {
+        if (!msg.has("error")) return false
+        Log.e(TAG, "SUNUCU HATASI: ${msg.getString("error")}")
+        return true
+    }
+
+    private fun handlePeerMessage(kind: String, from: String, msg: JSONObject) {
+        when (kind) {
+            "desc" -> handleDescriptionMessage(from, msg)
+            "ice" -> handleIceMessage(from, msg)
+            else -> Log.d(TAG, "Bilinmeyen kind: $kind")
+        }
+    }
+
+    private fun handleDescriptionMessage(from: String, msg: JSONObject) {
+        val payload = msg.getJSONObject("payload")
+        val sdpType = payload.getString("type")
+        val sdpStr = payload.getString("sdp")
+        Log.i(TAG, "DESC alindi: $sdpType from $from")
+
+        val type = when (sdpType) {
+            "offer" -> SessionDescription.Type.OFFER
+            "answer" -> SessionDescription.Type.ANSWER
+            else -> return
+        }
+        onRemoteDescription(SessionDescription(type, sdpStr))
+    }
+
+    private fun handleIceMessage(from: String, msg: JSONObject) {
+        val payload = msg.getJSONObject("payload")
+        Log.i(TAG, "ICE alindi from $from")
+        onRemoteIce(
+            IceCandidate(
+                payload.optString("sdpMid", ""),
+                payload.optInt("sdpMLineIndex", 0),
+                payload.getString("candidate")
+            )
+        )
+    }
+
+    private fun sendPing() {
+        val ping = JSONObject().put("kind", "ping").toString()
+        Log.d(TAG, "HEARTBEAT ping gonderiliyor")
+        send(ping)
+    }
+
+    fun sendOffer(sdp: SessionDescription) {
+        val msg = createSDPMessage("offer", sdp.description)
+        Log.i(TAG, "OFFER gonderiliyor")
         val sent = send(msg)
-        Log.i("CloudSig", "OFFER gonderildi: sent=$sent")
+        Log.i(TAG, "OFFER gonderildi: sent=$sent")
     }
 
     fun sendAnswer(sdp: SessionDescription) {
-        val payload = JSONObject()
-            .put("type", "answer")
-            .put("sdp", sdp.description)
+        val msg = createSDPMessage("answer", sdp.description)
+        Log.i(TAG, "ANSWER gonderiliyor")
+        val sent = send(msg)
+        Log.i(TAG, "ANSWER gonderildi: sent=$sent")
+    }
 
-        val msg = JSONObject()
+    private fun createSDPMessage(type: String, sdp: String): String {
+        val payload = JSONObject()
+            .put("type", type)
+            .put("sdp", sdp)
+
+        return JSONObject()
             .put("kind", "desc")
             .put("roomId", room)
             .put("from", peerId)
             .put("payload", payload)
             .toString()
-        Log.i("CloudSig", "ANSWER gonderiliyor")
-        val sent = send(msg)
-        Log.i("CloudSig", "ANSWER gonderildi: sent=$sent")
     }
 
     fun sendIce(candidate: IceCandidate) {
@@ -274,7 +321,7 @@ class CloudSignalingClient(
             .put("from", peerId)
             .put("payload", payload)
             .toString()
-        Log.i("CloudSig", "ICE gonderiliyor")
+        Log.i(TAG, "ICE gonderiliyor")
         send(msg)
     }
 
@@ -282,33 +329,38 @@ class CloudSignalingClient(
         return try {
             val sent = ws?.send(text) ?: false
             if (!sent) {
-                Log.w("CloudSig", "MESAJ GONDERILEMEDI (ws=$ws, connected=$connected)")
+                Log.w(TAG, "MESAJ GONDERILEMEDI (ws=$ws, connected=$connected)")
             }
-            Log.d("CloudSig", "Gonderildi($sent)")
+            Log.d(TAG, "Gonderildi($sent)")
             sent
         } catch (e: Exception) {
-            Log.e("CloudSig", "Gonderme hatasi: ${e.message}")
+            Log.e(TAG, "Gonderme hatasi: ${e.message}")
             false
         }
     }
 
     private fun scheduleReconnect() {
         if (closed) return
-        if (reconnectAttempt >= maxReconnectAttempts) {
-            Log.e("CloudSig", "Maksimum reconnect denemesine ulasildi ($maxReconnectAttempts)")
+        if (reconnectAttempt >= MAX_RECONNECT_ATTEMPTS) {
+            Log.e(TAG, "Maksimum reconnect denemesine ulasildi ($MAX_RECONNECT_ATTEMPTS)")
             onDisconnect?.invoke("Yeniden baglanma limiti asildi")
             return
         }
-        val delay = minOf(1000L * (1L shl minOf(reconnectAttempt, 30)), maxReconnectDelay)
+        val delay = calculateReconnectDelay()
         reconnectAttempt++
-        Log.i("CloudSig", "${delay}ms sonra yeniden baglanacak (deneme: $reconnectAttempt)")
+        Log.i(TAG, "${delay}ms sonra yeniden baglanacak (deneme: $reconnectAttempt)")
         onDisconnect?.invoke("Yeniden baglaniliyor... (deneme: $reconnectAttempt)")
         reconnectHandler.postDelayed({
             if (!closed && !connected) {
-                Log.i("CloudSig", "Yeniden baglaniyor...")
+                Log.i(TAG, "Yeniden baglaniyor...")
                 connect()
             }
         }, delay)
+    }
+
+    private fun calculateReconnectDelay(): Long {
+        val shift = minOf(reconnectAttempt, MAX_RECONNECT_SHIFT)
+        return minOf(INITIAL_RECONNECT_DELAY_MS * (1L shl shift), MAX_RECONNECT_DELAY_MS)
     }
 
     fun close() {
@@ -318,7 +370,7 @@ class CloudSignalingClient(
         rosterTimeoutHandler.removeCallbacksAndMessages(null)
         try {
             registered = false
-            ws?.close(1000, "kapat")
+            ws?.close(CLOSE_CODE_NORMAL, "kapat")
             ws = null
             client?.dispatcher?.executorService?.shutdown()
             client?.connectionPool?.evictAll()
