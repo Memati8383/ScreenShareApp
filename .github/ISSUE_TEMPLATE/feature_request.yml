@@ -1,0 +1,25 @@
+name: Özellik İsteği
+description: Yeni bir özellik veya geliştirme önerin
+title: "[ÖNERİ] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Bu özellik hangi sorunu çözüyor?
+      placeholder: Her yayında oda kodunu elle yazmak zorunda kalıyorum...
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Önerdiğiniz Çözüm
+      description: Özelliğin nasıl çalışmasını isterdiniz?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Değerlendirdiğiniz Alternatifler
+      description: Aynı sorunu çözebilecek başka yaklaşımlar var mı?

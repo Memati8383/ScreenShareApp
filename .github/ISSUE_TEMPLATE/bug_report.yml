@@ -1,0 +1,56 @@
+name: Hata Bildirimi
+description: Bir hata veya beklenmeyen davranış bildirin
+title: "[HATA] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Hata Açıklaması
+      description: Ne oldu? Ne olmasını bekliyordunuz?
+      placeholder: Yayın başlattıktan sonra izleyici bağlanamıyor...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Yeniden Üretme Adımları
+      description: Hatayı tekrarlamak için gereken adımları listeleyin.
+      value: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Cihaz ve Android Sürümü
+      description: Ör. Samsung Galaxy S23, Android 15
+      placeholder: Cihaz adı, Android sürümü
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Uygulama Sürümü
+      description: Ör. 3.0
+    validations:
+      required: true
+  - type: dropdown
+    id: side
+    attributes:
+      label: Hangi Modda?
+      options:
+        - Yayın (Host)
+        - İzleme (Viewer)
+        - Her ikisi
+        - Diğer
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Loglar (isteğe bağlı)
+      description: Varsa `adb logcat` çıktısının ilgili kısmını ekleyin.
+      render: shell
