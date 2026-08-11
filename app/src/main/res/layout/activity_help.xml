@@ -16,27 +16,89 @@
         app:navigationIcon="@drawable/ic_back"
         app:navigationIconTint="@color/text_primary" />
 
+    <!-- Arama Kutusu -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="4dp">
+
+        <EditText
+            android:id="@+id/searchInput"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_glass_card"
+            android:hint="@string/help_search_hint"
+            android:textColorHint="#66FFFFFF"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:paddingHorizontal="16dp"
+            android:paddingStart="40dp"
+            android:drawableStart="@drawable/ic_info_circle"
+            android:drawablePadding="10dp"
+            android:inputType="text"
+            android:singleLine="true"
+            android:imeOptions="actionSearch" />
+
+        <!-- Tümünü Aç/Kapat -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/btnExpandAll"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:gravity="center"
+                android:text="@string/help_expand_all"
+                android:textColor="@color/accent"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="12dp"
+                android:background="@drawable/bg_selector"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+    </LinearLayout>
+
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
 
         <LinearLayout
+            android:id="@+id/sectionsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="32dp">
 
-            <!-- Section 1 -->
+            <!-- Section 1: Nasıl Çalışır -->
             <LinearLayout
                 android:id="@+id/section1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_card"
+                android:background="@drawable/bg_glass_card"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="2dp">
+                android:layout_marginBottom="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/icon1"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_info_circle"
+                    android:layout_marginEnd="12dp" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -44,21 +106,22 @@
                     android:layout_weight="1"
                     android:text="@string/help_how_title"
                     android:textColor="@color/text_primary"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/arrow1"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_arrow_right" />
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_right"
+                    android:alpha="0.6" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/content1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_card_expanded"
+                android:background="@drawable/bg_glass_card"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="12dp"
@@ -66,24 +129,35 @@
                 android:visibility="gone">
 
                 <TextView
+                    android:id="@+id/text1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/help_how_desc"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     android:lineSpacingExtra="4dp" />
+
+                <include layout="@layout/help_feedback_buttons" />
             </LinearLayout>
 
-            <!-- Section 2 -->
+            <!-- Section 2: Ekran Yayını Nasıl Başlatılır? -->
             <LinearLayout
                 android:id="@+id/section2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_card"
+                android:background="@drawable/bg_glass_card"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="2dp">
+                android:layout_marginBottom="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/icon2"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_play"
+                    android:layout_marginEnd="12dp" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -91,21 +165,22 @@
                     android:layout_weight="1"
                     android:text="@string/help_start_title"
                     android:textColor="@color/text_primary"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/arrow2"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_arrow_right" />
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_right"
+                    android:alpha="0.6" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/content2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_card_expanded"
+                android:background="@drawable/bg_glass_card"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="12dp"
@@ -113,24 +188,35 @@
                 android:visibility="gone">
 
                 <TextView
+                    android:id="@+id/text2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/help_start_desc"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     android:lineSpacingExtra="4dp" />
+
+                <include layout="@layout/help_feedback_buttons" />
             </LinearLayout>
 
-            <!-- Section 3 -->
+            <!-- Section 3: Ekran Yayını Nasıl İzlenir? -->
             <LinearLayout
                 android:id="@+id/section3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_card"
+                android:background="@drawable/bg_glass_card"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="2dp">
+                android:layout_marginBottom="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/icon3"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_eye"
+                    android:layout_marginEnd="12dp" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -138,21 +224,22 @@
                     android:layout_weight="1"
                     android:text="@string/help_watch_title"
                     android:textColor="@color/text_primary"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/arrow3"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_arrow_right" />
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_right"
+                    android:alpha="0.6" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/content3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_card_expanded"
+                android:background="@drawable/bg_glass_card"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="12dp"
@@ -160,24 +247,35 @@
                 android:visibility="gone">
 
                 <TextView
+                    android:id="@+id/text3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/help_watch_desc"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     android:lineSpacingExtra="4dp" />
+
+                <include layout="@layout/help_feedback_buttons" />
             </LinearLayout>
 
-            <!-- Section 4 -->
+            <!-- Section 4: Sorun Giderme -->
             <LinearLayout
                 android:id="@+id/section4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_card"
+                android:background="@drawable/bg_glass_card"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="2dp">
+                android:layout_marginBottom="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/icon4"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_signal"
+                    android:layout_marginEnd="12dp" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -185,21 +283,22 @@
                     android:layout_weight="1"
                     android:text="@string/help_troubleshoot_title"
                     android:textColor="@color/text_primary"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/arrow4"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_arrow_right" />
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_right"
+                    android:alpha="0.6" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/content4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_card_expanded"
+                android:background="@drawable/bg_glass_card"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="12dp"
@@ -207,24 +306,102 @@
                 android:visibility="gone">
 
                 <TextView
+                    android:id="@+id/text4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/help_troubleshoot_desc"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     android:lineSpacingExtra="4dp" />
+
+                <!-- Yaygın Sorunlar Kartları -->
+                <LinearLayout
+                    android:id="@+id/troubleshootCards"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="12dp" />
+
+                <include layout="@layout/help_feedback_buttons" />
             </LinearLayout>
 
-            <!-- Section 5 -->
+            <!-- Section 5: Gizlilik ve Güvenlik -->
             <LinearLayout
                 android:id="@+id/section5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_card"
+                android:background="@drawable/bg_glass_card"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="2dp">
+                android:layout_marginBottom="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/icon5"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_lock"
+                    android:layout_marginEnd="12dp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/help_privacy_title"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/arrow5"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_right"
+                    android:alpha="0.6" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/content5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/text5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp" />
+
+                <include layout="@layout/help_feedback_buttons" />
+            </LinearLayout>
+
+            <!-- Section 6: Sıkça Sorulan Sorular -->
+            <LinearLayout
+                android:id="@+id/section6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/icon6"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_help"
+                    android:layout_marginEnd="12dp" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -232,21 +409,22 @@
                     android:layout_weight="1"
                     android:text="@string/help_faq_title"
                     android:textColor="@color/text_primary"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/arrow5"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_arrow_right" />
+                    android:id="@+id/arrow6"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_right"
+                    android:alpha="0.6" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/content5"
+                android:id="@+id/content6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_card_expanded"
+                android:background="@drawable/bg_glass_card"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="12dp"
@@ -254,12 +432,74 @@
                 android:visibility="gone">
 
                 <TextView
+                    android:id="@+id/text6"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/help_faq_desc"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     android:lineSpacingExtra="4dp" />
+
+                <include layout="@layout/help_feedback_buttons" />
+            </LinearLayout>
+
+            <!-- Cihaz Bilgisi -->
+            <LinearLayout
+                android:id="@+id/deviceInfoCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/help_device_info"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="11sp"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.1"
+                    android:layout_marginBottom="8dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/help_device_version"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/deviceVersion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/white"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/help_device_android"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/deviceAndroid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/white"
+                        android:textSize="13sp" />
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>

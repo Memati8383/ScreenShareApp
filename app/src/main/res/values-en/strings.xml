@@ -209,6 +209,27 @@
     <string name="help_troubleshoot_desc">• Connection issue: Check your internet connection\n• Latency: Try connecting to a WiFi network\n• Screen share not starting: Check permissions\n• App crashed: Restart the app</string>
     <string name="help_faq_title">FAQ</string>
     <string name="help_faq_desc">Q: How many devices can connect at once?\nA: Currently 2 devices (1 broadcaster + 1 viewer)\n\nQ: Is internet connection required?\nA: Yes, both devices need to be connected to the internet\n\nQ: Is it free?\nA: Yes, the app is completely free</string>
+    <string name="help_privacy_title">Privacy &amp; Security</string>
+    <string name="help_privacy_desc">ScreenShare takes the following measures to protect your privacy:\n\n🔒 Encryption: All WebRTC connections are encrypted with DTLS\n\n🗑️ Data Storage: Image data is not stored on servers, transmitted directly between devices\n\n🌐 Server Role: Server only helps with connection setup, cannot access screen content\n\n📱 Permissions: Screen sharing permission is only requested during broadcasting\n\n🔐 Room Security: Each room is protected with a unique name, unauthorized access is prevented\n\nNote: No usage statistics are collected.</string>
+    <string name="help_search_hint">Search help…</string>
+    <string name="help_expand_all">Expand All</string>
+    <string name="help_collapse_all">Collapse All</string>
+    <string name="help_feedback_question">Was this helpful?</string>
+    <string name="help_feedback_yes">Yes</string>
+    <string name="help_feedback_no">No</string>
+    <string name="help_feedback_thanks">Thank you!</string>
+    <string name="help_feedback_sorry">Sorry, your feedback has been recorded.</string>
+    <string name="help_device_info">Device Info</string>
+    <string name="help_device_version">Version</string>
+    <string name="help_device_android">Android</string>
+    <string name="troubleshoot_network_title">Connection Issue</string>
+    <string name="troubleshoot_network_desc">Check your internet connection.\nTry connecting via WiFi or mobile data.\nMake sure the server address is correct.</string>
+    <string name="troubleshoot_lag_title">Lag Issue</string>
+    <string name="troubleshoot_lag_desc">Try connecting to a WiFi network.\nClose unnecessary background apps.\nTry lowering the resolution (480p/720p).</string>
+    <string name="troubleshoot_screen_title">Screen Share Not Starting</string>
+    <string name="troubleshoot_screen_desc">Check screen sharing permission.\nRestart the app.\nGrant permission in app settings.</string>
+    <string name="troubleshoot_crash_title">App Crashed</string>
+    <string name="troubleshoot_crash_desc">Fully close and reopen the app.\nRestart your device.\nUpdate the app if the issue persists.</string>
 
     <!-- About -->
     <string name="about_version">Version 3.0 (Build 3)</string>

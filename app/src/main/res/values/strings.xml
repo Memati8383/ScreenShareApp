@@ -221,6 +221,27 @@
     <string name="help_troubleshoot_desc">• Bağlantı sorunu: İnternet bağlantınızı kontrol edin\n• Gecikme: WiFi ağına bağlanmayı deneyin\n• Ekran paylaşımı başlamadı: İzinleri kontrol edin\n• Uygulama çöktü: Uygulamayı yeniden başlatın</string>
     <string name="help_faq_title">Sıkça Sorulan Sorular</string>
     <string name="help_faq_desc">S: Aynı anda kaç cihaz bağlanabilir?\nC: Şu anda 2 cihaz (1 yayıncı + 1 izleyici)\n\nS: İnternet bağlantısı gerekli mi?\nC: Evet, her cihazın internete bağlı olması gerekir\n\nS: Ücretsiz mi?\nC: Evet, uygulama tamamen ücretsizdir</string>
+    <string name="help_privacy_title">Gizlilik ve Güvenlik</string>
+    <string name="help_privacy_desc">ScreenShare, gizliliğinizi korumak için aşağıdaki önlemleri alır:\n\n🔒 Şifreleme: Tüm WebRTC bağlantısı DTLS ile şifrelenir\n\n🗑️ Veri Saklama: Görüntü verileri sunucuda saklanmaz, doğrudan cihazlar arasında iletilir\n\n🌐 Sunucu Rolü: Sunucu sadece bağlantı kurulumunda rol oynar, ekran içeriklerine erişmez\n\n📱 İzinler: Ekran paylaşımı izni sadece yayın sırasında istenir\n\n🔐 Oda Güvenliği: Her oda benzersiz bir isimle korunur, izinsiz erişim engellenir\n\nNot: Uygulama kullanım istatistikleri toplanmaz.</string>
+    <string name="help_search_hint">Yardım ara…</string>
+    <string name="help_expand_all">Tümünü Aç</string>
+    <string name="help_collapse_all">Tümünü Kapat</string>
+    <string name="help_feedback_question">Bu yardımcı oldu mu?</string>
+    <string name="help_feedback_yes">Evet</string>
+    <string name="help_feedback_no">Hayır</string>
+    <string name="help_feedback_thanks">Teşekkürler!</string>
+    <string name="help_feedback_sorry">Özür dileriz, geri bildiriminiz kaydedildi.</string>
+    <string name="help_device_info">Cihaz Bilgisi</string>
+    <string name="help_device_version">Sürüm</string>
+    <string name="help_device_android">Android</string>
+    <string name="troubleshoot_network_title">Bağlantı Sorunu</string>
+    <string name="troubleshoot_network_desc">İnternet bağlantınızı kontrol edin.\nWiFi veya mobil veri ile tekrar deneyin.\nSunucu adresinin doğru olduğundan emin olun.</string>
+    <string name="troubleshoot_lag_title">Gecikme Sorunu</string>
+    <string name="troubleshoot_lag_desc">WiFi ağına bağlanmayı deneyin.\nArka plandaki gereksiz uygulamaları kapatın.\nÇözünürüğü düşürmeyi deneyin (480p/720p).</string>
+    <string name="troubleshoot_screen_title">Ekran Paylaşımı Başlamadı</string>
+    <string name="troubleshoot_screen_desc">Ekran paylaşımı iznini kontrol edin.\nUygulamayı yeniden başlatın.\nİzinler ayarlarından uygulamaya izin verin.</string>
+    <string name="troubleshoot_crash_title">Uygulama Çöktü</string>
+    <string name="troubleshoot_crash_desc">Uygulamayı tamamen kapatıp yeniden açın.\nCihazınızı yeniden başlatın.\nSorun devam ederse uygulamayı güncelleyin.</string>
 
     <!-- Hakkında -->
     <string name="about_version">Sürüm 3.0 (Build 3)</string>
