@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Gradient arka plan -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="135"
+                android:startColor="#FF0A0E27"
+                android:centerColor="#FF12163A"
+                android:endColor="#FF0D1120" />
+        </shape>
+    </item>
+    <!-- Üst parlak leke -->
+    <item
+        android:left="-80dp"
+        android:top="-120dp"
+        android:right="180dp"
+        android:bottom="200dp">
+        <shape android:shape="oval">
+            <solid android:color="#1A00B4FF" />
+            <size android:width="400dp" android:height="400dp" />
+        </shape>
+    </item>
+    <!-- Alt parlak leke -->
+    <item
+        android:left="120dp"
+        android:top="400dp"
+        android:right="-60dp"
+        android:bottom="-100dp">
+        <shape android:shape="oval">
+            <solid android:color="#12FF66FF" />
+            <size android:width="350dp" android:height="350dp" />
+        </shape>
+    </item>
+</layer-list>

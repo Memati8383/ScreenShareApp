@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="100dp"
+    android:layout_height="100dp"
+    android:layout_marginEnd="8dp">
+
+    <ImageView
+        android:id="@+id/ivScreenshot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_screenshot_preview"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/feedback_screenshot_label" />
+
+    <ImageView
+        android:id="@+id/btnRemove"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="end|top"
+        android:layout_margin="4dp"
+        android:background="@drawable/bg_circle_accent"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:padding="4dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="@string/feedback_screenshot_remove"
+        app:tint="@android:color/white" />
+
+</FrameLayout>

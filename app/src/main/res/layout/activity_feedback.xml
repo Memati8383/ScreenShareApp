@@ -1,185 +1,518 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#FF0A0E27"
-    android:fitsSystemWindows="true">
+    android:background="@drawable/bg_glassmorphism_root">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/transparent"
-        app:title="@string/feedback_title"
-        app:titleTextColor="@android:color/white"
-        app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="@android:color/white" />
-
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:orientation="vertical"
+        android:fitsSystemWindows="true">
 
-        <LinearLayout
+        <!-- Toolbar -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingTop="16dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent"
+            app:title="@string/feedback_title"
+            app:titleTextColor="@color/text_primary"
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="@color/text_primary" />
+
+        <!-- Ana ScrollView -->
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:overScrollMode="never"
+            android:clipToPadding="false"
             android:paddingBottom="32dp">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/feedback_header"
-                android:textColor="#99FFFFFF"
-                android:textSize="14sp"
-                android:gravity="center"
-                android:layout_marginBottom="20dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/feedback_subject_label"
-                android:textColor="#66FFFFFF"
-                android:textSize="11sp"
-                android:letterSpacing="0.15"
-                android:layout_marginBottom="8dp" />
-
             <LinearLayout
+                android:id="@+id/formContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="20dp">
+                android:orientation="vertical"
+                android:paddingHorizontal="18dp">
 
+                <!-- Başlık -->
                 <TextView
-                    android:id="@+id/btnOneri"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/feedback_header"
+                    android:textColor="#CCFFFFFF"
+                    android:textSize="15sp"
                     android:gravity="center"
-                    android:text="@string/feedback_subject_suggestion"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="24dp"
+                    android:fontFamily="sans-serif-light" />
+
+                <!-- ============================================ -->
+                <!-- KONU SEÇİMİ - Cam Kartlar -->
+                <!-- ============================================ -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/feedback_subject_label"
+                    android:textColor="#80FFFFFF"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.15"
+                    android:layout_marginBottom="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="20dp">
+
+                    <!-- Öneri -->
+                    <LinearLayout
+                        android:id="@+id/cardOneri"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:paddingVertical="16dp"
+                        android:paddingHorizontal="6dp"
+                        android:background="@drawable/bg_glass_card_active"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="@string/feedback_subject_suggestion">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:layout_marginBottom="8dp"
+                            android:background="@drawable/bg_glass_icon_circle">
+
+                            <ImageView
+                                android:id="@+id/iconOneri"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_feedback"
+                                app:tint="@android:color/white" />
+
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/labelOneri"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/feedback_subject_suggestion"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <!-- Hata -->
+                    <LinearLayout
+                        android:id="@+id/cardHata"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:paddingVertical="16dp"
+                        android:paddingHorizontal="6dp"
+                        android:background="@drawable/bg_glass_card_inactive"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="@string/feedback_subject_bug">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:layout_marginBottom="8dp"
+                            android:background="@drawable/bg_glass_icon_circle">
+
+                            <ImageView
+                                android:id="@+id/iconHata"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_bug"
+                                app:tint="#80FFFFFF" />
+
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/labelHata"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/feedback_subject_bug"
+                            android:textColor="#80FFFFFF"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <!-- Görüş -->
+                    <LinearLayout
+                        android:id="@+id/cardGorus"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:paddingVertical="16dp"
+                        android:paddingHorizontal="6dp"
+                        android:background="@drawable/bg_glass_card_inactive"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="@string/feedback_subject_opinion">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:layout_marginBottom="8dp"
+                            android:background="@drawable/bg_glass_icon_circle">
+
+                            <ImageView
+                                android:id="@+id/iconGorus"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_opinion"
+                                app:tint="#80FFFFFF" />
+
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/labelGorus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/feedback_subject_opinion"
+                            android:textColor="#80FFFFFF"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- ============================================ -->
+                <!-- YILDIZ PUANI - Glass Panel -->
+                <!-- ============================================ -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/feedback_rating_label"
+                    android:textColor="#80FFFFFF"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.15"
+                    android:layout_marginBottom="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_panel_light"
+                    android:paddingHorizontal="18dp"
+                    android:paddingVertical="14dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <RatingBar
+                        android:id="@+id/ratingBar"
+                        style="@style/Widget.AppCompat.RatingBar.Indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:numStars="5"
+                        android:stepSize="1"
+                        android:rating="0"
+                        android:isIndicator="false"
+                        android:progressTint="@color/accent"
+                        android:secondaryProgressTint="#4D00B4FF" />
+
+                    <TextView
+                        android:id="@+id/tvRatingLabel"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:text="@string/feedback_rating_not_selected"
+                        android:textColor="#80FFFFFF"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <!-- ============================================ -->
+                <!-- FORM ALANLARI - Glass Input -->
+                <!-- ============================================ -->
+
+                <!-- Ad -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilName"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:boxBackgroundColor="#0DFFFFFF"
+                    app:boxStrokeColor="#26FFFFFF"
+                    app:hintTextColor="@color/accent"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:startIconDrawable="@drawable/ic_person"
+                    app:startIconTint="#66FFFFFF">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/feedback_name_hint"
+                        android:textColor="@android:color/white"
+                        android:textColorHint="#66FFFFFF"
+                        android:textSize="14sp"
+                        android:inputType="textPersonName"
+                        android:singleLine="true"
+                        android:minHeight="52dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- E-posta -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilEmail"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:boxBackgroundColor="#0DFFFFFF"
+                    app:boxStrokeColor="#26FFFFFF"
+                    app:hintTextColor="@color/accent"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:startIconDrawable="@android:drawable/ic_dialog_email"
+                    app:startIconTint="#66FFFFFF"
+                    app:endIconMode="clear_text">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/feedback_email_hint"
+                        android:textColor="@android:color/white"
+                        android:textColorHint="#66FFFFFF"
+                        android:textSize="14sp"
+                        android:inputType="textEmailAddress"
+                        android:singleLine="true"
+                        android:minHeight="52dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Mesaj + Karakter Sayacı -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilMessage"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:boxBackgroundColor="#0DFFFFFF"
+                        app:boxStrokeColor="#26FFFFFF"
+                        app:hintTextColor="@color/accent"
+                        app:boxCornerRadiusTopStart="16dp"
+                        app:boxCornerRadiusTopEnd="16dp"
+                        app:boxCornerRadiusBottomStart="16dp"
+                        app:boxCornerRadiusBottomEnd="16dp"
+                        app:startIconDrawable="@drawable/ic_opinion"
+                        app:startIconTint="#66FFFFFF"
+                        app:helperTextEnabled="true"
+                        app:helperText="@string/feedback_message_helper">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etMessage"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/feedback_message_hint"
+                            android:textColor="@android:color/white"
+                            android:textColorHint="#66FFFFFF"
+                            android:textSize="14sp"
+                            android:gravity="top"
+                            android:inputType="textMultiLine"
+                            android:minLines="5"
+                            android:lines="6"
+                            android:maxLength="2000"
+                            android:lineSpacingExtra="4dp"
+                            android:layout_marginBottom="4dp" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:id="@+id/tvCharCount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginTop="4dp"
+                        android:text="0 / 2000"
+                        android:textColor="#66FFFFFF"
+                        android:textSize="11sp" />
+
+                </LinearLayout>
+
+                <!-- ============================================ -->
+                <!-- EKRAN GÖRÜNTÜLERİ -->
+                <!-- ============================================ -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="24dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/feedback_screenshot_label"
+                            android:textColor="#80FFFFFF"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.15" />
+
+                        <TextView
+                            android:id="@+id/tvScreenshotCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 / 4"
+                            android:textColor="#80FFFFFF"
+                            android:textSize="11sp"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvScreenshots"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:clipToPadding="false"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:id="@+id/btnAddScreenshot"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_glass_screenshot_chip"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:paddingHorizontal="16dp"
+                        android:contentDescription="@string/feedback_screenshot_add">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_screenshot_multi"
+                            android:layout_marginEnd="8dp"
+                            app:tint="@color/accent" />
+
+                        <TextView
+                            android:id="@+id/tvAddScreenshot"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/feedback_screenshot_add"
+                            android:textColor="@color/accent"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- ============================================ -->
+                <!-- GÖNDER BUTONU - Glow Effect -->
+                <!-- ============================================ -->
+                <Button
+                    android:id="@+id/btnSend"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:background="@drawable/bg_glass_send_glow"
+                    android:text="@string/feedback_send"
                     android:textColor="@android:color/white"
-                    android:textSize="13sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
-                    android:background="@drawable/bg_button_primary"
-                    android:layout_marginEnd="6dp"
-                    android:clickable="true"
-                    android:focusable="true" />
+                    android:letterSpacing="0.08"
+                    android:stateListAnimator="@null"
+                    android:layout_marginBottom="16dp" />
 
-                <TextView
-                    android:id="@+id/btnHata"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="@string/feedback_subject_bug"
-                    android:textColor="#99FFFFFF"
-                    android:textSize="13sp"
-                    android:background="@drawable/bg_input"
-                    android:layout_marginEnd="6dp"
-                    android:clickable="true"
-                    android:focusable="true" />
-
-                <TextView
-                    android:id="@+id/btnGorus"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="@string/feedback_subject_opinion"
-                    android:textColor="#99FFFFFF"
-                    android:textSize="13sp"
-                    android:background="@drawable/bg_input"
-                    android:clickable="true"
-                    android:focusable="true" />
             </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/feedback_name_label"
-                android:textColor="#66FFFFFF"
-                android:textSize="11sp"
-                android:letterSpacing="0.15"
-                android:layout_marginBottom="6dp" />
+    <!-- ============================================ -->
+    <!-- BAŞARI OVERLAY -->
+    <!-- ============================================ -->
+    <LinearLayout
+        android:id="@+id/successOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="#CC0A0E27"
+        android:visibility="gone"
+        android:elevation="10dp">
 
-            <EditText
-                android:id="@+id/etName"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_input"
-                android:hint="@string/feedback_name_hint"
-                android:textColorHint="#4DFFFFFF"
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
-                android:paddingHorizontal="14dp"
-                android:inputType="textPersonName"
-                android:singleLine="true"
-                android:layout_marginBottom="16dp" />
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottieSuccess"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="false"
+            app:lottie_fileName="success_check.json" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/feedback_email_label"
-                android:textColor="#66FFFFFF"
-                android:textSize="11sp"
-                android:letterSpacing="0.15"
-                android:layout_marginBottom="6dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/feedback_success_title"
+            android:textColor="@android:color/white"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginTop="20dp" />
 
-            <EditText
-                android:id="@+id/etEmail"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_input"
-                android:hint="@string/feedback_email_hint"
-                android:textColorHint="#4DFFFFFF"
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
-                android:paddingHorizontal="14dp"
-                android:inputType="textEmailAddress"
-                android:singleLine="true"
-                android:layout_marginBottom="16dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/feedback_success_message"
+            android:textColor="#B3FFFFFF"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="32dp"
+            android:lineSpacingExtra="4dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/feedback_message_label"
-                android:textColor="#66FFFFFF"
-                android:textSize="11sp"
-                android:letterSpacing="0.15"
-                android:layout_marginBottom="6dp" />
+        <Button
+            android:id="@+id/btnSuccessOk"
+            android:layout_width="200dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_glass_send_glow"
+            android:text="@string/feedback_success_ok"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:stateListAnimator="@null" />
 
-            <EditText
-                android:id="@+id/etMessage"
-                android:layout_width="match_parent"
-                android:layout_height="140dp"
-                android:background="@drawable/bg_input"
-                android:hint="@string/feedback_message_hint"
-                android:textColorHint="#4DFFFFFF"
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
-                android:paddingHorizontal="14dp"
-                android:paddingVertical="12dp"
-                android:gravity="top"
-                android:inputType="textMultiLine"
-                android:layout_marginBottom="24dp" />
+    </LinearLayout>
 
-            <Button
-                android:id="@+id/btnSend"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:background="@drawable/bg_button_primary"
-                android:text="@string/feedback_send"
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.1"
-                android:stateListAnimator="@null" />
-
-        </LinearLayout>
-    </ScrollView>
-
-</LinearLayout>
+</FrameLayout>
