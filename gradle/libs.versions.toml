@@ -10,6 +10,7 @@ lifecycle = "2.8.6"
 coreKtx = "1.13.1"
 activityKtx = "1.9.2"
 lottie = "6.6.2"
+preference = "1.2.1"
 
 [libraries]
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
@@ -32,6 +33,9 @@ activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref
 
 # Lottie
 lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
+
+# Preference
+androidx-preference = { group = "androidx.preference", name = "preference-ktx", version.ref = "preference" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

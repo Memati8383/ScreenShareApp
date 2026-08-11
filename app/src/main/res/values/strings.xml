@@ -53,13 +53,32 @@
     <string name="settings_notifications_desc">Bildirimleri aç/kapat</string>
     <string name="settings_quality_stats">Kalite İstatistikleri</string>
     <string name="settings_quality_stats_desc">Bağlantı kalitesi istatistiklerini göster</string>
+    <string name="settings_haptic">Titreşim</string>
+    <string name="settings_haptic_desc">Dokunma geri bildirimi titreşimleri</string>
     <string name="settings_turn_title">TURN Sunucu Ayarları</string>
+    <string name="settings_turn_url">TURN Sunucu Adresi</string>
     <string name="settings_turn_url_hint">turn:openrelay.metered.ca:443</string>
+    <string name="settings_turn_user">Kullanıcı Adı</string>
     <string name="settings_turn_user_hint">openrelayproject</string>
+    <string name="settings_turn_pass">Şifre</string>
     <string name="settings_turn_pass_hint">openrelayproject</string>
     <string name="settings_resolution_title">Yayın Kalitesi</string>
     <string name="settings_resolution">Çözünürlük</string>
     <string name="settings_fps">Kare Hızı (FPS)</string>
+    <string name="settings_category_general">Genel</string>
+    <string name="settings_category_advanced">Gelişmiş</string>
+    <string name="settings_reset_all">Varsayılana Dön</string>
+    <string name="settings_reset_all_desc">Tüm ayarları fabrika ayarlarına sıfırla</string>
+    <string name="settings_reset_all_title">Ayarlari Sifirla</string>
+    <string name="settings_reset_all_msg">Tüm ayarlar varsayilan degerlerine dondurulecek. Emin misiniz?</string>
+    <string name="settings_reset_confirm">Sifirla</string>
+    <string name="settings_reset_done">Ayarlar sifirlandi</string>
+    <string name="settings_validation_error">Giris Hatasi</string>
+    <string name="settings_error_turn_url_empty">TURN sunucu adresi bos birakilamaz</string>
+    <string name="settings_error_turn_url_format">TURN adresi \"turn:\" veya \"stun:\" ile baslamalidir</string>
+    <string name="settings_error_turn_url_host">TURN adresi gecersiz. Orn: turn:sunucu.com:3478</string>
+    <string name="settings_error_turn_field_empty">%s bos birakilamaz</string>
+    <string name="btn_ok">Tamam</string>
 
     <!-- Profil -->
     <string name="profile_title">Profil</string>

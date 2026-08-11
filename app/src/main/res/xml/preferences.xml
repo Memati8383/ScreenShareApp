@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Genel Ayarlar -->
+    <PreferenceCategory
+        app:key="category_general"
+        app:title="@string/settings_category_general"
+        app:layout="@layout/preference_glass_category">
+
+        <ListPreference
+            app:key="language"
+            app:title="@string/settings_language"
+            app:entries="@array/language_entries"
+            app:entryValues="@array/language_values"
+            app:defaultValue="tr"
+            app:layout="@layout/preference_glass_list"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            app:key="notifications_enabled"
+            app:title="@string/settings_notifications"
+            app:summary="@string/settings_notifications_desc"
+            app:defaultValue="true"
+            app:layout="@layout/preference_glass_switch"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            app:key="quality_stats_enabled"
+            app:title="@string/settings_quality_stats"
+            app:summary="@string/settings_quality_stats_desc"
+            app:defaultValue="true"
+            app:layout="@layout/preference_glass_switch"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            app:key="haptic_enabled"
+            app:title="@string/settings_haptic"
+            app:summary="@string/settings_haptic_desc"
+            app:defaultValue="true"
+            app:layout="@layout/preference_glass_switch"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <!-- Yayin Kalitesi -->
+    <PreferenceCategory
+        app:key="category_quality"
+        app:title="@string/settings_resolution_title"
+        app:layout="@layout/preference_glass_category">
+
+        <com.example.screenmirror.SpinnerPreference
+            app:key="capture_resolution"
+            app:title="@string/settings_resolution"
+            app:layout="@layout/preference_glass_spinner"
+            app:iconSpaceReserved="false" />
+
+        <com.example.screenmirror.SpinnerPreference
+            app:key="capture_fps"
+            app:title="@string/settings_fps"
+            app:layout="@layout/preference_glass_spinner"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <!-- TURN Sunucu Ayarlari -->
+    <PreferenceCategory
+        app:key="category_turn"
+        app:title="@string/settings_turn_title"
+        app:layout="@layout/preference_glass_category">
+
+        <EditTextPreference
+            app:key="turn_url"
+            app:title="@string/settings_turn_url"
+            app:defaultValue="turn:openrelay.metered.ca:443"
+            app:layout="@layout/preference_glass_edittext"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            app:key="turn_user"
+            app:title="@string/settings_turn_user"
+            app:defaultValue="openrelayproject"
+            app:layout="@layout/preference_glass_edittext"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            app:key="turn_pass"
+            app:title="@string/settings_turn_pass"
+            app:defaultValue="openrelayproject"
+            app:layout="@layout/preference_glass_edittext"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <!-- Gelistirilmis Ayarlar -->
+    <PreferenceCategory
+        app:key="category_advanced"
+        app:title="@string/settings_category_advanced"
+        app:layout="@layout/preference_glass_category">
+
+        <Preference
+            app:key="reset_all"
+            app:title="@string/settings_reset_all"
+            app:summary="@string/settings_reset_all_desc"
+            app:layout="@layout/preference_glass_reset"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

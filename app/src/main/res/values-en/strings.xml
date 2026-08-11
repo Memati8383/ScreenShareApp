@@ -53,6 +53,32 @@
     <string name="settings_notifications_desc">Turn notifications on/off</string>
     <string name="settings_quality_stats">Quality Stats</string>
     <string name="settings_quality_stats_desc">Show connection quality statistics</string>
+    <string name="settings_haptic">Vibration</string>
+    <string name="settings_haptic_desc">Haptic feedback vibrations</string>
+    <string name="settings_turn_title">TURN Server Settings</string>
+    <string name="settings_turn_url">TURN Server Address</string>
+    <string name="settings_turn_url_hint">turn:openrelay.metered.ca:443</string>
+    <string name="settings_turn_user">Username</string>
+    <string name="settings_turn_user_hint">openrelayproject</string>
+    <string name="settings_turn_pass">Password</string>
+    <string name="settings_turn_pass_hint">openrelayproject</string>
+    <string name="settings_resolution_title">Stream Quality</string>
+    <string name="settings_resolution">Resolution</string>
+    <string name="settings_fps">Frame Rate (FPS)</string>
+    <string name="settings_category_general">General</string>
+    <string name="settings_category_advanced">Advanced</string>
+    <string name="settings_reset_all">Reset to Defaults</string>
+    <string name="settings_reset_all_desc">Reset all settings to factory defaults</string>
+    <string name="settings_reset_all_title">Reset Settings</string>
+    <string name="settings_reset_all_msg">All settings will be restored to their default values. Are you sure?</string>
+    <string name="settings_reset_confirm">Reset</string>
+    <string name="settings_reset_done">Settings reset</string>
+    <string name="settings_validation_error">Input Error</string>
+    <string name="settings_error_turn_url_empty">TURN server address cannot be empty</string>
+    <string name="settings_error_turn_url_format">TURN address must start with \"turn:\" or \"stun:\"</string>
+    <string name="settings_error_turn_url_host">Invalid TURN address. Example: turn:server.com:3478</string>
+    <string name="settings_error_turn_field_empty">%s cannot be empty</string>
+    <string name="btn_ok">OK</string>
 
     <!-- Profile -->
     <string name="profile_title">Profile</string>

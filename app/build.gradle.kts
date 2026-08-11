@@ -47,6 +47,9 @@ dependencies {
     // Lottie
     implementation(libs.lottie)
 
+    // Preference
+    implementation(libs.androidx.preference)
+
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)

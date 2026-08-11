@@ -24,6 +24,7 @@
         <item name="android:editTextColor">@color/dark_text_primary</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
     <style name="ShapeAppearanceOverlay.Circle" parent="">
@@ -31,11 +32,27 @@
     </style>
 
     <style name="Theme.ScreenShare.Dialog" parent="Theme.MaterialComponents.Dialog.Alert">
-        <item name="android:background">@color/dark_bg_card</item>
+        <item name="android:background">@drawable/bg_glass_card</item>
         <item name="android:textColorPrimary">@color/dark_text_primary</item>
         <item name="android:textColorSecondary">@color/dark_text_secondary</item>
         <item name="colorAccent">@color/dark_accent</item>
         <item name="colorPrimary">@color/dark_accent</item>
         <item name="colorSurface">@color/dark_bg_card</item>
+    </style>
+
+    <style name="Theme.ScreenShare.PreferenceDialog" parent="Theme.MaterialComponents.Dialog.Alert">
+        <item name="android:background">@drawable/bg_glass_card</item>
+        <item name="android:textColorPrimary">@color/dark_text_primary</item>
+        <item name="android:textColorSecondary">@color/dark_text_secondary</item>
+        <item name="android:textColorHint">@color/dark_text_hint</item>
+        <item name="colorAccent">@color/dark_accent</item>
+        <item name="colorPrimary">@color/dark_accent</item>
+        <item name="colorSurface">@color/dark_bg_card</item>
+        <item name="buttonBarPositiveButtonStyle">@style/GlassDialogButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/GlassDialogButton</item>
+    </style>
+
+    <style name="GlassDialogButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/dark_accent</item>
     </style>
 </resources>
