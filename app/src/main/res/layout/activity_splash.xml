@@ -1,59 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.motion.widget.MotionLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/splash_motion_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_dark">
+    android:background="@color/dark_bg"
+    android:fitsSystemWindows="false"
+    app:layoutDescription="@xml/splash_motion_scene">
 
-    <ImageView
-        android:id="@+id/splash_bg"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/bg_gradient"
-        android:alpha="0.3" />
+    <!-- Animated gradient background -->
+    <View
+        android:id="@+id/splash_bg_gradient_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/splash_gradient_1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <View
+        android:id="@+id/splash_bg_gradient_2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/splash_gradient_2"
+        android:alpha="0.6"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Particle effect layer -->
+    <com.example.screenmirror.splash.ParticleView
+        android:id="@+id/particle_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Main content container -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/content_container"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:orientation="vertical">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Glow background for icon -->
+        <View
+            android:id="@+id/icon_glow"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:background="@drawable/splash_icon_glow"
+            app:layout_constraintTop_toTopOf="@id/splash_icon"
+            app:layout_constraintBottom_toBottomOf="@id/splash_icon"
+            app:layout_constraintStart_toStartOf="@id/splash_icon"
+            app:layout_constraintEnd_toEndOf="@id/splash_icon" />
+
+        <!-- Main app icon -->
         <ImageView
             android:id="@+id/splash_icon"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@drawable/ic_cast"
-            android:alpha="0" />
+            android:tint="@color/dark_accent"
+            android:contentDescription="@string/app_name"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- App title -->
         <TextView
             android:id="@+id/splash_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="32dp"
             android:text="@string/splash_title"
             android:textColor="@android:color/white"
-            android:textSize="36sp"
+            android:textSize="42sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium"
-            android:alpha="0" />
+            android:letterSpacing="0.02"
+            android:shadowColor="@color/dark_accent"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="20"
+            app:layout_constraintTop_toBottomOf="@id/splash_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Subtitle -->
         <TextView
             android:id="@+id/splash_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:text="@string/splash_subtitle"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/dark_text_secondary"
             android:textSize="16sp"
-            android:alpha="0" />
-    </LinearLayout>
+            android:letterSpacing="0.05"
+            android:fontFamily="sans-serif-light"
+            app:layout_constraintTop_toBottomOf="@id/splash_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Version badge -->
+        <TextView
+            android:id="@+id/version_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="v3.0"
+            android:textColor="@color/dark_accent"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-medium"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="@drawable/splash_version_badge"
+            android:letterSpacing="0.1"
+            app:layout_constraintTop_toBottomOf="@id/splash_subtitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Loading animation -->
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/splash_lottie"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Progress shimmer -->
+    <View
+        android:id="@+id/progress_shimmer"
         android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="80dp"
-        android:alpha="0" />
-</FrameLayout>
+        android:layout_height="2dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/splash_progress_shimmer"
+        android:alpha="0.3"
+        app:layout_constraintTop_toBottomOf="@id/splash_lottie"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Loading text -->
+    <TextView
+        android:id="@+id/loading_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/splash_loading"
+        android:textColor="@color/dark_text_secondary"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif"
+        android:letterSpacing="0.15"
+        app:layout_constraintTop_toBottomOf="@id/progress_shimmer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.motion.widget.MotionLayout>

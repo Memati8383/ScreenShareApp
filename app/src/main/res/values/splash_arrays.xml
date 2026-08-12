@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash Screen Particle Color Palette -->
+    <integer-array name="splash_particle_colors">
+        <item>@color/dark_accent</item>
+        <item>@color/dark_gradient_start</item>
+        <item>@color/dark_gradient_end</item>
+        <item>@color/dark_status_good</item>
+        <item>@android:color/white</item>
+    </integer-array>
+    
+    <!-- Splash animation durations in milliseconds -->
+    <integer name="splash_phase_1_duration">800</integer>
+    <integer name="splash_phase_2_duration">1200</integer>
+    <integer name="splash_total_duration">3200</integer>
+    <integer name="splash_celebration_duration">300</integer>
+    <integer name="splash_fadeout_duration">400</integer>
+</resources>

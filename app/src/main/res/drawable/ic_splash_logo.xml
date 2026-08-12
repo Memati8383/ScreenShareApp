@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    
+    <!-- Outer glow circle -->
+    <path
+        android:fillColor="#2000B4FF"
+        android:pathData="M60,60m-58,0a58,58 0,1,1 116,0a58,58 0,1,1 -116,0" />
+    
+    <!-- Middle circle -->
+    <path
+        android:fillColor="#4000B4FF"
+        android:pathData="M60,60m-45,0a45,45 0,1,1 90,0a45,45 0,1,1 -90,0" />
+    
+    <!-- Cast icon path (simplified screencast icon) -->
+    <group
+        android:pivotX="60"
+        android:pivotY="60">
+        
+        <!-- Screen rectangle -->
+        <path
+            android:fillColor="@color/dark_accent"
+            android:pathData="M30,25 L90,25 L90,75 L75,75 L75,70 L85,70 L85,30 L35,30 L35,45 L30,45 Z" />
+        
+        <!-- Cast waves (bottom left corner) -->
+        <path
+            android:fillColor="@color/dark_accent"
+            android:pathData="M30,60 L30,65 L35,65 Q32,65 32,62 Q32,60 30,60 Z"
+            android:fillAlpha="0.9" />
+        
+        <path
+            android:fillColor="@color/dark_accent"
+            android:pathData="M30,70 L30,75 L35,75 Q30,75 30,70 Z"
+            android:fillAlpha="0.7" />
+        
+        <path
+            android:fillColor="@color/dark_accent"
+            android:pathData="M40,75 Q30,75 30,85 L35,85 Q35,78 40,75 Z"
+            android:fillAlpha="0.5" />
+        
+        <!-- Signal waves (emanating from device) -->
+        <path
+            android:fillColor="@color/dark_gradient_end"
+            android:pathData="M50,75 Q45,75 45,70 L48,70 Q48,73 50,73 Z"
+            android:fillAlpha="0.8" />
+        
+        <path
+            android:fillColor="@color/dark_gradient_end"
+            android:pathData="M60,75 Q52,75 52,67 L55,67 Q55,72 60,72 Z"
+            android:fillAlpha="0.6" />
+    </group>
+</vector>

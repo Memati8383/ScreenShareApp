@@ -69,21 +69,24 @@ Screen Mirror; bir cihazın ekranını tek bir oda adı üzerinden, düşük gec
 
 <table>
   <tr>
+    <td align="center"><img src="splash_screen.png" width="200" alt="Splash Screen"><br><b>Splash Screen</b></td>
     <td align="center"><img src="screenshots/splash.png" width="200" alt="Açılış ekranı"><br><b>Açılış Ekranı</b></td>
     <td align="center"><img src="screenshots/main.png" width="200" alt="Ana ekran"><br><b>Ana Ekran (Yayınla)</b></td>
     <td align="center"><img src="screenshots/main_viewer_mode.png" width="200" alt="Ana ekran izleme modu"><br><b>Ana Ekran (İzle)</b></td>
-    <td align="center"><img src="screenshots/drawer.png" width="200" alt="Menü çekmecesi"><br><b>Menü (Drawer)</b></td>
   </tr>
   <tr>
+    <td align="center"><img src="screenshots/drawer.png" width="200" alt="Menü çekmecesi"><br><b>Menü (Drawer)</b></td>
     <td align="center"><img src="screenshots/sender.png" width="200" alt="Yayın ekranı"><br><b>Yayın (Host)</b></td>
     <td align="center"><img src="screenshots/viewer.png" width="200" alt="İzleme ekranı"><br><b>İzleme (Viewer)</b></td>
     <td align="center"><img src="screenshots/recent_activity_screen.png" width="200" alt="Son odalar - Yeni modern tasarım"><br><b>Son Odalar (Yeni)</b></td>
-    <td align="center"><img src="screenshots/profile.png" width="200" alt="Profil ve istatistikler"><br><b>Profil & İstatistik</b></td>
   </tr>
   <tr>
+    <td align="center"><img src="screenshots/profile.png" width="200" alt="Profil ve istatistikler"><br><b>Profil & İstatistik</b></td>
     <td align="center"><img src="screenshots/settings.png" width="200" alt="Ayarlar"><br><b>Ayarlar</b></td>
     <td align="center"><img src="screenshots/help.png" width="200" alt="Yardım"><br><b>Yardım</b></td>
     <td align="center"><img src="screenshots/about.png" width="200" alt="Hakkında"><br><b>Uygulama Hakkında</b></td>
+  </tr>
+  <tr>
     <td align="center"><img src="screenshots/feedback.png" width="200" alt="Geri bildirim"><br><b>Geri Bildirim</b></td>
   </tr>
 </table>

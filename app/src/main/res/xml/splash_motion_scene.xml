@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <!-- Start state -->
+    <ConstraintSet android:id="@+id/start">
+        <Constraint
+            android:id="@id/content_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:alpha="0"
+            android:scaleX="0.7"
+            android:scaleY="0.7"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent" />
+    </ConstraintSet>
+
+    <!-- Middle state -->
+    <ConstraintSet android:id="@+id/middle">
+        <Constraint
+            android:id="@id/content_container"
+            android:alpha="0.7"
+            android:scaleX="0.85"
+            android:scaleY="0.85" />
+    </ConstraintSet>
+
+    <!-- End state -->
+    <ConstraintSet android:id="@+id/end">
+        <Constraint
+            android:id="@id/content_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:alpha="1"
+            android:scaleX="1.0"
+            android:scaleY="1.0"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent" />
+    </ConstraintSet>
+
+    <!-- Transition from start to middle -->
+    <Transition
+        motion:constraintSetStart="@id/start"
+        motion:constraintSetEnd="@id/middle"
+        motion:duration="800"
+        motion:autoTransition="none">
+        
+        <KeyFrameSet>
+            <KeyAttribute
+                motion:motionTarget="@id/content_container"
+                motion:framePosition="70"
+                android:scaleX="0.9"
+                android:scaleY="0.9" />
+        </KeyFrameSet>
+    </Transition>
+
+    <!-- Transition from middle to end -->
+    <Transition
+        motion:constraintSetStart="@id/middle"
+        motion:constraintSetEnd="@id/end"
+        motion:duration="1200"
+        motion:autoTransition="none" />
+
+</MotionScene>
