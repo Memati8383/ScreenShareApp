@@ -53,8 +53,8 @@
             android:theme="@style/Theme.ScreenShare" />
 
         <activity
-            android:name=".RecentActivity"
-            android:exported="false"
+            android:name=".presentation.recent.RecentActivity"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.ScreenShare" />
 

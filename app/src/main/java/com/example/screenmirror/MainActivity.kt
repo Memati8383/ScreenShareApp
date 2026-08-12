@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_home -> true
                 R.id.nav_recent -> {
-                    startActivity(Intent(this, RecentActivity::class.java))
+                    startActivity(Intent(this, com.example.screenmirror.presentation.recent.RecentActivity::class.java))
                     false
                 }
                 R.id.nav_profile -> {

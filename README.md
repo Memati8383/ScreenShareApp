@@ -77,7 +77,7 @@ Screen Mirror; bir cihazın ekranını tek bir oda adı üzerinden, düşük gec
   <tr>
     <td align="center"><img src="screenshots/sender.png" width="200" alt="Yayın ekranı"><br><b>Yayın (Host)</b></td>
     <td align="center"><img src="screenshots/viewer.png" width="200" alt="İzleme ekranı"><br><b>İzleme (Viewer)</b></td>
-    <td align="center"><img src="screenshots/recent.png" width="200" alt="Son odalar"><br><b>Son Odalar</b></td>
+    <td align="center"><img src="screenshots/recent_activity_screen.png" width="200" alt="Son odalar - Yeni modern tasarım"><br><b>Son Odalar (Yeni)</b></td>
     <td align="center"><img src="screenshots/profile.png" width="200" alt="Profil ve istatistikler"><br><b>Profil & İstatistik</b></td>
   </tr>
   <tr>

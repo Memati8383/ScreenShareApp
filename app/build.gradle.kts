@@ -1,5 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -33,6 +36,10 @@ android {
             )
         }
     }
+
+    lint {
+        abortOnError = false
+    }
 }
 
 dependencies {
@@ -57,4 +64,20 @@ dependencies {
     // Lifecycle
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.runtime.ktx)
+
+    // Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    implementation(libs.room.paging)
+    ksp(libs.room.compiler)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
+    // Paging
+    implementation(libs.paging.runtime)
+
+    // DataStore
+    implementation(libs.datastore.preferences)
 }

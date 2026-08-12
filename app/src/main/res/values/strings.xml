@@ -409,8 +409,53 @@
     <string name="error_peer_connection_null">Es baglantisi kurulamadi</string>
     <string name="error_unknown">Bilinmeyen hata</string>
 
-    <!-- Baglanti Kalitesi -->
-    <string name="quality_good">IYI</string>
-    <string name="quality_medium">ORTA</string>
-    <string name="quality_bad">KOTU</string>
+    <!-- Yeni Recent Activity String'leri -->
+    <string name="statistics_title">İstatistikler</string>
+    <string name="stats_total_sessions">Toplam Oturum</string>
+    <string name="stats_total_duration">Toplam Süre</string>
+    <string name="stats_sender_count">Gönderici</string>
+    <string name="stats_viewer_count">İzleyici</string>
+    
+    <string name="filter_all">Hepsi</string>
+    <string name="filter_favorites">Favoriler</string>
+    <string name="filter_sender">Gönderici</string>
+    <string name="filter_viewer">İzleyici</string>
+    
+    <string name="role_sender">Gönderici</string>
+    <string name="role_viewer">İzleyici</string>
+    
+    <string name="time_just_now">Şimdi</string>
+    <string name="time_minutes_ago">%d dakika önce</string>
+    <string name="time_hours_ago">%d saat önce</string>
+    <string name="time_yesterday">Dün</string>
+    
+    <string name="recent_empty_title">Henüz oda geçmişi yok</string>
+    <string name="recent_empty_message">Bir odaya katıldığınızda geçmiş burada görünecek</string>
+    
+    <string name="room_details_title">Oda Detayları</string>
+    <string name="detail_start_time">Başlangıç Zamanı</string>
+    <string name="detail_end_time">Bitiş Zamanı</string>
+    <string name="detail_duration">Süre</string>
+    <string name="detail_participants">Katılımcılar</string>
+    <string name="detail_connection_quality">Bağlantı Kalitesi</string>
+    <string name="detail_avg_bitrate">Ortalama Bitrate</string>
+    <string name="detail_data_transferred">Aktarılan Veri</string>
+    
+    <string name="technical_details">Teknik Detaylar</string>
+    <string name="disconnect_reason">Bağlantı Kesme Nedeni</string>
+    <string name="notes">Notlar</string>
+    
+    <string name="quality_excellent">Mükemmel</string>
+    <string name="quality_good">İyi</string>
+    <string name="quality_medium">Orta</string>
+    <string name="quality_bad">Kötü</string>
+    <string name="quality_fair">Orta</string>
+    <string name="quality_poor">Zayıf</string>
+    
+    <string name="btn_reconnect">Tekrar Bağlan</string>
+    <string name="btn_close">Kapat</string>
+    
+    <string name="action_search">Ara</string>
+    <string name="action_export">Dışa Aktar</string>
+    <string name="action_delete_all">Tümünü Sil</string>
 </resources>
