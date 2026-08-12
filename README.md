@@ -88,6 +88,29 @@ Screen Mirror; bir cihazın ekranını tek bir oda adı üzerinden, düşük gec
   </tr>
 </table>
 
+---
+
+## 📊 İnternet Kullanımı (Tahmini)
+
+Aşağıdaki tablo, her çözünürlük ve FPS ayarında **yaklaşık ne kadar internet harcanacağını** gösterir. Değerler, uygulamanın video kodlayıcısının hedef bit hızı formülüne dayanır:
+
+> `hedef bit hızı = genişlik × yükseklik × 3` bit/sn  &nbsp;*(kaynak: `ScreenShareService.kt`)*
+
+Bu formül çözünürlüğe göre sabitlendiği için **tüketim büyük ölçüde çözünürlük tarafından belirlenir**; FPS'in etkisi sınırlıdır (kodlayıcı aynı hedef bit hızını kullanır, daha yüksek FPS daha akıcı görüntü verir ama veri miktarını belirgin şekilde artırmaz). Tablodaki rakamlar, **sürekli değişen bir ekran** (video, kayan pencereler vb.) için geçerlidir; durağan bir ekran çok daha az veri kullanır.
+
+**Ölçü birimi:** MB / saat (yaklaşık GB / saat parantez içinde).
+
+| Çözünürlük | 15 FPS | 24 FPS | 30 FPS | 60 FPS |
+|---|---|---|---|---|
+| **480p** (854×480) | ~538 MB/sa (0.53 GB) | ~580 MB/sa (0.57 GB) | ~598 MB/sa (0.58 GB) | ~748 MB/sa (0.73 GB) |
+| **720p** (1280×720) | ~1209 MB/sa (1.18 GB) | ~1303 MB/sa (1.27 GB) | ~1343 MB/sa (1.31 GB) | ~1679 MB/sa (1.64 GB) |
+| **1080p** (1920×1080) | ~2721 MB/sa (2.66 GB) | ~2932 MB/sa (2.86 GB) | ~3023 MB/sa (2.95 GB) | ~3779 MB/sa (3.69 GB) |
+| **1440p** (2560×1440) | ~4838 MB/sa (4.72 GB) | ~5214 MB/sa (5.09 GB) | ~5375 MB/sa (5.25 GB) | ~6719 MB/sa (6.56 GB) |
+
+**Yaklaşık bit hızları (kbps):** 480p ≈ 1.200, 720p ≈ 2.760, 1080p ≈ 6.220, 1440p ≈ 11.060 kbps (aktif ekran, protokol yükü dahil).
+
+> ℹ️ Bu değerler **tahminidir** (gerçek ölçüm değil). Gerçek tüketim; yayınlanan içeriğin hareketliliğine, ağ kalitesine ve TURN sunucusu yüküne göre değişir. Durağan bir ekran söz konusu olduğunda tüketim hedef bit hızının çok altına düşebilir.
+
 ### 🎬 Demo Video
 
 > 📹 Uygulamanın kullanımını gösteren tanıtım videosu yakında eklenecek.

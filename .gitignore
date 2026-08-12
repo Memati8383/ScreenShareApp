@@ -10,4 +10,11 @@
 local.properties
 /app/build
 .kiro/
-*.txt
+# Hata ayıklama / oturum logları (geçici, repoya dahil edilmez)
+*.log
+crash_*.txt
+sender_*.txt
+viewer_*.txt
+onboarding_report.txt
+other_device_logs.txt
+pyver.txt
