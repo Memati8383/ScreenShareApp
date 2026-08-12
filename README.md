@@ -107,17 +107,9 @@ Bu formül çözünürlüğe göre sabitlendiği için **tüketim büyük ölç�
 | **1080p** (1920×1080) | ~2721 MB/sa (2.66 GB) | ~2932 MB/sa (2.86 GB) | ~3023 MB/sa (2.95 GB) | ~3779 MB/sa (3.69 GB) |
 | **1440p** (2560×1440) | ~4838 MB/sa (4.72 GB) | ~5214 MB/sa (5.09 GB) | ~5375 MB/sa (5.25 GB) | ~6719 MB/sa (6.56 GB) |
 
-**Yaklaşık bit hızları (kbps):** 480p ≈ 1.200, 720p ≈ 2.760, 1080p ≈ 6.220, 1440p ≈ 11.060 kbps (aktif ekran, protokol yükü dahil).
+**Yaklaşık hedef bit hızları (encoder):** 480p ≈ 1.23, 720p ≈ 2.76, 1080p ≈ 6.22, 1440p ≈ 11.06 Mbps (formülden hesaplanmıştır; protokol yükü ile birlikte saatlik tüketim yukarıdaki tablodadır).
 
 > ℹ️ Bu değerler **tahminidir** (gerçek ölçüm değil). Gerçek tüketim; yayınlanan içeriğin hareketliliğine, ağ kalitesine ve TURN sunucusu yüküne göre değişir. Durağan bir ekran söz konusu olduğunda tüketim hedef bit hızının çok altına düşebilir.
-
-### 🎬 Demo Video
-
-> 📹 Uygulamanın kullanımını gösteren tanıtım videosu yakında eklenecek.
->
-> <!-- Video hazır olduğunda aşağıdaki satırı açın ve URL'yi güncelleyin:
-> [![Demo Video](https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
-> -->
 
 ---
 
@@ -364,7 +356,6 @@ Uygulama `wss://wss.getlost.ovh` adresindeki sinyalleşme sunucusuyla JSON taban
 | `ping` / `sys: pong` | istemci ↔ sunucu | Heartbeat (25 sn aralık, 60 sn pong zaman aşımı) |
 
 ---
-
 
 ## 🤝 Katkıda Bulunma
 
