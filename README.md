@@ -365,15 +365,6 @@ Uygulama `wss://wss.getlost.ovh` adresindeki sinyalleşme sunucusuyla JSON taban
 
 ---
 
-## 🗺 Yol Haritası
-
-- [ ] Parola korumalı odalar
-- [ ] Yayıncının kamera görüntüsünü köşe penceresi (PiP) olarak ekleme
-- [ ] Yayın sırasında sohbet
-- [ ] Yayın bağlantısını tek dokunuşla paylaşma (QR kod)
-- [ ] Otomatik kalite düşürme (adaptif bitrate)
-
----
 
 ## 🤝 Katkıda Bulunma
 
