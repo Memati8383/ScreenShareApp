@@ -69,8 +69,6 @@ Screen Mirror; bir cihazın ekranını tek bir oda adı üzerinden, düşük gec
 
 <table>
   <tr>
-    <td align="center"><img src="splash_screen.png" width="200" alt="Splash Screen"><br><b>Splash Screen</b></td>
-    <td align="center"><img src="screenshots/splash.png" width="200" alt="Açılış ekranı"><br><b>Açılış Ekranı</b></td>
     <td align="center"><img src="screenshots/main.png" width="200" alt="Ana ekran"><br><b>Ana Ekran (Yayınla)</b></td>
     <td align="center"><img src="screenshots/main_viewer_mode.png" width="200" alt="Ana ekran izleme modu"><br><b>Ana Ekran (İzle)</b></td>
   </tr>
