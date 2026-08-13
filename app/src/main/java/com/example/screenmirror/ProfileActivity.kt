@@ -103,7 +103,23 @@ class ProfileActivity : AppCompatActivity() {
 
         permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val cameraGranted = permissions[Manifest.permission.CAMERA] == true
-            if (cameraGranted) openCamera()
+            if (cameraGranted) {
+                openCamera()
+                return@registerForActivityResult
+            }
+            
+            // Android 13+ için READ_MEDIA_IMAGES izni
+            val readMediaImagesGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permissions[Manifest.permission.READ_MEDIA_IMAGES] == true
+            } else {
+                permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true
+            }
+            
+            if (readMediaImagesGranted) {
+                galleryLauncher.launch("image/*")
+            } else {
+                Toast.makeText(this, getString(R.string.feedback_permission_denied), Toast.LENGTH_SHORT).show()
+            }
         }
 
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
@@ -178,14 +194,19 @@ class ProfileActivity : AppCompatActivity() {
             } else false
         }
 
-        findViewById<View>(R.id.avatarContainer).setOnClickListener {
+        findViewById<View>(R.id.avatarBg).setOnClickListener {
             HapticHelper.lightTap(this)
-            showAvatarPicker()
+            showModernProfileOptions()
+        }
+
+        findViewById<TextView>(R.id.avatarLetter).setOnClickListener {
+            HapticHelper.lightTap(this)
+            showModernProfileOptions()
         }
 
         profilePhoto.setOnClickListener {
             HapticHelper.lightTap(this)
-            showPhotoPicker()
+            showModernProfileOptions()
         }
 
         findViewById<LinearLayout>(R.id.btnLogout).setOnClickListener {
@@ -272,6 +293,86 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    private fun showModernProfileOptions() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_profile_options, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+        
+        // Dialog arkaplan şeffaf yap
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        val hasPhoto = prefs.getString("photo_path", null) != null
+        val removeOption = dialogView.findViewById<LinearLayout>(R.id.optionRemove)
+        
+        // Fotoğraf varsa "Kaldır" seçeneğini göster
+        if (hasPhoto) {
+            removeOption.visibility = View.VISIBLE
+        }
+        
+        // Galeri seçeneği
+        dialogView.findViewById<LinearLayout>(R.id.optionGallery).setOnClickListener {
+            HapticHelper.lightTap(this)
+            dialog.dismiss()
+            checkGalleryPermissionAndOpen()
+        }
+        
+        // Kamera seçeneği
+        dialogView.findViewById<LinearLayout>(R.id.optionCamera).setOnClickListener {
+            HapticHelper.lightTap(this)
+            dialog.dismiss()
+            checkCameraPermissionAndOpen()
+        }
+        
+        // Avatar seçeneği
+        dialogView.findViewById<LinearLayout>(R.id.optionAvatar).setOnClickListener {
+            HapticHelper.lightTap(this)
+            dialog.dismiss()
+            showAvatarPicker()
+        }
+        
+        // Kaldır seçeneği
+        if (hasPhoto) {
+            removeOption.setOnClickListener {
+                HapticHelper.lightTap(this)
+                dialog.dismiss()
+                removeProfilePhoto()
+            }
+        }
+        
+        dialog.show()
+    }
+
+    private fun showAvatarOrPhotoOptions() {
+        val hasPhoto = prefs.getString("photo_path", null) != null
+        val items = if (hasPhoto) {
+            arrayOf(
+                getString(R.string.profile_photo_gallery),
+                getString(R.string.profile_photo_camera),
+                getString(R.string.profile_avatar_title),
+                getString(R.string.profile_photo_remove)
+            )
+        } else {
+            arrayOf(
+                getString(R.string.profile_photo_gallery),
+                getString(R.string.profile_photo_camera),
+                getString(R.string.profile_avatar_title)
+            )
+        }
+        
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.profile_change_profile))
+            .setItems(items) { _, which ->
+                when (which) {
+                    0 -> checkGalleryPermissionAndOpen()
+                    1 -> checkCameraPermissionAndOpen()
+                    2 -> showAvatarPicker()
+                    3 -> if (hasPhoto) removeProfilePhoto()
+                }
+            }
+            .show()
+    }
+
     private fun showPhotoPicker() {
         val items = arrayOf(
             getString(R.string.profile_photo_gallery),
@@ -282,12 +383,33 @@ class ProfileActivity : AppCompatActivity() {
             .setTitle(getString(R.string.profile_photo_title))
             .setItems(items) { _, which ->
                 when (which) {
-                    0 -> galleryLauncher.launch("image/*")
+                    0 -> checkGalleryPermissionAndOpen()
                     1 -> checkCameraPermissionAndOpen()
                     2 -> removeProfilePhoto()
                 }
             }
             .show()
+    }
+
+    private fun checkGalleryPermissionAndOpen() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+ için READ_MEDIA_IMAGES izni
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED) {
+                galleryLauncher.launch("image/*")
+            } else {
+                permissionLauncher.launch(arrayOf(Manifest.permission.READ_MEDIA_IMAGES))
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Android 6-12 için READ_EXTERNAL_STORAGE izni
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                galleryLauncher.launch("image/*")
+            } else {
+                permissionLauncher.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
+            }
+        } else {
+            // Android 6'dan önce izin gerekmiyor
+            galleryLauncher.launch("image/*")
+        }
     }
 
     private fun checkCameraPermissionAndOpen() {

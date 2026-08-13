@@ -2,6 +2,7 @@ package com.example.screenmirror
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.os.Build
@@ -19,6 +20,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import android.widget.EditText
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -133,6 +135,10 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.closeDrawers()
             when (item.itemId) {
                 R.id.drawer_home -> true
+                R.id.drawer_history -> {
+                    startActivity(Intent(this, com.example.screenmirror.presentation.recent.RecentActivity::class.java))
+                    true
+                }
                 R.id.drawer_help -> {
                     startActivity(Intent(this, HelpActivity::class.java))
                     true
@@ -149,21 +155,122 @@ class MainActivity : AppCompatActivity() {
                     startActivity(Intent(this, AboutActivity::class.java))
                     true
                 }
-                R.id.drawer_share -> {
-                    shareApp()
-                    true
-                }
                 else -> false
             }
         }
 
+        setupDrawerAnimation()
         requestPermissions()
+    }
+
+    private fun setupDrawerAnimation() {
+        val contentView = findViewById<LinearLayout>(R.id.main_content)
+        
+        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                // Drawer açılırken ana içeriği sağa kaydır ve hafifçe küçült
+                val slideX = drawerView.width * slideOffset * 0.5f
+                contentView.translationX = slideX
+                
+                val scale = 1f - (slideOffset * 0.15f)
+                contentView.scaleX = scale
+                contentView.scaleY = scale
+                
+                // Hafif alpha efekti
+                contentView.alpha = 1f - (slideOffset * 0.3f)
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+                HapticHelper.lightTap(this@MainActivity)
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                // Ana içeriği sıfırla
+                contentView.translationX = 0f
+                contentView.scaleX = 1f
+                contentView.scaleY = 1f
+                contentView.alpha = 1f
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+                // State değişikliklerini izle
+            }
+        })
+    }
+
+    private fun updateDrawerStatistics() {
+        val headerView = navigationView.getHeaderView(0)
+        val tvUserName = headerView.findViewById<TextView>(R.id.tv_user_name)
+        val ivAvatar = headerView.findViewById<ImageView>(R.id.iv_avatar)
+        val profilePhoto = headerView.findViewById<com.google.android.material.imageview.ShapeableImageView>(R.id.iv_profile_photo)
+        val avatarBg = headerView.findViewById<View>(R.id.avatar_bg)
+        val avatarLetter = headerView.findViewById<TextView>(R.id.avatar_letter)
+        
+        // Kullanıcı profil bilgilerini yükle
+        val prefs = getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+        val nickname = prefs.getString("nickname", null)
+        
+        if (nickname != null) {
+            tvUserName.text = nickname
+            
+            // Profil fotoğrafını yükle
+            val photoPath = prefs.getString("photo_path", null)
+            if (photoPath != null) {
+                val file = File(photoPath)
+                if (file.exists()) {
+                    val bitmap = android.graphics.BitmapFactory.decodeFile(file.absolutePath)
+                    if (bitmap != null) {
+                        profilePhoto.setImageBitmap(bitmap)
+                        profilePhoto.visibility = View.VISIBLE
+                        avatarBg.visibility = View.GONE
+                        avatarLetter.visibility = View.GONE
+                    }
+                }
+            } else {
+                // Fotoğraf yoksa avatar göster
+                profilePhoto.visibility = View.GONE
+                avatarBg.visibility = View.VISIBLE
+                avatarLetter.visibility = View.VISIBLE
+                
+                val firstLetter = nickname.firstOrNull()?.uppercase() ?: "U"
+                avatarLetter.text = firstLetter
+                
+                val avatarColors = intArrayOf(
+                    R.drawable.bg_avatar_color1,
+                    R.drawable.bg_avatar_color2,
+                    R.drawable.bg_avatar_color3,
+                    R.drawable.bg_avatar_color4,
+                    R.drawable.bg_avatar_color5,
+                    R.drawable.bg_avatar_color6
+                )
+                val colorIndex = prefs.getInt("avatar_color", nickname.hashCode().mod(avatarColors.size).let {
+                    if (it < 0) it + avatarColors.size else it
+                } % avatarColors.size)
+                avatarBg.setBackgroundResource(avatarColors[colorIndex])
+            }
+        } else {
+            tvUserName.text = "Kullanıcı"
+        }
+        
+        // Avatar'a tıklama listener
+        ivAvatar.setOnClickListener {
+            HapticHelper.lightTap(this)
+            drawerLayout.closeDrawers()
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
+        
+        profilePhoto.setOnClickListener {
+            HapticHelper.lightTap(this)
+            drawerLayout.closeDrawers()
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
     }
 
     override fun onResume() {
         super.onResume()
         bottomNav.menu.setGroupCheckable(0, true, true)
         bottomNav.menu.findItem(R.id.nav_home)?.isChecked = true
+        updateDrawerStatistics()
     }
 
     private fun switchMode(hostMode: Boolean) {

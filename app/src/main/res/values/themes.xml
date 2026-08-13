@@ -67,4 +67,25 @@
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowTranslucentNavigation">false</item>
     </style>
+
+    <!-- Navigation Drawer Style -->
+    <style name="NavigationDrawerStyle" parent="Widget.MaterialComponents.NavigationView">
+        <item name="android:background">@color/dark_bg_card</item>
+        <item name="itemIconTint">@color/nav_item_color</item>
+        <item name="itemTextColor">@color/nav_item_color</item>
+        <item name="itemBackground">@drawable/nav_item_background</item>
+        <item name="itemShapeAppearance">@style/ShapeAppearance.NavigationItem</item>
+        <item name="itemIconSize">24dp</item>
+        <item name="itemHorizontalPadding">20dp</item>
+        <item name="itemVerticalPadding">14dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+    </style>
+
+    <style name="ShapeAppearance.NavigationItem" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
 </resources>

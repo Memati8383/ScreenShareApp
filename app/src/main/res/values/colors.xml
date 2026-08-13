@@ -62,4 +62,5 @@
     <color name="surface_stroke">@color/dark_border</color>
     <color name="status_error">@color/dark_status_error</color>
     <color name="status_warning">@color/dark_status_warning</color>
+    <color name="error">#FFEF4444</color>
 </resources>

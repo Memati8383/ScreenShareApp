@@ -47,6 +47,17 @@
     <string name="drawer_header_title">ScreenShare</string>
     <string name="drawer_header_subtitle">Ekran Paylaşımı v1.0</string>
 
+    <!-- Yeni Menü Öğeleri -->
+    <string name="menu_theme">Tema</string>
+    <string name="menu_rate">Bizi Değerlendirin</string>
+    <string name="menu_history">Geçmiş</string>
+    <string name="theme_title">Tema Seç</string>
+    <string name="theme_system">Sistem</string>
+    <string name="theme_light">Açık</string>
+    <string name="theme_dark">Koyu</string>
+    <string name="navigation_drawer_open">Menüyü Aç</string>
+    <string name="navigation_drawer_close">Menüyü Kapat</string>
+
     <!-- Ayarlar -->
     <string name="settings_title">Ayarlar</string>
     <string name="settings_language">Dil</string>
@@ -174,6 +185,7 @@
 
     <!-- Profil Fotoğrafı -->
     <string name="profile_photo_title">Fotoğraf Seç</string>
+    <string name="profile_change_profile">Profil Değiştir</string>
     <string name="profile_photo_gallery">Galeriden Seç</string>
     <string name="profile_photo_camera">Fotoğraf Çek</string>
     <string name="profile_photo_remove">Fotoğrafı Kaldır</string>
@@ -459,4 +471,9 @@
     <string name="action_search">Ara</string>
     <string name="action_export">Dışa Aktar</string>
     <string name="action_delete_all">Tümünü Sil</string>
+    
+    <!-- Drawer İstatistikler -->
+    <string name="drawer_stats_no_sessions">Henüz oturum yok</string>
+    <string name="drawer_stats_session">oturum</string>
+    <string name="drawer_stats_sessions">oturum</string>
 </resources>

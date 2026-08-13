@@ -164,15 +164,15 @@
                         android:id="@+id/avatarContainer"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
-                        android:layout_marginBottom="16dp"
-                        android:clickable="true"
-                        android:focusable="true">
+                        android:layout_marginBottom="16dp">
 
                         <View
                             android:id="@+id/avatarBg"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/bg_avatar_color1" />
+                            android:background="@drawable/bg_avatar_color1"
+                            android:clickable="true"
+                            android:focusable="true" />
 
                         <TextView
                             android:id="@+id/avatarLetter"
@@ -181,7 +181,9 @@
                             android:layout_gravity="center"
                             android:textColor="@android:color/white"
                             android:textSize="36sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:clickable="true"
+                            android:focusable="true" />
 
                         <com.google.android.material.imageview.ShapeableImageView
                             android:id="@+id/profilePhoto"
@@ -189,6 +191,8 @@
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
                             android:visibility="gone"
+                            android:clickable="true"
+                            android:focusable="true"
                             app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circle" />
                     </FrameLayout>
 

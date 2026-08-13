@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <!-- Ana Bölüm -->
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/drawer_home"
             android:icon="@drawable/ic_home"
             android:title="@string/nav_home" />
+        
+        <item
+            android:id="@+id/drawer_history"
+            android:icon="@drawable/ic_history"
+            android:title="@string/menu_history" />
     </group>
 
+    <!-- Destek -->
     <item android:title="@string/drawer_title">
         <menu>
             <item
                 android:id="@+id/drawer_help"
                 android:icon="@drawable/ic_help"
                 android:title="@string/drawer_help" />
+            
             <item
                 android:id="@+id/drawer_feedback"
                 android:icon="@drawable/ic_feedback"
@@ -20,20 +31,18 @@
         </menu>
     </item>
 
+    <!-- Uygulama -->
     <item android:title="@string/drawer_app_title">
         <menu>
             <item
                 android:id="@+id/drawer_settings"
                 android:icon="@drawable/ic_settings"
                 android:title="@string/drawer_settings" />
+            
             <item
                 android:id="@+id/drawer_about"
                 android:icon="@drawable/ic_info_circle"
                 android:title="@string/drawer_about" />
-            <item
-                android:id="@+id/drawer_share"
-                android:icon="@drawable/ic_share_app"
-                android:title="@string/drawer_share" />
         </menu>
     </item>
 </menu>
